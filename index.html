@@ -23,6 +23,7 @@
             opacity: 0;
             transform: translateY(30px);
             color: #ecf0f1; /* Color de texto por defecto */
+            visibility: hidden;
         }
 
         /* Animación de entrada para los textos */
@@ -80,10 +81,10 @@
         function getRandomPosition(textWidth, textHeight) {
             const width = window.innerWidth;
             const height = window.innerHeight;
-            
+
             let x = Math.random() * (width - textWidth);
             let y = Math.random() * (height - textHeight);
-            
+
             return { x, y };
         }
 
@@ -120,28 +121,36 @@
             return position;
         }
 
-        document.addEventListener('keydown', function(event) {
-            if (event.code === 'Space') {
-                document.body.style.backgroundColor = '#2c3e50'; 
-                
-                const texts = document.querySelectorAll('.animate-text');
-                
-                texts.forEach((text, index) => {
-                    const { x, y } = placeTextWithoutCollision(text, texts);
-                    text.style.left = `${x}px`;
-                    text.style.top = `${y}px`;
-                    text.style.visibility = 'visible'; 
-                    text.style.color = colors[index % colors.length]; // Asigna un color diferente
-                    text.style.animation = `fadeInUp 1s forwards ${index * 0.1}s`;
-                });
+        function startAnimation() {
+            document.body.style.backgroundColor = '#2c3e50'; 
 
-                setTimeout(() => {
-                    texts.forEach((text, index) => {
-                        text.style.animation = `fadeOutDown 1s forwards ${index * 0.1}s`;
-                    });
-                }, 2000);
-            }
-        });
+            const texts = document.querySelectorAll('.animate-text');
+
+            texts.forEach((text, index) => {
+                const { x, y } = placeTextWithoutCollision(text, texts);
+                text.style.left = `${x}px`;
+                text.style.top = `${y}px`;
+                text.style.visibility = 'visible'; 
+                text.style.color = colors[index % colors.length]; // Asigna un color diferente
+                text.style.animation = `fadeInUp 1s forwards ${index * 0.5}s`;
+            });
+
+            setTimeout(() => {
+                texts.forEach((text, index) => {
+                    text.style.animation = `fadeOutDown 1s forwards ${index * 0.5}s`;
+                });
+            }, 5000);
+        }
+
+        function initiateAnimation() {
+            setTimeout(() => {
+                startAnimation();
+                setInterval(startAnimation, 9500); // Repite la animación cada 2 segundos
+            }, 2000); // Espera 2 segundos antes de iniciar la animación
+        }
+
+        // Inicia la animación cuando se hace clic en la pantalla
+        document.addEventListener('click', initiateAnimation);
     </script>
 </body>
 </html>
