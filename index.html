@@ -64,7 +64,7 @@
               dispararBalas();
               intervaloEstrellas = setInterval(crearEstrellas, 250); // Generar estrellas cada 1/4 de segundo
               setTimeout(pararGenerarEstrellas, 3000); // Detener generación de estrellas después de 3 segundos
-              setTimeout(redirigirPagina, 3000); // Redirigir a otra página después de 3 segundos
+              setTimeout(redirigirPagina, 3500); // Redirigir a otra página después de 3 segundos
           }
 
           function pararGenerarEstrellas() {
@@ -76,7 +76,7 @@
           }
 
           function crearEstrellas() {
-              const cantidadEstrellas = Math.random() * 5 + 1; // Generar de 1 a 5 estrellas
+              const cantidadEstrellas = Math.random() * 6 + 2; // Generar de 1 a 5 estrellas
               for (let i = 0; i < cantidadEstrellas; i++) {
                   const estrella = document.createElement('div');
                   estrella.classList.add('estrella');
