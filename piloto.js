@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Cube Invaders</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 1px solid white;
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+        }
+        .direction-buttons, .shoot-buttons {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .shoot-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+        }
+        .shoot-button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        button {
+            padding: 15px 20px;
+            font-size: 20px;
+            color: white;
+            background-color: green;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            min-height: 60px;
+            white-space: normal;
+            text-align: center;
+            line-height: 1.2;
+            user-select: none;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: darkgreen;
+        }
+        #shootBtn {
+            background-color: orange;
+        }
+        #bigShootBtn {
+            background-color: blue;
+        }
+        #redFollowBtn {
+            background-color: red;
+        }
+        button[disabled] {
+            background-color: #555 !important;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        #gameOver {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border: 2px solid white;
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }
+        #startScreen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border: 2px solid white;
+            text-align: center;
+            animation: slideIn 0.5s;
+        }
+        #scoreBoard {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+        }
+        h1 {
+            animation: bounce 1s infinite;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translate(-50%, -60%); }
+            to { transform: translate(-50%, -50%); }
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Ajustes para móviles */
+        @media (max-width: 600px) {
+            #startBtn, #restartBtn {
+                padding: 10px;
+                font-size: 16px;
+                width: auto;
+                min-width: 120px;
+            }
+            .shoot-buttons button {
+                font-size: 16px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="scoreBoard">Puntaje: 0</div>
+    <canvas id="gameCanvas"></canvas>
+    <div id="startScreen">
+        <h1>Space Cube Invaders</h1>
+        <button id="startBtn">Iniciar Juego</button>
+    </div>
+    <div class="controls" style="display: none;">
+        <div class="direction-buttons">
+            <button id="leftBtn">Izquierda</button>
+            <button id="rightBtn">Derecha</button>
+        </div>
+        <div class="shoot-buttons">
+            <div class="shoot-button-container">
+                <button id="shootBtn">Descarga</button>
+            </div>
+            <div class="shoot-button-container">
+                <button id="bigShootBtn">Cañón de<br>Plasma</button>
+            </div>
+            <div class="shoot-button-container">
+                <button id="redFollowBtn">Misil<br>Infrarrojo</button>
+            </div>
+        </div>
+    </div>
+    <div id="gameOver">
+        <h1>¡Game Over!</h1>
+        <button id="restartBtn">Reiniciar</button>
+    </div>
+    <script type="module">
+        // Importar funciones y variables desde balas.js
+        import { playerBullets, enemyBullets, createPlayerBullet, createEnemyBullet, updateBullets, drawBullets, detectCollisions } from './balas.js';
+        // Importar la clase BarraDeVida
+        import { BarraDeVida } from './vida.js';
+
+        // Configuración del canvas
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth * 0.9;
+        canvas.height = window.innerHeight * 0.7;
+
+        // Variables del jugador
+        let player = {
+            x: canvas.width / 2 - 15,
+            y: canvas.height - 30,
+            width: 30,
+            height: 30,
+            color: 'green',
+            speed: 5,
+            movingLeft: false,
+            movingRight: false,
+            canShoot: true,
+            canBigShoot: true,
+            canRedShoot: true
+        };
+
+        // Variables de los enemigos
+        let enemies = [];
+        for (let i = 0; i < 5; i++) {
+            enemies.push({x: i * (canvas.width / 5) + 30, y: 30, width: 40, height: 20, color: 'red', direction: 1});
+        }
+
+        // Variables del juego
+        let gameOver = false;
+        let gameStarted = false;
+        let score = 0;
+
+        // Crear la barra de vida
+        const barraDeVida = new BarraDeVida(5);
+
+        // Función para dibujar al jugador
+        function drawPlayer() {
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+
+        // Función para dibujar a los enemigos
+        function drawEnemies() {
+            for (const enemy of enemies) {
+                ctx.fillStyle = enemy.color;
+                ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+            }
+        }
+
+        // Función para mover a los enemigos
+        function moveEnemies() {
+            enemies.forEach(enemy => {
+                if (Math.random() < 0.05) {
+                    enemy.direction *= -1;
+                }
+                enemy.x += enemy.direction * 2;
+                if (enemy.x < 0) {
+                    enemy.x = 0;
+                    enemy.direction = 1;
+                } else if (enemy.x + enemy.width > canvas.width) {
+                    enemy.x = canvas.width - enemy.width;
+                    enemy.direction = -1;
+                }
+                if (Math.random() < (enemy.color === 'blue' ? 0.05 : 0.02)) {
+                    createEnemyBullet(enemy.x + enemy.width / 2 - (enemy.color === 'blue' ? 5 : 2.5), enemy.y + enemy.height, enemy.color);
+                }
+            });
+        }
+
+        // Función para agregar un enemigo
+        function addEnemy() {
+            const newEnemy = {x: Math.random() * (canvas.width - 40), y: 30, width: 40, height: 20, color: 'red', direction: 1};
+            enemies.push(newEnemy);
+        }
+
+        // Función para agregar un enemigo azul
+        function addBlueEnemy() {
+            const blueEnemy = {x: Math.random() * (canvas.width - 40), y: 30, width: 40, height: 20, color: 'blue', direction: 1};
+            enemies.push(blueEnemy);
+        }
+
+        // Función para detectar colisiones
+        function handleCollisions() {
+            detectCollisions(
+                player,
+                enemies,
+                (enemyIndex) => { // onEnemyHit
+                    enemies.splice(enemyIndex, 1);
+                    score++;
+                    document.getElementById('scoreBoard').innerText = `Puntaje: ${score}`;
+                    if (score % 5 === 0) addBlueEnemy();
+                    if (score % 10 === 0) {
+                        addBlueEnemy();
+                        addBlueEnemy();
+                    }
+                },
+                () => { // onPlayerHit
+                    const tieneVidas = barraDeVida.perderVida();
+                    if (!tieneVidas) {
+                        gameOver = true;
+                        document.getElementById('gameOver').style.display = 'block';
+                    }
+                }
+            );
+        }
+
+        // Función principal del juego
+        function gameLoop() {
+            if (gameOver) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Dibujar elementos
+            drawPlayer();
+            drawEnemies();
+            drawBullets(ctx);
+
+            // Actualizar elementos
+            updateBullets(canvas.height, enemies);
+            moveEnemies();
+            handleCollisions();
+
+            // Mover al jugador
+            if (player.movingLeft && player.x > 0) {
+                player.x -= player.speed;
+            }
+            if (player.movingRight && player.x + player.width < canvas.width) {
+                player.x += player.speed;
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Eventos de los botones de disparo
+        document.getElementById('shootBtn').addEventListener('click', () => {
+            if (gameStarted && player.canShoot) {
+                const button = document.getElementById('shootBtn');
+                button.disabled = true;
+                button.innerHTML = "Recargando";
+
+                createPlayerBullet(player.x + player.width / 2 - 2.5, player.y);
+                player.canShoot = false;
+
+                setTimeout(() => {
+                    player.canShoot = true;
+                    button.disabled = false;
+                    button.innerHTML = "Descarga";
+                }, 1000);
+            }
+        });
+
+        document.getElementById('bigShootBtn').addEventListener('click', () => {
+            if (gameStarted && player.canBigShoot) {
+                const button = document.getElementById('bigShootBtn');
+                button.disabled = true;
+                button.innerHTML = "Recargando";
+
+                createPlayerBullet(player.x + player.width / 2 - 7.5, player.y, true);
+                player.canBigShoot = false;
+
+                setTimeout(() => {
+                    player.canBigShoot = true;
+                    button.disabled = false;
+                    button.innerHTML = "Cañón de<br>Plasma";
+                }, 2000);
+            }
+        });
+
+        document.getElementById('redFollowBtn').addEventListener('click', () => {
+            if (gameStarted && player.canRedShoot) {
+                const button = document.getElementById('redFollowBtn');
+                button.disabled = true;
+                button.innerHTML = "Recargando";
+
+                createPlayerBullet(player.x + player.width / 2 - 2.5, player.y, false, true);
+                player.canRedShoot = false;
+
+                setTimeout(() => {
+                    player.canRedShoot = true;
+                    button.disabled = false;
+                    button.innerHTML = "Misil<br>Infrarrojo";
+                }, 3000);
+            }
+        });
+
+        // Evento para iniciar el juego
+        document.getElementById('startBtn').addEventListener('click', () => {
+            gameStarted = true;
+            document.getElementById('startScreen').style.display = 'none';
+            document.querySelector('.controls').style.display = 'flex';
+            gameLoop();
+            setInterval(addEnemy, 10000);
+            setButtonsMinHeight();
+        });
+
+        // Eventos de movimiento del jugador
+        document.getElementById('leftBtn').addEventListener('mousedown', () => {
+            player.movingLeft = true;
+        });
+        document.getElementById('leftBtn').addEventListener('mouseup', () => {
+            player.movingLeft = false;
+        });
+        document.getElementById('leftBtn').addEventListener('touchstart', () => {
+            player.movingLeft = true;
+        });
+        document.getElementById('leftBtn').addEventListener('touchend', () => {
+            player.movingLeft = false;
+        });
+
+        document.getElementById('rightBtn').addEventListener('mousedown', () => {
+            player.movingRight = true;
+        });
+        document.getElementById('rightBtn').addEventListener('mouseup', () => {
+            player.movingRight = false;
+        });
+        document.getElementById('rightBtn').addEventListener('touchstart', () => {
+            player.movingRight = true;
+        });
+        document.getElementById('rightBtn').addEventListener('touchend', () => {
+            player.movingRight = false;
+        });
+
+        // Evento para reiniciar el juego
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            location.reload();
+        });
+    </script>
+</body>
+</html>
