@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Cube Invaders</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow-y: scroll;
+        }
+        #title {
+            text-align: center;
+            font-size: 3em;
+            margin-top: 20px;
+        }
+        #subtitle {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 40px;
+        }
+        .button-container {
+            width: 80%;
+            max-width: 600px;
+            margin: 10px auto;
+            position: relative;
+        }
+        .button {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background-color: #444;
+            border: none;
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .button:hover {
+            background-color: #666;
+        }
+        .button video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .expanded {
+            height: auto;
+            padding: 10px;
+            background: #222;
+            text-align: center;
+        }
+        .hidden {
+            display: none;
+        }
+        .action-button {
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #666;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .action-button:hover {
+            background-color: #888;
+        }
+        #stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div id="stars"></div>
+    <div id="title">space<br>Cube<br>Invaders</div>
+    <div id="subtitle">(elije tu piloto espacial)</div>
+
+    <div class="button-container">
+        <button class="button" onclick="toggleExpansion(0)">
+            <video src="prologo.mp4" autoplay loop muted></video>
+        </button>
+        <div id="expansion-0" class="expanded hidden">
+            <p>Prólogo<br>La Expedición Perdida:<div></div>Siempre mirado al cielo con curiosidad y ambición. Un día finalmente conquistamos el viaje espacial, enviamos a nuestros mejores exploradores a las profundidades del espacio en busca de conocimiento a bordo de la nave N-P-E, tres especialistas y un viaje en dirección al último horozonte.<div><br></div>Todo cambió cuando un enjambre enemigo conformado por estructuras geométricas, atacó. N-P-E fue destruida y sólo tres sobrevivientes lograron escapar en cápsulas de escape personales.<br>Estas cápsulas, con una forma cúbica única, son ahora una esperanza de supervivencia, cada una equipada con habilidades especiales que reflejan las destrezas de los supervivientes:<div><br></div>El capitán de flota, un experto piloto, equipado con un futurista arcenal de armas.<div><br></div>La bióloga especialista en botánica, dotada de peligroso material biológico.<div><br></div>El ingeniero aeroespacial, con la capacidad de reparar y mejorar su cápsula para enfrentar la amenaza.<div><br></div>El destino de la misión está en tus manos, pero solo podrás elegir uno de estos pilotos para navegar la guerra contra el enemigo. Las cápsulas, hechas de cubos, te permitirán enfrentarte al enjambre enemigo en una batalla que pondrá a prueba tus reflejos y habilidades.</p>
+            <button class="action-button" onclick="toggleExpansion(0)">Cerrar</button>
+        </div>
+    </div>
+
+    <div class="button-container">
+        <button class="button" onclick="toggleExpansion(1)">
+            <video src="piloto1.mp4" autoplay loop muted></video>
+        </button>
+        <div id="expansion-1" class="expanded hidden">
+            <p>Capitán de flota: Joven ex piloto militar, ahora a cargo de la ex tripulación del N-P-E equipado con armas de última tecnología<div></div>habilidades:<br>descarga:<br>Arma de fuego directo, rápida pero con poca superficie de impacto (cooldown 1s)<br>Cañón de Plasma:<br>Arma de fuego directo, velocidad media, amplia superficie de impacto (cooldown 2s)<br>Misil infrarrojo:<br>Arma teledirigida, lenta, poca superficie de impacto</p>
+            <button class="action-button" onclick="window.location.href='juego1.html'">Jugar</button>
+            <button class="action-button" onclick="toggleExpansion(1)">Cerrar</button>
+        </div>
+    </div>
+
+    <div class="button-container">
+        <button class="button" onclick="toggleExpansion(2)">
+            <video src="piloto2.mp4" autoplay loop muted></video>
+        </button>
+        <div id="expansion-2" class="expanded hidden">
+            <p>Bióloga: Ex científica del N-P-E experta en botánica<div></div>habilidades:<br>Carga de Polen:<br>Arma de fuego indirecto, rápida, superficie de impacto media (cooldown 0.5s)<br>Esporas:<br>Escudo, velocidad de despliegue media, libera esporas que se destruyen al contacto (cooldown 5s)<br>Tinte carmesí:<br>Arma de fuego directo, rápida, superficie de impacto media (cooldown 1s)</p>
+            <button class="action-button" onclick="window.location.href='juego2.html'">Jugar</button>
+            <button class="action-button" onclick="toggleExpansion(2)">Cerrar</button>
+        </div>
+    </div>
+
+    <div class="button-container">
+        <button class="button" onclick="toggleExpansion(3)">
+            <video src="piloto3.mp4" autoplay loop muted></video>
+        </button>
+        <div id="expansion-3" class="expanded hidden">
+            <p>Piloto 3: Un maestro de la defensa y la resistencia.</p>
+            <button class="action-button" onclick="window.location.href='juego3.html'">Jugar</button>
+            <button class="action-button" onclick="toggleExpansion(3)">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleExpansion(index) {
+            const expansion = document.getElementById(`expansion-${index}`);
+            expansion.classList.toggle("hidden");
+        }
+
+        function createStar() {
+            const star = document.createElement('div');
+            const size = Math.random() * 5 + 2;
+            star.className = 'star';
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            star.style.top = `${Math.random() * 100}vh`;
+            star.style.left = `${Math.random() * 100}vw`;
+            document.getElementById('stars').appendChild(star);
+            setTimeout(() => {
+                star.remove();
+            }, 2000);
+        }
+
+        setInterval(createStar, 500);
+    </script>
+</body>
+</html>
