@@ -32,7 +32,7 @@ h1 {
     margin-bottom: 20px;
 }
 
-.form-control, .form-select, .btn {
+.form-control, .btn {
     border-radius: 10px;
 }
 
@@ -193,63 +193,42 @@ h5 {
     }
 }
 
-/* Estilos para el selector de buscadores */
-.form-select {
+/* Estilos para los botones del selector de navegadores */
+.search-engine-buttons {
+    display: flex;
+    gap: 10px; /* Espacio entre botones */
+    margin-bottom: 20px;
+    flex-wrap: wrap; /* Para que los botones se ajusten en pantallas pequeñas */
+}
+
+.search-engine-btn {
     background-color: #fff;
     border: 2px solid #2575fc; /* Borde azul */
     border-radius: 10px;
-    padding: 10px;
-    font-size: 16px;
+    padding: 10px 15px;
+    font-size: 14px;
     color: #333;
     cursor: pointer;
     transition: all 0.3s ease;
-    appearance: none; /* Quita el estilo por defecto del dropdown */
-    -webkit-appearance: none; /* Para compatibilidad con Safari */
-    -moz-appearance: none; /* Para compatibilidad con Firefox */
-    background-image: url("data:image/svg+xml;charset=UT…3C/svg%3E"); /* Flecha personalizada */
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espacio entre ícono y texto */
 }
 
-.form-select:hover {
-    border-color: #1a5bbf; /* Borde azul más oscuro al pasar el mouse */
-    box-shadow: 0 0 10px rgba(37, 117, 252, 0.3); /* Sombra suave */
+.search-engine-btn:hover {
+    background-color: #2575fc; /* Fondo azul al pasar el mouse */
+    color: #fff; /* Texto blanco */
+    border-color: #1a5bbf; /* Borde más oscuro */
 }
 
-.form-select:focus {
-    border-color: #1a5bbf;
-    box-shadow: 0 0 10px rgba(37, 117, 252, 0.5); /* Sombra más intensa al enfocar */
+.search-engine-btn.active {
+    background-color: #2575fc; /* Fondo azul para el botón activo */
+    color: #fff; /* Texto blanco */
+    border-color: #1a5bbf; /* Borde más oscuro */
 }
 
-/* Estilos para las opciones del dropdown */
-.form-select option {
-    padding: 10px;
-    font-size: 14px;
-    color: #333;
-    background-color: #fff;
-    transition: background-color 0.3s ease;
-}
-
-.form-select option:hover {
-    background-color: #f1f1f1; /* Fondo gris claro al pasar el mouse */
-}
-
-/* Estilos para los íconos dentro del selector */
-.form-select option i {
-    margin-right: 10px; /* Espacio entre el ícono y el texto */
-    font-size: 14px;
-    color: #2575fc; /* Color azul para los íconos */
-}
-
-/* Ocultar filtros de Instagram por defecto */
-.instagram-filter {
-    display: none;
-}
-
-/* Mostrar filtros de Instagram cuando se seleccione Instagram */
-.instagram-filter.visible {
-    display: inline-block;
+.search-engine-btn i {
+    font-size: 16px; /* Tamaño del ícono */
 }
 
 /* Media queries para móviles (hasta 768px de ancho) */
@@ -271,7 +250,6 @@ h5 {
     }
 
     .input-group .form-control,
-    .input-group .form-select,
     .input-group .btn {
         width: 100%;
         margin-bottom: 10px;
