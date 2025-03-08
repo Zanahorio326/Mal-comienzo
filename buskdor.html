@@ -16,12 +16,12 @@
         <form id="searchForm" class="mb-3">
             <div class="input-group">
                 <input type="text" id="searchInput" class="form-control" placeholder="Buscar..." required>
-                <!-- Botón para abrir el selector de buscadores -->
-                <button type="button" id="toggleSearchEngines" class="btn btn-outline-primary">
+                <!-- Botón "Buscadores" -->
+                <button type="button" id="searchEngineButton" class="btn btn-outline-primary">
                     <i class="fas fa-search"></i> Buscadores
                 </button>
                 <!-- Tarjeta flotante con los buscadores -->
-                <div id="searchEnginesCard" class="search-engines-card hidden">
+                <div id="searchEngineCard" class="search-engine-card hidden">
                     <button class="search-engine-btn" data-engine="google">
                         <i class="fab fa-google"></i> Google
                     </button>
@@ -85,9 +85,10 @@
         const filterButtons = document.querySelectorAll('.filter-buttons .btn');
         const filterSection = document.getElementById('filterSection');
         const filterMessage = document.getElementById('filterMessage');
-        const toggleSearchEngines = document.getElementById('toggleSearchEngines');
-        const searchEnginesCard = document.getElementById('searchEnginesCard');
+        const searchEngineButton = document.getElementById('searchEngineButton');
+        const searchEngineCard = document.getElementById('searchEngineCard');
         const searchEngineButtons = document.querySelectorAll('.search-engine-btn');
+        const instagramFilters = document.querySelectorAll('.instagram-filter');
 
         // Filtro activo (predeterminado: "all")
         let activeFilter = "all";
@@ -200,37 +201,33 @@
             });
         });
 
-        // Mostrar/ocultar la tarjeta de buscadores
-        toggleSearchEngines.addEventListener('click', function () {
-            searchEnginesCard.classList.toggle('hidden');
+        // Mostrar/ocultar tarjeta de buscadores
+        searchEngineButton.addEventListener('click', function () {
+            searchEngineCard.classList.toggle('hidden');
         });
 
         // Cambiar motor de búsqueda
         searchEngineButtons.forEach(button => {
             button.addEventListener('click', function () {
                 // Ocultar la tarjeta de buscadores
-                searchEnginesCard.classList.add('hidden');
+                searchEngineCard.classList.add('hidden');
+
+                // Actualizar el texto del botón "Buscadores"
+                searchEngineButton.innerHTML = this.innerHTML;
 
                 // Actualizar el motor de búsqueda seleccionado
                 selectedEngine = this.getAttribute('data-engine');
 
-                // Mostrar u ocultar filtros según el motor seleccionado
-                if (selectedEngine === 'youtube') {
-                    filterSection.classList.add('hidden');
-                    filterMessage.textContent = "Los filtros no están disponibles para YouTube.";
-                    filterMessage.classList.remove('hidden');
-                } else if (selectedEngine === 'duckduckgo') {
-                    filterSection.classList.add('hidden');
-                    filterMessage.textContent = "Los filtros no están disponibles para DuckDuckGo.";
-                    filterMessage.classList.remove('hidden');
-                } else if (selectedEngine === 'instagram') {
-                    filterSection.classList.remove('hidden');
-                    filterMessage.classList.add('hidden');
-                    document.querySelectorAll('.instagram-filter').forEach(btn => btn.classList.remove('hidden'));
+                // Mostrar/ocultar filtros según el motor seleccionado
+                if (selectedEngine === 'instagram') {
+                    instagramFilters.forEach(filter => filter.classList.remove('hidden'));
+                    filterButtons.forEach(btn => btn.classList.add('hidden'));
+                } else if (selectedEngine === 'youtube' || selectedEngine === 'duckduckgo') {
+                    filterButtons.forEach(btn => btn.classList.add('hidden'));
+                    instagramFilters.forEach(filter => filter.classList.add('hidden'));
                 } else {
-                    filterSection.classList.remove('hidden');
-                    filterMessage.classList.add('hidden');
-                    document.querySelectorAll('.instagram-filter').forEach(btn => btn.classList.add('hidden'));
+                    filterButtons.forEach(btn => btn.classList.remove('hidden'));
+                    instagramFilters.forEach(filter => filter.classList.add('hidden'));
                 }
             });
         });
