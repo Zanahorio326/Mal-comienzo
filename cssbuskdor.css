@@ -107,8 +107,9 @@ h1 {
     color: #2575fc;
 }
 
-.hidden {
-    display: none;
+/* Clase para ocultar elementos */
+.search-engine-hidden {
+    display: none !important; /* Asegura que esté oculta */
 }
 
 .search-results {
