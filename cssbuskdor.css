@@ -1,5 +1,3 @@
-/* cssbuskdor.css */
-
 /* Estilos generales */
 body {
     padding: 20px;
@@ -202,9 +200,10 @@ h5 {
     padding: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    display: grid; /* Usar CSS Grid */
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas */
+    gap: 10px; /* Espacio entre botones */
+    width: 300px; /* Ancho fijo para la tarjeta */
 }
 
 .search-engine-btn {
@@ -218,6 +217,7 @@ h5 {
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
+    justify-content: center; /* Centrar texto */
     gap: 8px;
 }
 
@@ -271,5 +271,10 @@ h5 {
 
     .filter-message {
         font-size: 14px;
+    }
+
+    .search-engine-card {
+        width: 100%; /* Ajustar ancho en móviles */
+        grid-template-columns: repeat(1, 1fr); /* 1 columna en móviles */
     }
 }
