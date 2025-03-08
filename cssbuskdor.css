@@ -219,4 +219,83 @@ h5 {
 
 .form-select:focus {
     border-color: #1a5bbf;
-    box-shadow: 0 0 10px rgba(37,
+    box-shadow: 0 0 10px rgba(37, 117, 252, 0.5); /* Sombra más intensa al enfocar */
+}
+
+/* Estilos para las opciones del dropdown */
+.form-select option {
+    padding: 10px;
+    font-size: 14px;
+    color: #333;
+    background-color: #fff;
+    transition: background-color 0.3s ease;
+}
+
+.form-select option:hover {
+    background-color: #f1f1f1; /* Fondo gris claro al pasar el mouse */
+}
+
+/* Estilos para los íconos dentro del selector */
+.form-select option i {
+    margin-right: 10px; /* Espacio entre el ícono y el texto */
+    font-size: 14px;
+    color: #2575fc; /* Color azul para los íconos */
+}
+
+/* Ocultar filtros de Instagram por defecto */
+.instagram-filter {
+    display: none;
+}
+
+/* Mostrar filtros de Instagram cuando se seleccione Instagram */
+.instagram-filter.visible {
+    display: inline-block;
+}
+
+/* Media queries para móviles (hasta 768px de ancho) */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .search-container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .input-group {
+        flex-direction: column;
+    }
+
+    .input-group .form-control,
+    .input-group .form-select,
+    .input-group .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .filter-buttons .btn {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .suggestions {
+        max-height: 100px;
+    }
+
+    .btn-clear-history {
+        width: 100%;
+    }
+
+    .result-item {
+        padding: 8px;
+    }
+
+    .filter-message {
+        font-size: 14px;
+    }
+}
