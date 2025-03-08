@@ -160,50 +160,70 @@ h5 {
     margin-bottom: 15px;
 }
 
+/* Estilos para los créditos */
+.credits {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #555;
+    font-family: 'Arial', sans-serif;
+}
+
+.credits a {
+    color: #2575fc;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.credits a:hover {
+    color: #1a5bbf;
+    text-decoration: underline;
+}
+
 /* Media queries para móviles (hasta 768px de ancho) */
 @media (max-width: 768px) {
     body {
-        padding: 10px; /* Reducir el padding en móviles */
+        padding: 10px;
     }
 
     .search-container {
-        padding: 20px; /* Reducir el padding del contenedor */
+        padding: 20px;
     }
 
     h1 {
-        font-size: 24px; /* Reducir el tamaño del título */
+        font-size: 24px;
     }
 
     .input-group {
-        flex-direction: column; /* Cambiar a disposición vertical */
+        flex-direction: column;
     }
 
     .input-group .form-control,
     .input-group .form-select,
     .input-group .btn {
-        width: 100%; /* Hacer que los elementos ocupen el 100% del ancho */
-        margin-bottom: 10px; /* Añadir margen inferior entre elementos */
+        width: 100%;
+        margin-bottom: 10px;
     }
 
     .filter-buttons .btn {
-        width: 100%; /* Hacer que los botones de filtro ocupen el 100% del ancho */
-        margin-right: 0; /* Eliminar el margen derecho */
-        margin-bottom: 10px; /* Añadir margen inferior entre botones */
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
     }
 
     .suggestions {
-        max-height: 100px; /* Reducir la altura máxima de las sugerencias */
+        max-height: 100px;
     }
 
     .btn-clear-history {
-        width: 100%; /* Hacer que el botón de borrar historial ocupe el 100% del ancho */
+        width: 100%;
     }
 
     .result-item {
-        padding: 8px; /* Reducir el padding de los resultados */
+        padding: 8px;
     }
 
     .filter-message {
-        font-size: 14px; /* Reducir el tamaño de la fuente del mensaje de filtro */
+        font-size: 14px;
     }
 }
