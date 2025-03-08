@@ -165,19 +165,32 @@ h5 {
     margin-top: 20px;
     text-align: center;
     font-size: 14px;
-    color: #555;
+    color: #222; /* Negro suave para mejor contraste */
     font-family: 'Arial', sans-serif;
 }
 
 .credits a {
-    color: #2575fc;
+    background: linear-gradient(90deg, #FF0000, #2575fc, #FF0000); /* Degradé rojo-azul-rojo */
+    background-size: 200% auto; /* Doble ancho para la animación */
+    color: transparent; /* Hace que el texto sea transparente */
+    -webkit-background-clip: text; /* Aplica el degradé al texto */
+    background-clip: text;
     text-decoration: none;
-    transition: color 0.3s ease;
+    animation: gradientShift 3s linear infinite; /* Animación del degradé */
 }
 
 .credits a:hover {
-    color: #1a5bbf;
-    text-decoration: underline;
+    text-decoration: underline; /* Subrayado al pasar el mouse */
+}
+
+/* Animación para desplazar el degradé */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%; /* Inicia a la izquierda */
+    }
+    100% {
+        background-position: 100% 50%; /* Termina a la derecha */
+    }
 }
 
 /* Media queries para móviles (hasta 768px de ancho) */
