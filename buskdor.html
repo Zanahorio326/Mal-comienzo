@@ -53,12 +53,8 @@
             <button type="button" class="btn btn-outline-primary" data-filter="shopping">Shopping</button>
             <button type="button" class="btn btn-outline-primary" data-filter="videos">Videos</button>
             <!-- Filtros específicos para Instagram -->
-            <button type="button" id="instagramAccountsFilter" class="btn btn-outline-primary instagram-filter search-engine-hidden" data-filter="accounts">
-                <i class="fas fa-user"></i> Cuentas
-            </button>
-            <button type="button" id="instagramHashtagsFilter" class="btn btn-outline-primary instagram-filter search-engine-hidden" data-filter="hashtags">
-                <i class="fas fa-hashtag"></i> Hashtags
-            </button>
+            <button type="button" class="btn btn-outline-primary instagram-filter search-engine-hidden" data-filter="accounts">Cuentas</button>
+            <button type="button" class="btn btn-outline-primary instagram-filter search-engine-hidden" data-filter="hashtags">Hashtags</button>
         </div>
         <div id="filterMessage" class="filter-message search-engine-hidden">
             <!-- Mensaje dinámico para YouTube o DuckDuckGo -->
@@ -227,25 +223,22 @@
                     // Ocultar filtros generales
                     filterButtons.forEach(btn => btn.classList.add('search-engine-hidden'));
                     // Ocultar mensaje de no disponibilidad
-                    filterMessage.classList.add('search-engine-hidden'));
-                } else {
-                    // Ocultar filtros de Instagram
+                    filterMessage.classList.add('search-engine-hidden');
+                } else if (selectedEngine === 'youtube' || selectedEngine === 'duckduckgo') {
+                    // Ocultar todos los filtros
+                    filterButtons.forEach(btn => btn.classList.add('search-engine-hidden'));
                     instagramFilters.forEach(filter => filter.classList.add('search-engine-hidden'));
+                    // Mostrar mensaje de no disponibilidad
+                    filterMessage.classList.remove('search-engine-hidden');
+                    filterMessage.textContent = "No hay filtros disponibles para este motor de búsqueda.";
+                } else {
                     // Mostrar filtros generales
                     filterButtons.forEach(btn => btn.classList.remove('search-engine-hidden'));
-                    // Mostrar mensaje de no disponibilidad si es necesario
-                    if (selectedEngine === 'youtube' || selectedEngine === 'duckduckgo') {
-                        filterMessage.classList.remove('search-engine-hidden'));
-                        filterMessage.textContent = "No hay filtros disponibles para este motor de búsqueda.";
-                    } else {
-                        filterMessage.classList.add('search-engine-hidden'));
-                    }
+                    // Ocultar filtros de Instagram
+                    instagramFilters.forEach(filter => filter.classList.add('search-engine-hidden'));
+                    // Ocultar mensaje de no disponibilidad
+                    filterMessage.classList.add('search-engine-hidden');
                 }
-
-                // Restablecer el filtro activo a "Todos"
-                activeFilter = "all";
-                filterButtons.forEach(btn => btn.classList.remove('active'));
-                filterButtons[0].classList.add('active'); // Activar el filtro "Todos"
             });
         });
 
