@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>bus K dor</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="cssbuskdor.css" rel="stylesheet">
 </head>
 <body>
@@ -16,11 +17,24 @@
             <div class="input-group">
                 <input type="text" id="searchInput" class="form-control" placeholder="Buscar..." required>
                 <select id="searchEngine" class="form-select">
-                    <option value="google">Google</option>
-                    <option value="bing">Bing</option>
-                    <option value="duckduckgo">DuckDuckGo</option>
-                    <option value="yahoo">Yahoo</option>
-                    <option value="youtube">YouTube</option>
+                    <option value="google">
+                        <i class="fab fa-google"></i> Google
+                    </option>
+                    <option value="bing">
+                        <i class="fab fa-microsoft"></i> Bing
+                    </option>
+                    <option value="duckduckgo">
+                        <i class="fas fa-search"></i> DuckDuckGo
+                    </option>
+                    <option value="yahoo">
+                        <i class="fab fa-yahoo"></i> Yahoo
+                    </option>
+                    <option value="youtube">
+                        <i class="fab fa-youtube"></i> YouTube
+                    </option>
+                    <option value="instagram">
+                        <i class="fab fa-instagram"></i> Instagram
+                    </option>
                 </select>
                 <button type="submit" class="btn btn-primary">Buscar</button>
             </div>
@@ -33,6 +47,10 @@
             <button class="btn btn-outline-primary" data-filter="news">Noticias</button>
             <button class="btn btn-outline-primary" data-filter="shopping">Shopping</button>
             <button class="btn btn-outline-primary" data-filter="videos">Videos</button>
+            <!-- Filtros específicos para Instagram -->
+            <button class="btn btn-outline-primary instagram-filter hidden" data-filter="accounts">Cuentas</button>
+            <button class="btn btn-outline-primary instagram-filter hidden" data-filter="hashtags">Hashtags</button>
+            <button class="btn btn-outline-primary instagram-filter hidden" data-filter="reels">Reels</button>
         </div>
         <div id="filterMessage" class="filter-message hidden">
             <!-- Mensaje dinámico para YouTube o DuckDuckGo -->
@@ -92,6 +110,11 @@
             },
             youtube: {
                 all: "https://www.youtube.com/results?search_query=",
+            },
+            instagram: {
+                accounts: "https://www.instagram.com/explore/search/keyword/?q=",
+                hashtags: "https://www.instagram.com/explore/tags/",
+                reels: "https://www.instagram.com/reels/search/?q=",
             },
         };
 
@@ -169,17 +192,28 @@
 
         // Mostrar u ocultar filtros según el motor de búsqueda seleccionado
         searchEngineSelect.addEventListener('change', function () {
-            if (this.value === 'youtube') {
-                filterSection.classList.add('hidden'); // Ocultar filtros para YouTube
+            const engine = this.value;
+
+            // Ocultar todos los filtros primero
+            filterButtons.forEach(btn => btn.classList.remove('active', 'visible'));
+            filterSection.classList.remove('hidden');
+            filterMessage.classList.add('hidden');
+
+            if (engine === 'youtube') {
+                filterSection.classList.add('hidden');
                 filterMessage.textContent = "Los filtros no están disponibles para YouTube.";
-                filterMessage.classList.remove('hidden'); // Mostrar mensaje
-            } else if (this.value === 'duckduckgo') {
-                filterSection.classList.add('hidden'); // Ocultar filtros para DuckDuckGo
+                filterMessage.classList.remove('hidden');
+            } else if (engine === 'duckduckgo') {
+                filterSection.classList.add('hidden');
                 filterMessage.textContent = "Los filtros no están disponibles para DuckDuckGo.";
-                filterMessage.classList.remove('hidden'); // Mostrar mensaje
+                filterMessage.classList.remove('hidden');
+            } else if (engine === 'instagram') {
+                // Mostrar solo los filtros de Instagram
+                document.querySelectorAll('.instagram-filter').forEach(btn => btn.classList.add('visible'));
+                filterButtons[0].classList.add('active'); // Activar el primer filtro por defecto
             } else {
-                filterSection.classList.remove('hidden'); // Mostrar filtros para otros motores
-                filterMessage.classList.add('hidden'); // Ocultar mensaje
+                // Mostrar filtros normales
+                filterButtons[0].classList.add('active'); // Activar el primer filtro por defecto
             }
         });
 
@@ -188,12 +222,23 @@
             e.preventDefault();
             const query = searchInput.value;
             const engine = document.getElementById('searchEngine').value;
+            const activeFilter = document.querySelector('.filter-buttons .btn.active').getAttribute('data-filter');
 
             // Guardar en historial
             saveToHistory(query);
 
             // Obtener la URL del motor de búsqueda con el filtro aplicado
-            const searchUrl = searchEngines[engine][activeFilter] + encodeURIComponent(query);
+            let searchUrl;
+            if (engine === 'instagram') {
+                if (activeFilter === 'hashtags') {
+                    searchUrl = searchEngines[engine][activeFilter] + encodeURIComponent(query.replace('#', ''));
+                } else {
+                    searchUrl = searchEngines[engine][activeFilter] + encodeURIComponent(query);
+                }
+            } else {
+                searchUrl = searchEngines[engine][activeFilter] + encodeURIComponent(query);
+            }
+
             window.open(searchUrl, '_blank');
 
             // Analítica (simulada)
