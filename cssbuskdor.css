@@ -242,6 +242,16 @@ h5 {
     color: #2575fc; /* Color azul para los íconos */
 }
 
+/* Ocultar filtros de Instagram por defecto */
+.instagram-filter {
+    display: none;
+}
+
+/* Mostrar filtros de Instagram cuando se seleccione Instagram */
+.instagram-filter.visible {
+    display: inline-block;
+}
+
 /* Media queries para móviles (hasta 768px de ancho) */
 @media (max-width: 768px) {
     body {
