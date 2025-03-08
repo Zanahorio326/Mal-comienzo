@@ -193,6 +193,55 @@ h5 {
     }
 }
 
+/* Estilos para el selector de buscadores */
+.form-select {
+    background-color: #fff;
+    border: 2px solid #2575fc; /* Borde azul */
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none; /* Quita el estilo por defecto del dropdown */
+    -webkit-appearance: none; /* Para compatibilidad con Safari */
+    -moz-appearance: none; /* Para compatibilidad con Firefox */
+    background-image: url("data:image/svg+xml;charset=UT…3C/svg%3E"); /* Flecha personalizada */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+}
+
+.form-select:hover {
+    border-color: #1a5bbf; /* Borde azul más oscuro al pasar el mouse */
+    box-shadow: 0 0 10px rgba(37, 117, 252, 0.3); /* Sombra suave */
+}
+
+.form-select:focus {
+    border-color: #1a5bbf;
+    box-shadow: 0 0 10px rgba(37, 117, 252, 0.5); /* Sombra más intensa al enfocar */
+}
+
+/* Estilos para las opciones del dropdown */
+.form-select option {
+    padding: 10px;
+    font-size: 14px;
+    color: #333;
+    background-color: #fff;
+    transition: background-color 0.3s ease;
+}
+
+.form-select option:hover {
+    background-color: #f1f1f1; /* Fondo gris claro al pasar el mouse */
+}
+
+/* Estilos para los íconos dentro del selector */
+.form-select option i {
+    margin-right: 10px; /* Espacio entre el ícono y el texto */
+    font-size: 14px;
+    color: #2575fc; /* Color azul para los íconos */
+}
+
 /* Media queries para móviles (hasta 768px de ancho) */
 @media (max-width: 768px) {
     body {
