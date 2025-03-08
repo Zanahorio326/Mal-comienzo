@@ -211,19 +211,14 @@
                 }
             }
 
-            // Asignar el evento "loadeddata" a cada vídeo
+            // Forzar la carga de los vídeos
             videos.forEach(video => {
-                if (video.readyState >= 3) { // Si el vídeo ya está parcialmente cargado
-                    checkVideosLoaded();
-                } else {
-                    video.addEventListener('loadeddata', checkVideosLoaded);
-                }
-            });
+                // Asignar el evento "canplaythrough" para asegurar que el vídeo esté completamente cargado
+                video.addEventListener('canplaythrough', checkVideosLoaded);
 
-            // Ocultar la pantalla de carga después de 10 segundos (por si falla la carga)
-            setTimeout(() => {
-                loadingScreen.style.display = 'none';
-            }, 10000); // 10 segundos
+                // Forzar la carga del vídeo
+                video.load();
+            });
         });
     </script>
 </body>
