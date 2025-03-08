@@ -55,7 +55,6 @@
             <!-- Filtros específicos para Instagram -->
             <button type="button" class="btn btn-outline-primary instagram-filter search-engine-hidden" data-filter="accounts">Cuentas</button>
             <button type="button" class="btn btn-outline-primary instagram-filter search-engine-hidden" data-filter="hashtags">Hashtags</button>
-            <button type="button" class="btn btn-outline-primary instagram-filter search-engine-hidden" data-filter="reels">Reels</button>
         </div>
         <div id="filterMessage" class="filter-message search-engine-hidden">
             <!-- Mensaje dinámico para YouTube o DuckDuckGo -->
@@ -125,7 +124,6 @@
             instagram: {
                 accounts: "https://www.instagram.com/explore/search/keyword/?q=",
                 hashtags: "https://www.instagram.com/explore/tags/",
-                reels: "https://www.instagram.com/reels/search/?q=",
             },
         };
 
@@ -222,12 +220,16 @@
                 if (selectedEngine === 'instagram') {
                     instagramFilters.forEach(filter => filter.classList.remove('search-engine-hidden'));
                     filterButtons.forEach(btn => btn.classList.add('search-engine-hidden'));
+                    filterMessage.classList.add('search-engine-hidden'); // Ocultar mensaje
                 } else if (selectedEngine === 'youtube' || selectedEngine === 'duckduckgo') {
                     filterButtons.forEach(btn => btn.classList.add('search-engine-hidden'));
                     instagramFilters.forEach(filter => filter.classList.add('search-engine-hidden'));
+                    filterMessage.classList.remove('search-engine-hidden'); // Mostrar mensaje
+                    filterMessage.textContent = "No hay filtros disponibles para este motor de búsqueda.";
                 } else {
                     filterButtons.forEach(btn => btn.classList.remove('search-engine-hidden'));
                     instagramFilters.forEach(filter => filter.classList.add('search-engine-hidden'));
+                    filterMessage.classList.add('search-engine-hidden'); // Ocultar mensaje
                 }
             });
         });
