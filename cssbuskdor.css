@@ -1,0 +1,161 @@
+/* cssbuskdor.css */
+
+body {
+    padding: 20px;
+    background: linear-gradient(135deg, #FF0000, #000080);
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-container {
+    max-width: 800px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+    color: #000080;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.form-control, .form-select, .btn {
+    border-radius: 10px;
+}
+
+.btn-primary {
+    background-color: #3F448C;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #1a5bbf;
+}
+
+.suggestions {
+    border: 1px solid #ddd;
+    border-top: none;
+    max-height: 150px;
+    overflow-y: auto;
+    border-radius: 0 0 10px 10px;
+    background-color: #fff;
+}
+
+.suggestions div {
+    padding: 10px;
+    cursor: pointer;
+    color: #333;
+    transition: background-color 0.3s ease;
+}
+
+.suggestions div:hover {
+    background-color: #f1f1f1;
+}
+
+.history-item {
+    cursor: pointer;
+    color: #2575fc;
+    transition: color 0.3s ease;
+}
+
+.history-item:hover {
+    color: #1b5bbf;
+    text-decoration: underline;
+}
+
+.btn-clear-history {
+    margin-top: 10px;
+    background-color: #cc0000; /* Rojo inicial */
+    color: #fff;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn-clear-history:hover {
+    background-color: #ff0000; /* Rojo más claro al pasar el mouse */
+}
+
+.filter-buttons {
+    margin-bottom: 20px;
+}
+
+.filter-buttons .btn {
+    margin-right: 10px;
+    border-radius: 10px;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.filter-buttons .btn:hover {
+    transform: scale(1.05);
+}
+
+.highlight {
+    font-weight: bold;
+    color: #2575fc;
+}
+
+.hidden {
+    display: none;
+}
+
+.search-results {
+    margin-top: 20px;
+}
+
+.result-item {
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    background-color: #fff;
+    color: #333;
+    transition: box-shadow 0.3s ease;
+}
+
+.result-item:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.filter-message {
+    color: #333;
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+/* Animación para el botón de borrar historial */
+@keyframes pulseColor {
+    0% {
+        background-color: #cc0000; /* Rojo inicial */
+    }
+    50% {
+        background-color: #1a5bbf; /* Azul */
+    }
+    100% {
+        background-color: #cc0000; /* Vuelve a rojo */
+    }
+}
+
+/* Clase que activa la animación */
+.btn-clear-history.pulse {
+    animation: pulseColor 0.7s ease;
+}
+
+/* Estilo para el título "Historial de búsquedas" */
+h5 {
+    color: #4B0082; /* Color morado oscuro */
+    font-weight: bold; /* Opcional: para que el texto sea más llamativo */
+    margin-bottom: 15px; /* Ajusta el margen inferior si es necesario */
+}
