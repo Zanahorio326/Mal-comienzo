@@ -28,6 +28,7 @@ h1 {
 
 .input-group {
     margin-bottom: 20px;
+    position: relative; /* Para posicionar la tarjeta de buscadores */
 }
 
 .form-control, .btn {
@@ -204,6 +205,9 @@ h5 {
     grid-template-columns: repeat(2, 1fr); /* 2 columnas */
     gap: 10px; /* Espacio entre botones */
     width: 300px; /* Ancho fijo para la tarjeta */
+    top: 100%; /* Posicionar debajo del botón "Buscadores" */
+    left: 0;
+    margin-top: 10px; /* Espacio entre el botón y la tarjeta */
 }
 
 .search-engine-btn {
