@@ -232,6 +232,15 @@ h5 {
     border-color: #1a5bbf;
 }
 
+/* Nuevo código: Manejo de visibilidad de los filtros de Instagram */
+.instagram-filter {
+    display: none; /* Ocultar inicialmente */
+}
+
+.instagram-filter:not(.search-engine-hidden) {
+    display: inline-block; /* Mostrar cuando no estén ocultos */
+}
+
 /* Media queries para móviles (hasta 768px de ancho) */
 @media (max-width: 768px) {
     body {
