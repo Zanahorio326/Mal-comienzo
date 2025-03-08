@@ -1,5 +1,6 @@
 /* cssbuskdor.css */
 
+/* Estilos generales */
 body {
     padding: 20px;
     background: linear-gradient(135deg, #FF0000, #000080);
@@ -78,14 +79,14 @@ h1 {
 
 .btn-clear-history {
     margin-top: 10px;
-    background-color: #cc0000; /* Rojo inicial */
+    background-color: #cc0000;
     color: #fff;
     border: none;
     transition: background-color 0.3s ease;
 }
 
 .btn-clear-history:hover {
-    background-color: #ff0000; /* Rojo más claro al pasar el mouse */
+    background-color: #ff0000;
 }
 
 .filter-buttons {
@@ -138,24 +139,71 @@ h1 {
 /* Animación para el botón de borrar historial */
 @keyframes pulseColor {
     0% {
-        background-color: #cc0000; /* Rojo inicial */
+        background-color: #cc0000;
     }
     50% {
-        background-color: #1a5bbf; /* Azul */
+        background-color: #1a5bbf;
     }
     100% {
-        background-color: #cc0000; /* Vuelve a rojo */
+        background-color: #cc0000;
     }
 }
 
-/* Clase que activa la animación */
 .btn-clear-history.pulse {
     animation: pulseColor 0.7s ease;
 }
 
 /* Estilo para el título "Historial de búsquedas" */
 h5 {
-    color: #4B0082; /* Color morado oscuro */
-    font-weight: bold; /* Opcional: para que el texto sea más llamativo */
-    margin-bottom: 15px; /* Ajusta el margen inferior si es necesario */
+    color: #4B0082;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* Media queries para móviles (hasta 768px de ancho) */
+@media (max-width: 768px) {
+    body {
+        padding: 10px; /* Reducir el padding en móviles */
+    }
+
+    .search-container {
+        padding: 20px; /* Reducir el padding del contenedor */
+    }
+
+    h1 {
+        font-size: 24px; /* Reducir el tamaño del título */
+    }
+
+    .input-group {
+        flex-direction: column; /* Cambiar a disposición vertical */
+    }
+
+    .input-group .form-control,
+    .input-group .form-select,
+    .input-group .btn {
+        width: 100%; /* Hacer que los elementos ocupen el 100% del ancho */
+        margin-bottom: 10px; /* Añadir margen inferior entre elementos */
+    }
+
+    .filter-buttons .btn {
+        width: 100%; /* Hacer que los botones de filtro ocupen el 100% del ancho */
+        margin-right: 0; /* Eliminar el margen derecho */
+        margin-bottom: 10px; /* Añadir margen inferior entre botones */
+    }
+
+    .suggestions {
+        max-height: 100px; /* Reducir la altura máxima de las sugerencias */
+    }
+
+    .btn-clear-history {
+        width: 100%; /* Hacer que el botón de borrar historial ocupe el 100% del ancho */
+    }
+
+    .result-item {
+        padding: 8px; /* Reducir el padding de los resultados */
+    }
+
+    .filter-message {
+        font-size: 14px; /* Reducir el tamaño de la fuente del mensaje de filtro */
+    }
 }
