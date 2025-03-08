@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Space Cube Invaders</title>
     <style>
+        /* Estilos generales */
         body {
             background-color: black;
             color: white;
@@ -97,19 +98,41 @@
             0%, 100% { opacity: 0.8; }
             50% { opacity: 0.2; }
         }
+
+        /* Pantalla de carga */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            color: white;
+            z-index: 1000; /* Asegura que esté por encima de todo */
+        }
     </style>
 </head>
 <body>
+    <!-- Pantalla de carga -->
+    <div id="loading-screen">
+        <p>Cargando...</p>
+    </div>
+
+    <!-- Contenido de la página -->
     <div id="stars"></div>
     <div id="title">Space<br>Cube<br>Invaders</div>
     <div id="subtitle">Elije tu piloto espacial</div>(Homenaje y parodia a "Space Invaders" 1978)
 
     <div class="button-container">
         <button class="button" onclick="toggleExpansion(0)">
-            <video src="prologo.mp4" autoplay loop muted></video>
+            <video src="prologo.mp4" autoplay loop muted preload="auto"></video>
         </button>
         <div id="expansion-0" class="expanded hidden">
-            <p>Prólogo<br>La Expedición Perdida:<div></div>Siempre mirando al cielo con curiosidad y ambición. Un día finalmente conquistamos el viaje espacial, enviamos a nuestros mejores exploradores a las profundidades del espacio en busca de conocimiento a bordo de la nave N-P-E, tres especialistas y un viaje en dirección al último horizonte.<div><br></div>Todo cambió cuando un enjambre enemigo conformado por estructuras geométricas atacó. N-P-E fue destruida y sólo tres sobrevivientes lograron escapar en cápsulas de escape personales.<br>Estas cápsulas, con una forma cúbica única, son ahora una esperanza de supervivencia, cada una equipada con habilidades especiales que reflejan las destrezas de los supervivientes:<div><br></div>El capitán de flota, un experto piloto, equipado con un futurista arsenal de armas.<div><br></div>La bióloga especialista en botánica, dotada de peligroso material biológico.<div><br></div>El ingeniero aeroespacial, con la capacidad de reparar y mejorar su cápsula para enfrentar la amenaza.<div><br></div>El destino de la misión está en tus manos, pero solo podrás elegir uno de estos pilotos para navegar la guerra contra el enemigo. Las cápsulas, hechas de cubos, te permitirán enfrentarte al enjambre enemigo en una batalla que pondrá a prueba tus reflejos y habilidades.</p>
+            <p>Prólogo<br>La Expedición Perdida:<div></div>Siempre mirado al cielo con curiosidad y ambición. Un día finalmente conquistamos el viaje espacial, enviamos a nuestros mejores exploradores a las profundidades del espacio en busca de conocimiento a bordo de la nave N-P-E, tres especialistas y un viaje en dirección al último horizonte.<div><br></div>Todo cambió cuando un enjambre enemigo conformado por estructuras geométricas atacó. N-P-E fue destruida y sólo tres sobrevivientes lograron escapar en cápsulas de escape personales.<br>Estas cápsulas, con una forma cúbica única, son ahora una esperanza de supervivencia, cada una equipada con habilidades especiales que reflejan las destrezas de los supervivientes:<div><br></div>El capitán de flota, un experto piloto, equipado con un futurista arsenal de armas.<div><br></div>La bióloga especialista en botánica, dotada de peligroso material biológico.<div><br></div>El ingeniero aeroespacial, con la capacidad de reparar y mejorar su cápsula para enfrentar la amenaza.<div><br></div>El destino de la misión está en tus manos, pero solo podrás elegir uno de estos pilotos para navegar la guerra contra el enemigo. Las cápsulas, hechas de cubos, te permitirán enfrentarte al enjambre enemigo en una batalla que pondrá a prueba tus reflejos y habilidades.</p>
             <button class="action-button" onclick="toggleExpansion(0)">Cerrar</button>
             <button class="action-button" onclick="window.location.href='https://www.instagram.com/_kevin_sx?igsh=MXUyaHNxb3pybXh4cw=='">Créditos</button>
         </div>
@@ -117,7 +140,7 @@
 
     <div class="button-container">
         <button class="button" onclick="toggleExpansion(1)">
-            <video src="piloto1.mp4" autoplay loop muted></video>
+            <video src="piloto1.mp4" autoplay loop muted preload="auto"></video>
         </button>
         <div id="expansion-1" class="expanded hidden">
             <p>Capitán de flota: Joven ex piloto militar, ahora a cargo de la ex tripulación del N-P-E equipado con armas de última tecnología<div></div>habilidades:<br>descarga:<br>Arma de fuego directo, rápida pero con poca superficie de impacto (cooldown 1s)<br>Cañón de Plasma:<br>Arma de fuego directo, velocidad media, amplia superficie de impacto (cooldown 2s)<br>Misil infrarrojo:<br>Arma teledirigida, lenta, poca superficie de impacto (cooldown 4s)</p>
@@ -128,7 +151,7 @@
 
     <div class="button-container">
         <button class="button" onclick="toggleExpansion(2)">
-            <video src="piloto2.mp4" autoplay loop muted></video>
+            <video src="piloto2.mp4" autoplay loop muted preload="auto"></video>
         </button>
         <div id="expansion-2" class="expanded hidden">
             <p>Bióloga: Ex científica del N-P-E experta en botánica<div></div>habilidades:<br>Carga de Polen:<br>Arma de fuego indirecto, rápida, superficie de impacto media (cooldown 0.5s)<br>Esporas:<br>Escudo, velocidad de despliegue media, libera esporas que se destruyen al contacto (cooldown 5s)<br>Tinte carmesí:<br>Arma de fuego directo, rápida, superficie de impacto media (cooldown 1s)</p>
@@ -139,7 +162,7 @@
 
     <div class="button-container">
         <button class="button" onclick="toggleExpansion(3)">
-            <video src="piloto3.mp4" autoplay loop muted></video>
+            <video src="piloto3.mp4" autoplay loop muted preload="auto"></video>
         </button>
         <div id="expansion-3" class="expanded hidden">
             <p>Piloto 3: Un maestro de la defensa y la resistencia.</p>
@@ -149,11 +172,13 @@
     </div>
 
     <script>
+        // Función para mostrar/ocultar la expansión de los botones
         function toggleExpansion(index) {
             const expansion = document.getElementById(`expansion-${index}`);
             expansion.classList.toggle("hidden");
         }
 
+        // Función para crear estrellas en el fondo
         function createStar() {
             const star = document.createElement('div');
             const size = Math.random() * 5 + 2;
@@ -168,7 +193,38 @@
             }, 2000);
         }
 
+        // Crear estrellas cada 500ms
         setInterval(createStar, 500);
+
+        // Verificar la carga de los vídeos
+        document.addEventListener('DOMContentLoaded', () => {
+            const videos = document.querySelectorAll('video');
+            const loadingScreen = document.getElementById('loading-screen');
+            let videosLoaded = 0;
+
+            // Función para verificar si todos los vídeos están listos
+            function checkVideosLoaded() {
+                videosLoaded++;
+                if (videosLoaded === videos.length) {
+                    // Todos los vídeos están cargados, ocultar la pantalla de carga
+                    loadingScreen.style.display = 'none';
+                }
+            }
+
+            // Asignar el evento "loadeddata" a cada vídeo
+            videos.forEach(video => {
+                if (video.readyState >= 3) { // Si el vídeo ya está parcialmente cargado
+                    checkVideosLoaded();
+                } else {
+                    video.addEventListener('loadeddata', checkVideosLoaded);
+                }
+            });
+
+            // Ocultar la pantalla de carga después de 10 segundos (por si falla la carga)
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 10000); // 10 segundos
+        });
     </script>
 </body>
 </html>
