@@ -43,14 +43,14 @@
 
         <!-- Filtros avanzados -->
         <div id="filterSection" class="filter-buttons">
-            <button class="btn btn-outline-primary active" data-filter="all">Todos</button>
+            <button class="btn btn-outline-primary" data-filter="all">Todos</button>
             <button class="btn btn-outline-primary" data-filter="news">Noticias</button>
             <button class="btn btn-outline-primary" data-filter="shopping">Shopping</button>
             <button class="btn btn-outline-primary" data-filter="videos">Videos</button>
             <!-- Filtros específicos para Instagram -->
-            <button class="btn btn-outline-primary instagram-filter hidden" data-filter="accounts">Cuentas</button>
-            <button class="btn btn-outline-primary instagram-filter hidden" data-filter="hashtags">Hashtags</button>
-            <button class="btn btn-outline-primary instagram-filter hidden" data-filter="reels">Reels</button>
+            <button class="btn btn-outline-primary instagram-filter" data-filter="accounts">Cuentas</button>
+            <button class="btn btn-outline-primary instagram-filter" data-filter="hashtags">Hashtags</button>
+            <button class="btn btn-outline-primary instagram-filter" data-filter="reels">Reels</button>
         </div>
         <div id="filterMessage" class="filter-message hidden">
             <!-- Mensaje dinámico para YouTube o DuckDuckGo -->
@@ -195,25 +195,35 @@
             const engine = this.value;
 
             // Ocultar todos los filtros primero
-            filterButtons.forEach(btn => btn.classList.remove('active', 'visible'));
-            filterSection.classList.remove('hidden');
+            filterButtons.forEach(btn => {
+                btn.classList.remove('active', 'visible');
+                btn.style.display = 'none'; // Ocultar todos los botones
+            });
+
+            // Mostrar mensaje si es necesario
             filterMessage.classList.add('hidden');
 
             if (engine === 'youtube') {
-                filterSection.classList.add('hidden');
                 filterMessage.textContent = "Los filtros no están disponibles para YouTube.";
                 filterMessage.classList.remove('hidden');
             } else if (engine === 'duckduckgo') {
-                filterSection.classList.add('hidden');
                 filterMessage.textContent = "Los filtros no están disponibles para DuckDuckGo.";
                 filterMessage.classList.remove('hidden');
             } else if (engine === 'instagram') {
                 // Mostrar solo los filtros de Instagram
-                document.querySelectorAll('.instagram-filter').forEach(btn => btn.classList.add('visible'));
-                filterButtons[0].classList.add('active'); // Activar el primer filtro por defecto
+                document.querySelectorAll('.instagram-filter').forEach(btn => {
+                    btn.style.display = 'inline-block'; // Mostrar filtros de Instagram
+                    btn.classList.add('visible');
+                });
+                // Activar el primer filtro de Instagram por defecto
+                document.querySelector('.instagram-filter').classList.add('active');
             } else {
                 // Mostrar filtros normales
-                filterButtons[0].classList.add('active'); // Activar el primer filtro por defecto
+                document.querySelectorAll('.btn:not(.instagram-filter)').forEach(btn => {
+                    btn.style.display = 'inline-block'; // Mostrar filtros normales
+                });
+                // Activar el primer filtro por defecto
+                filterButtons[0].classList.add('active');
             }
         });
 
