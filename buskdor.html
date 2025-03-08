@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>bus K dor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="search-container">
+        <h1>bus-K-dor</h1>
+
+        <!-- Formulario de búsqueda -->
+        <form id="searchForm" class="mb-3">
+            <div class="input-group">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar..." required>
+                <select id="searchEngine" class="form-select">
+                    <option value="google">Google</option>
+                    <option value="bing">Bing</option>
+                    <option value="duckduckgo">DuckDuckGo</option>
+                    <option value="yahoo">Yahoo</option>
+                    <option value="youtube">YouTube</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Buscar</button>
+            </div>
+            <div id="suggestions" class="suggestions"></div>
+        </form>
+
+        <!-- Filtros avanzados -->
+        <div id="filterSection" class="filter-buttons">
+            <button class="btn btn-outline-primary active" data-filter="all">Todos</button>
+            <button class="btn btn-outline-primary" data-filter="news">Noticias</button>
+            <button class="btn btn-outline-primary" data-filter="shopping">Shopping</button>
+            <button class="btn btn-outline-primary" data-filter="videos">Videos</button>
+        </div>
+        <div id="filterMessage" class="filter-message hidden">
+            <!-- Mensaje dinámico para YouTube o DuckDuckGo -->
+        </div>
+
+        <!-- Historial de búsquedas -->
+        <div class="mb-3">
+            <h5>Historial de búsquedas:</h5>
+            <div id="history"></div>
+            <button id="clearHistory" class="btn btn-danger btn-clear-history">Borrar historial</button>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo para autocompletado
+        const terms = ["HTML", "CSS", "JavaScript", "Python", "PHP", "Buscador", "Desarrollo web"];
+
+        // Elementos del DOM
+        const searchInput = document.getElementById('searchInput');
+        const suggestionsDiv = document.getElementById('suggestions');
+        const historyDiv = document.getElementById('history');
+        const clearHistoryButton = document.getElementById('clearHistory');
+        const filterButtons = document.querySelectorAll('.filter-buttons .btn');
+        const filterSection = document.getElementById('filterSection');
+        const filterMessage = document.getElementById('filterMessage');
+        const searchEngineSelect = document.getElementById('searchEngine');
+
+        // Filtro activo (predeterminado: "all")
+        let activeFilter = "all";
+
+        // URLs base para cada motor de búsqueda
+        const searchEngines = {
+            google: {
+                all: "https://www.google.com/search?q=",
+                news: "https://www.google.com/search?q=&tbm=nws&q=",
+                shopping: "https://www.google.com/search?q=&tbm=shop&q=",
+                videos: "https://www.google.com/search?q=&tbm=vid&q=",
+            },
+            bing: {
+                all: "https://www.bing.com/search?q=",
+                news: "https://www.bing.com/news/search?q=",
+                shopping: "https://www.bing.com/shop?q=",
+                videos: "https://www.bing.com/videos/search?q=",
+            },
+            duckduckgo: {
+                all: "https://duckduckgo.com/?q=",
+            },
+            yahoo: {
+                all: "https://search.yahoo.com/search?p=",
+                news: "https://news.search.yahoo.com/search?p=",
+                shopping: "https://shopping.yahoo.com/search?p=",
+                videos: "https://video.search.yahoo.com/search?p=",
+            },
+            youtube: {
+                all: "https://www.youtube.com/results?search_query=",
+            },
+        };
+
+        // Función para resaltar coincidencias
+        function highlightMatch(text, query) {
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        // Autocompletado
+        searchInput.addEventListener('input', function () {
+            const inputText = this.value.toLowerCase();
+            const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+            const allTerms = [...new Set([...terms, ...history])]; // Combina términos y historial
+            const filteredTerms = allTerms
+                .filter(term => term.toLowerCase().includes(inputText))
+                .slice(0, 5); // Limita a 5 sugerencias
+
+            suggestionsDiv.innerHTML = filteredTerms
+                .map(term => `<div>${highlightMatch(term, inputText)}</div>`)
+                .join('');
+            suggestionsDiv.style.display = filteredTerms.length ? 'block' : 'none';
+        });
+
+        // Seleccionar sugerencia
+        suggestionsDiv.addEventListener('click', function (e) {
+            if (e.target.tagName === 'DIV') {
+                searchInput.value = e.target.textContent;
+                suggestionsDiv.style.display = 'none';
+            }
+        });
+
+        // Historial de búsquedas
+        function updateHistory() {
+            const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+            historyDiv.innerHTML = history.map(term => `<div class="history-item">${term}</div>`).join('');
+        }
+
+        // Guardar búsqueda en el historial
+        function saveToHistory(query) {
+            const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+            if (!history.includes(query)) {
+                history.push(query);
+                localStorage.setItem('searchHistory', JSON.stringify(history));
+                updateHistory();
+            }
+        }
+
+        // Borrar historial
+        clearHistoryButton.addEventListener('click', function () {
+            // Agregar la clase "pulse" para activar la animación
+            this.classList.add('pulse');
+
+            // Eliminar la clase después de que termine la animación (0.7s)
+            setTimeout(() => {
+                this.classList.remove('pulse');
+            }, 700); // 700ms = 0.7s
+
+            // Borrar el historial
+            localStorage.removeItem('searchHistory');
+            updateHistory();
+        });
+
+        // Cambiar filtro activo
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                // Remover la clase "active" de todos los botones
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                // Agregar la clase "active" al botón seleccionado
+                this.classList.add('active');
+                // Actualizar el filtro activo
+                activeFilter = this.getAttribute('data-filter');
+            });
+        });
+
+        // Mostrar u ocultar filtros según el motor de búsqueda seleccionado
+        searchEngineSelect.addEventListener('change', function () {
+            if (this.value === 'youtube') {
+                filterSection.classList.add('hidden'); // Ocultar filtros para YouTube
+                filterMessage.textContent = "Los filtros no están disponibles para YouTube.";
+                filterMessage.classList.remove('hidden'); // Mostrar mensaje
+            } else if (this.value === 'duckduckgo') {
+                filterSection.classList.add('hidden'); // Ocultar filtros para DuckDuckGo
+                filterMessage.textContent = "Los filtros no están disponibles para DuckDuckGo.";
+                filterMessage.classList.remove('hidden'); // Mostrar mensaje
+            } else {
+                filterSection.classList.remove('hidden'); // Mostrar filtros para otros motores
+                filterMessage.classList.add('hidden'); // Ocultar mensaje
+            }
+        });
+
+        // Enviar búsqueda
+        document.getElementById('searchForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const query = searchInput.value;
+            const engine = document.getElementById('searchEngine').value;
+
+            // Guardar en historial
+            saveToHistory(query);
+
+            // Obtener la URL del motor de búsqueda con el filtro aplicado
+            const searchUrl = searchEngines[engine][activeFilter] + encodeURIComponent(query);
+            window.open(searchUrl, '_blank');
+
+            // Analítica (simulada)
+            console.log(`Búsqueda realizada: ${query} en ${engine} con filtro ${activeFilter}`);
+        });
+
+        // Cargar historial al inicio
+        updateHistory();
+    </script>
+</body>
+</html>
