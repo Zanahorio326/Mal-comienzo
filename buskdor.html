@@ -16,9 +16,13 @@
         <form id="searchForm" class="mb-3">
             <div class="input-group">
                 <input type="text" id="searchInput" class="form-control" placeholder="Buscar..." required>
-                <!-- Selector de navegadores personalizado -->
-                <div class="search-engine-buttons">
-                    <button class="search-engine-btn active" data-engine="google">
+                <!-- Botón para abrir el selector de buscadores -->
+                <button type="button" id="toggleSearchEngines" class="btn btn-outline-primary">
+                    <i class="fas fa-search"></i> Buscadores
+                </button>
+                <!-- Tarjeta flotante con los buscadores -->
+                <div id="searchEnginesCard" class="search-engines-card hidden">
+                    <button class="search-engine-btn" data-engine="google">
                         <i class="fab fa-google"></i> Google
                     </button>
                     <button class="search-engine-btn" data-engine="bing">
@@ -49,9 +53,9 @@
             <button class="btn btn-outline-primary" data-filter="shopping">Shopping</button>
             <button class="btn btn-outline-primary" data-filter="videos">Videos</button>
             <!-- Filtros específicos para Instagram -->
-            <button class="btn btn-outline-primary instagram-filter" data-filter="accounts">Cuentas</button>
-            <button class="btn btn-outline-primary instagram-filter" data-filter="hashtags">Hashtags</button>
-            <button class="btn btn-outline-primary instagram-filter" data-filter="reels">Reels</button>
+            <button class="btn btn-outline-primary instagram-filter hidden" data-filter="accounts">Cuentas</button>
+            <button class="btn btn-outline-primary instagram-filter hidden" data-filter="hashtags">Hashtags</button>
+            <button class="btn btn-outline-primary instagram-filter hidden" data-filter="reels">Reels</button>
         </div>
         <div id="filterMessage" class="filter-message hidden">
             <!-- Mensaje dinámico para YouTube o DuckDuckGo -->
@@ -81,6 +85,8 @@
         const filterButtons = document.querySelectorAll('.filter-buttons .btn');
         const filterSection = document.getElementById('filterSection');
         const filterMessage = document.getElementById('filterMessage');
+        const toggleSearchEngines = document.getElementById('toggleSearchEngines');
+        const searchEnginesCard = document.getElementById('searchEnginesCard');
         const searchEngineButtons = document.querySelectorAll('.search-engine-btn');
 
         // Filtro activo (predeterminado: "all")
@@ -194,15 +200,38 @@
             });
         });
 
+        // Mostrar/ocultar la tarjeta de buscadores
+        toggleSearchEngines.addEventListener('click', function () {
+            searchEnginesCard.classList.toggle('hidden');
+        });
+
         // Cambiar motor de búsqueda
         searchEngineButtons.forEach(button => {
             button.addEventListener('click', function () {
-                // Remover la clase "active" de todos los botones
-                searchEngineButtons.forEach(btn => btn.classList.remove('active'));
-                // Agregar la clase "active" al botón seleccionado
-                this.classList.add('active');
+                // Ocultar la tarjeta de buscadores
+                searchEnginesCard.classList.add('hidden');
+
                 // Actualizar el motor de búsqueda seleccionado
                 selectedEngine = this.getAttribute('data-engine');
+
+                // Mostrar u ocultar filtros según el motor seleccionado
+                if (selectedEngine === 'youtube') {
+                    filterSection.classList.add('hidden');
+                    filterMessage.textContent = "Los filtros no están disponibles para YouTube.";
+                    filterMessage.classList.remove('hidden');
+                } else if (selectedEngine === 'duckduckgo') {
+                    filterSection.classList.add('hidden');
+                    filterMessage.textContent = "Los filtros no están disponibles para DuckDuckGo.";
+                    filterMessage.classList.remove('hidden');
+                } else if (selectedEngine === 'instagram') {
+                    filterSection.classList.remove('hidden');
+                    filterMessage.classList.add('hidden');
+                    document.querySelectorAll('.instagram-filter').forEach(btn => btn.classList.remove('hidden'));
+                } else {
+                    filterSection.classList.remove('hidden');
+                    filterMessage.classList.add('hidden');
+                    document.querySelectorAll('.instagram-filter').forEach(btn => btn.classList.add('hidden'));
+                }
             });
         });
 
