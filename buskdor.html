@@ -21,7 +21,7 @@
                     <i class="fas fa-search"></i> Buscadores
                 </button>
                 <!-- Tarjeta flotante con los buscadores -->
-                <div id="searchEngineCard" class="search-engine-card hidden">
+                <div id="searchEngineCard" class="search-engine-card search-engine-hidden">
                     <button type="button" class="search-engine-btn" data-engine="google">
                         <i class="fab fa-google"></i> Google
                     </button>
@@ -53,11 +53,11 @@
             <button type="button" class="btn btn-outline-primary" data-filter="shopping">Shopping</button>
             <button type="button" class="btn btn-outline-primary" data-filter="videos">Videos</button>
             <!-- Filtros específicos para Instagram -->
-            <button type="button" class="btn btn-outline-primary instagram-filter hidden" data-filter="accounts">Cuentas</button>
-            <button type="button" class="btn btn-outline-primary instagram-filter hidden" data-filter="hashtags">Hashtags</button>
-            <button type="button" class="btn btn-outline-primary instagram-filter hidden" data-filter="reels">Reels</button>
+            <button type="button" class="btn btn-outline-primary instagram-filter search-engine-hidden" data-filter="accounts">Cuentas</button>
+            <button type="button" class="btn btn-outline-primary instagram-filter search-engine-hidden" data-filter="hashtags">Hashtags</button>
+            <button type="button" class="btn btn-outline-primary instagram-filter search-engine-hidden" data-filter="reels">Reels</button>
         </div>
-        <div id="filterMessage" class="filter-message hidden">
+        <div id="filterMessage" class="filter-message search-engine-hidden">
             <!-- Mensaje dinámico para YouTube o DuckDuckGo -->
         </div>
 
@@ -203,14 +203,14 @@
 
         // Mostrar/ocultar tarjeta de buscadores
         searchEngineButton.addEventListener('click', function () {
-            searchEngineCard.classList.toggle('hidden');
+            searchEngineCard.classList.toggle('search-engine-hidden');
         });
 
         // Cambiar motor de búsqueda
         searchEngineButtons.forEach(button => {
             button.addEventListener('click', function () {
                 // Ocultar la tarjeta de buscadores
-                searchEngineCard.classList.add('hidden');
+                searchEngineCard.classList.add('search-engine-hidden');
 
                 // Actualizar el texto del botón "Buscadores"
                 searchEngineButton.innerHTML = this.innerHTML;
@@ -220,14 +220,14 @@
 
                 // Mostrar/ocultar filtros según el motor seleccionado
                 if (selectedEngine === 'instagram') {
-                    instagramFilters.forEach(filter => filter.classList.remove('hidden'));
-                    filterButtons.forEach(btn => btn.classList.add('hidden'));
+                    instagramFilters.forEach(filter => filter.classList.remove('search-engine-hidden'));
+                    filterButtons.forEach(btn => btn.classList.add('search-engine-hidden'));
                 } else if (selectedEngine === 'youtube' || selectedEngine === 'duckduckgo') {
-                    filterButtons.forEach(btn => btn.classList.add('hidden'));
-                    instagramFilters.forEach(filter => filter.classList.add('hidden'));
+                    filterButtons.forEach(btn => btn.classList.add('search-engine-hidden'));
+                    instagramFilters.forEach(filter => filter.classList.add('search-engine-hidden'));
                 } else {
-                    filterButtons.forEach(btn => btn.classList.remove('hidden'));
-                    instagramFilters.forEach(filter => filter.classList.add('hidden'));
+                    filterButtons.forEach(btn => btn.classList.remove('search-engine-hidden'));
+                    instagramFilters.forEach(filter => filter.classList.add('search-engine-hidden'));
                 }
             });
         });
