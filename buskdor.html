@@ -218,18 +218,26 @@
 
                 // Mostrar/ocultar filtros según el motor seleccionado
                 if (selectedEngine === 'instagram') {
+                    // Mostrar filtros de Instagram
                     instagramFilters.forEach(filter => filter.classList.remove('search-engine-hidden'));
+                    // Ocultar filtros generales
                     filterButtons.forEach(btn => btn.classList.add('search-engine-hidden'));
-                    filterMessage.classList.add('search-engine-hidden'); // Ocultar mensaje
+                    // Ocultar mensaje de no disponibilidad
+                    filterMessage.classList.add('search-engine-hidden');
                 } else if (selectedEngine === 'youtube' || selectedEngine === 'duckduckgo') {
+                    // Ocultar todos los filtros
                     filterButtons.forEach(btn => btn.classList.add('search-engine-hidden'));
                     instagramFilters.forEach(filter => filter.classList.add('search-engine-hidden'));
-                    filterMessage.classList.remove('search-engine-hidden'); // Mostrar mensaje
+                    // Mostrar mensaje de no disponibilidad
+                    filterMessage.classList.remove('search-engine-hidden');
                     filterMessage.textContent = "No hay filtros disponibles para este motor de búsqueda.";
                 } else {
+                    // Mostrar filtros generales
                     filterButtons.forEach(btn => btn.classList.remove('search-engine-hidden'));
+                    // Ocultar filtros de Instagram
                     instagramFilters.forEach(filter => filter.classList.add('search-engine-hidden'));
-                    filterMessage.classList.add('search-engine-hidden'); // Ocultar mensaje
+                    // Ocultar mensaje de no disponibilidad
+                    filterMessage.classList.add('search-engine-hidden');
                 }
             });
         });
