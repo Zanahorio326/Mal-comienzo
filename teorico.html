@@ -84,7 +84,7 @@
                 createUserWithEmailAndPassword(auth, email, password)
                     .then((userCredential) => {
                         const user = userCredential.user;
-                        // Guardar el nombre de usuario en la base de datos
+                        // Guardar el nombre de usuario en la base de datos junto con el correo
                         set(ref(db, 'usuarios/' + user.uid), {
                             username: username,
                             email: user.email
@@ -109,7 +109,7 @@
                 const userRef = ref(db, "mensajes");
                 const newMessageRef = push(userRef);
                 set(newMessageRef, {
-                    username: user.email,
+                    username: user.displayName || user.email,
                     message: mensaje
                 }).then(() => {
                     document.getElementById("mensaje").value = "";
@@ -153,7 +153,7 @@
                 document.getElementById("registro").style.display = "none";
                 document.getElementById("chat").style.display = "block";
                 cargarMensajes();
-                // Mostrar el nombre de usuario en el chat
+                // Obtener y mostrar el nombre de usuario desde la base de datos
                 const userRef = ref(db, "usuarios/" + user.uid);
                 get(userRef).then((snapshot) => {
                     if (snapshot.exists()) {
