@@ -3,13 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <script type="module">
-        // Importar Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    <title>Login - Registro</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+</head>
+<body>
 
+    <!-- Contenedor para la tarjeta de login -->
+    <div class="login-card">
+        <!-- Botones de Registro e Iniciar sesión -->
+        <button id="registerButton">Registrarse</button>
+        <button id="loginButton">Iniciar sesión</button>
+
+        <!-- Formularios de Login y Registro -->
+        <div id="loginForm" style="display: none;">
+            <h3>Iniciar sesión</h3>
+            <input type="text" id="usernameInput" placeholder="Nombre de usuario" />
+            <input type="password" id="passwordInput" placeholder="Contraseña" />
+            <button onclick="loginUser()">Entrar al Chat</button>
+        </div>
+
+        <div id="registerForm" style="display: none;">
+            <h3>Registrarse</h3>
+            <input type="text" id="usernameInputRegister" placeholder="Nombre de usuario" />
+            <input type="password" id="passwordInputRegister" placeholder="Contraseña" />
+            <button onclick="registerUser()">Registrar y Entrar al Chat</button>
+        </div>
+    </div>
+
+    <script>
         // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
@@ -22,82 +44,81 @@
             measurementId: "G-9M3CBJ3LV9"
         };
 
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
-        alert("Firebase cargado correctamente"); // Verificar carga de Firebase
+        // Inicialización de Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-        // Función de Registro
-        document.addEventListener("DOMContentLoaded", function() {
-            document.getElementById("btnRegistro").addEventListener("click", function() {
-                alert("Botón de registro presionado"); // Verificar clic
+        // Variables de formulario
+        const registerButton = document.getElementById("registerButton");
+        const loginButton = document.getElementById("loginButton");
+        const loginForm = document.getElementById("loginForm");
+        const registerForm = document.getElementById("registerForm");
 
-                const username = document.getElementById("username").value;
-                const password = document.getElementById("password").value;
-
-                if (username === "" || password === "") {
-                    alert("Por favor, completa todos los campos.");
-                    return;
-                }
-
-                const userRef = ref(db, 'users/' + username);
-                get(child(ref(db), 'users/' + username)).then((snapshot) => {
-                    if (snapshot.exists()) {
-                        alert("El nombre de usuario ya está registrado.");
-                    } else {
-                        set(userRef, {
-                            username: username,
-                            password: password
-                        }).then(() => {
-                            alert("Registro exitoso, redirigiendo al chat...");
-                            window.location.href = "chat.html";
-                        }).catch((error) => {
-                            alert("Error al registrar: " + error.message);
-                        });
-                    }
-                }).catch((error) => {
-                    alert("Error al verificar usuario: " + error.message);
-                });
-            });
-
-            // Función de Inicio de Sesión
-            document.getElementById("btnLogin").addEventListener("click", function() {
-                alert("Botón de inicio de sesión presionado"); // Verificar clic
-
-                const username = document.getElementById("username").value;
-                const password = document.getElementById("password").value;
-
-                if (username === "" || password === "") {
-                    alert("Por favor, completa todos los campos.");
-                    return;
-                }
-
-                const userRef = ref(db, 'users/' + username);
-                get(child(ref(db), 'users/' + username)).then((snapshot) => {
-                    if (snapshot.exists() && snapshot.val().password === password) {
-                        alert("Inicio de sesión exitoso, redirigiendo al chat...");
-                        window.location.href = "chat.html";
-                    } else {
-                        alert("Nombre de usuario o contraseña incorrectos.");
-                    }
-                }).catch((error) => {
-                    alert("Error al verificar credenciales: " + error.message);
-                });
-            });
+        // Mostrar el formulario de Login
+        loginButton.addEventListener("click", () => {
+            loginForm.style.display = "block";
+            registerForm.style.display = "none";
         });
+
+        // Mostrar el formulario de Registro
+        registerButton.addEventListener("click", () => {
+            registerForm.style.display = "block";
+            loginForm.style.display = "none";
+        });
+
+        // Verificación de existencia de usuario
+        const checkIfUserExists = async (username) => {
+            const snapshot = await database.ref('users').orderByChild('username').equalTo(username).once('value');
+            return snapshot.exists();
+        };
+
+        // Función de registro de usuario
+        const registerUser = async () => {
+            const username = document.getElementById("usernameInputRegister").value;
+            const password = document.getElementById("passwordInputRegister").value;
+
+            // Verificar si el nombre de usuario ya existe
+            const userExists = await checkIfUserExists(username);
+
+            if (userExists) {
+                alert('El nombre de usuario ya está registrado. Elige otro.');
+                return;
+            }
+
+            // Guardar el nuevo usuario
+            database.ref('users').push({
+                username: username,
+                password: password
+            }).then(() => {
+                alert('Registro exitoso. ¡Bienvenido!');
+                window.location.href = "chat.html";  // Redirigir al chat
+            }).catch((error) => {
+                alert('Error en el registro: ' + error.message);
+            });
+        };
+
+        // Función de inicio de sesión
+        const loginUser = async () => {
+            const username = document.getElementById("usernameInput").value;
+            const password = document.getElementById("passwordInput").value;
+
+            const snapshot = await database.ref('users').orderByChild('username').equalTo(username).once('value');
+
+            if (!snapshot.exists()) {
+                alert('El nombre de usuario no existe. Por favor, regístrate primero.');
+                return;
+            }
+
+            // Verificar si la contraseña es correcta
+            const userData = Object.values(snapshot.val())[0];
+            if (userData.password === password) {
+                alert('Inicio de sesión exitoso.');
+                window.location.href = "chat.html";  // Redirigir al chat
+            } else {
+                alert('Contraseña incorrecta.');
+            }
+        };
     </script>
-</head>
-<body>
-    <div style="width: 300px; margin: auto; padding: 20px; border: 1px solid #ccc; text-align: center;">
-        <button id="btnRegistro">Registrarse</button>
-        <button id="btnLogin">Iniciar Sesión</button>
-        <br><br>
-        <input type="text" id="username" placeholder="Nombre de usuario">
-        <br><br>
-        <input type="password" id="password" placeholder="Contraseña">
-        <br><br>
-        <button id="btnChat">Chat</button>
-    </div>
+
 </body>
 </html>
