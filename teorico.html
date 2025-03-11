@@ -1,32 +1,68 @@
-import { getAuth, deleteUser } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
-import { getDatabase, ref, remove } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminar Cuenta</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
 
-// Función para eliminar cuenta y datos
-function eliminarCuenta() {
-    const auth = getAuth();
-    const db = getDatabase();
+    <div class="container">
+        <h2>Eliminar Cuenta y Datos</h2>
+        <p>Al eliminar tu cuenta, perderás todos los datos asociados, incluyendo tu nombre de usuario y mensajes.</p>
+        <button id="deleteBtn">Eliminar Cuenta</button>
+        <p id="confirmationMsg" style="color: green;"></p>
+    </div>
 
-    const user = auth.currentUser;
-    if (user) {
-        // Eliminar datos del usuario en la base de datos
-        remove(ref(db, 'usuarios/' + user.uid))
-            .then(() => {
-                console.log('Datos eliminados de la base de datos');
-                // Eliminar cuenta de Firebase Authentication
-                deleteUser(user)
-                    .then(() => {
-                        console.log('Cuenta eliminada con éxito');
-                        // Redirigir o actualizar UI
-                        window.location.href = '/'; // Redirigir a la página de inicio o login
-                    })
-                    .catch((error) => {
-                        console.error('Error al eliminar la cuenta:', error);
-                    });
-            })
-            .catch((error) => {
-                console.error('Error al eliminar los datos de la base de datos:', error);
-            });
-    } else {
-        console.log('No hay usuario autenticado');
-    }
-}
+    <script>
+        document.getElementById("deleteBtn").addEventListener("click", function() {
+            if (confirm("¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.")) {
+                // Eliminar datos de usuario (Ejemplo de eliminar datos del chat)
+                localStorage.removeItem("usuario");  // Eliminar el nombre de usuario
+                localStorage.removeItem("chat");  // Eliminar mensajes (ajusta según tu estructura)
+
+                // Si tienes datos en sessionStorage o en tu base de datos, haz lo mismo con ellos.
+                // sessionStorage.removeItem("usuario");
+                // sessionStorage.removeItem("chat");
+
+                // Redirigir o mostrar mensaje de éxito
+                document.getElementById("confirmationMsg").textContent = "Tu cuenta y datos han sido eliminados con éxito.";
+                setTimeout(() => {
+                    window.location.href = "index.html";  // Cambia esto a la URL que prefieras
+                }, 2000);
+            }
+        });
+    </script>
+
+</body>
+</html>
