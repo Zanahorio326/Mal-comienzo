@@ -1,153 +1,192 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat con Registro y Nombre de Usuario</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat con autenticación Firebase</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .chat-box {
+      margin-top: 20px;
+      padding: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .messages {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .message {
+      padding: 10px;
+      margin: 5px 0;
+      background-color: #e9ecef;
+      border-radius: 5px;
+    }
+    .message .username {
+      font-weight: bold;
+    }
+    .input-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    .input-container input {
+      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .input-container button {
+      width: 15%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+    }
+    .input-container button:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
 <body>
-    <h2>Bienvenido al chat</h2>
 
-    <!-- Sección de registro -->
-    <div id="registro">
-        <h3>Regístrate para participar</h3>
-        <input type="email" id="email" placeholder="Correo electrónico">
-        <input type="password" id="password" placeholder="Contraseña">
-        <input type="text" id="username" placeholder="Nombre de usuario (letras y números)">
-        <button onclick="registrarUsuario()">Registrar</button>
-        <p id="errorRegistro"></p>
+  <div class="container">
+    <!-- Pantalla de registro -->
+    <div id="registro" class="registro">
+      <h2>Registro</h2>
+      <form id="register-form">
+        <label for="email">Correo electrónico:</label>
+        <input type="email" id="email" required>
+
+        <label for="password">Contraseña:</label>
+        <input type="password" id="password" required>
+
+        <label for="username">Nombre de usuario:</label>
+        <input type="text" id="username" required>
+
+        <button type="submit">Registrar</button>
+      </form>
+      <p id="error-message" style="color: red;"></p>
     </div>
 
-    <!-- Sección de chat -->
-    <div id="chat" style="display:none;">
-        <h3>Bienvenido al chat</h3>
-        <p>Nombre de usuario: <span id="nombreUsuario"></span></p>
-        <textarea id="mensaje" placeholder="Escribe un mensaje..."></textarea><br>
-        <button onclick="enviarMensaje()">Enviar mensaje</button>
-        <div id="mensajes"></div>
+    <!-- Pantalla de chat -->
+    <div id="chat" class="chat-box" style="display: none;">
+      <h2>Bienvenido al chat, <span id="usuario-nombre"></span>!</h2>
+
+      <div class="messages" id="messages">
+        <!-- Los mensajes aparecerán aquí -->
+      </div>
+
+      <div class="input-container">
+        <input type="text" id="message-input" placeholder="Escribe un mensaje..." />
+        <button id="send-message">Enviar mensaje</button>
+      </div>
     </div>
+  </div>
 
-    <script type="module">
-        // Importar las funciones necesarias de Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
-        import { getDatabase, ref, set, push, get, child } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+  <script>
+    // Configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+      authDomain: "thegame-5afaa.firebaseapp.com",
+      databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+      projectId: "thegame-5afaa",
+      storageBucket: "thegame-5afaa.appspot.com",
+      messagingSenderId: "588556182984",
+      appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+      measurementId: "G-9M3CBJ3LV9"
+    };
+    
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
 
-        // Configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
-            authDomain: "thegame-5afaa.firebaseapp.com",
-            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
-            projectId: "thegame-5afaa",
-            storageBucket: "thegame-5afaa.firebasestorage.app",
-            messagingSenderId: "588556182984",
-            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
-            measurementId: "G-9M3CBJ3LV9"
-        };
+    // Registro de usuario
+    document.getElementById('register-form').addEventListener('submit', function(event) {
+      event.preventDefault();
 
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const username = document.getElementById('username').value;
 
-        let usuarioActual = null;
+      // Validación del nombre de usuario (solo letras y números)
+      if (!/^[a-zA-Z0-9]+$/.test(username)) {
+        document.getElementById('error-message').textContent = 'El nombre de usuario solo puede contener letras y números.';
+        return;
+      }
 
-        // Función para registrar un nuevo usuario
-        function registrarUsuario() {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
-            const username = document.getElementById("username").value;
+      // Registrar el usuario en Firebase Authentication
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(function(userCredential) {
+          const user = userCredential.user;
 
-            // Verificar que el nombre de usuario solo contenga letras y números
-            if (!username.match(/^[a-zA-Z0-9]+$/)) {
-                document.getElementById("errorRegistro").innerText = "El nombre de usuario solo puede contener letras y números.";
-                return;
-            }
+          // Guardar el nombre de usuario en la base de datos
+          database.ref('users/' + user.uid).set({
+            username: username
+          }).then(function() {
+            // Redirigir al chat después de registrarse
+            document.getElementById('registro').style.display = 'none';
+            document.getElementById('chat').style.display = 'block';
+            document.getElementById('usuario-nombre').textContent = username;
 
-            // Verificar que el nombre de usuario no esté registrado
-            const userRef = ref(db, "usuarios");
-            get(userRef).then((snapshot) => {
-                let usernameTaken = false;
-                snapshot.forEach((childSnapshot) => {
-                    if (childSnapshot.val().username === username) {
-                        usernameTaken = true;
-                    }
-                });
-
-                if (usernameTaken) {
-                    document.getElementById("errorRegistro").innerText = "Este nombre de usuario ya está en uso.";
-                    return;
-                }
-
-                // Crear el nuevo usuario en Firebase
-                createUserWithEmailAndPassword(auth, email, password)
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        // Guardar el nombre de usuario en la base de datos junto con el correo
-                        set(ref(db, 'usuarios/' + user.uid), {
-                            username: username,
-                            email: user.email
-                        }).then(() => {
-                            usuarioActual = user;
-                            document.getElementById("registro").style.display = "none";
-                            document.getElementById("chat").style.display = "block";
-                            document.getElementById("nombreUsuario").innerText = username;
-                        });
-                    })
-                    .catch((error) => {
-                        document.getElementById("errorRegistro").innerText = "Error al registrar: " + error.message;
-                    });
-            });
-        }
-
-        // Función para enviar un mensaje
-        function enviarMensaje() {
-            const mensaje = document.getElementById("mensaje").value;
-            if (mensaje.trim() !== "") {
-                const user = usuarioActual;
-                const userRef = ref(db, "mensajes");
-                const newMessageRef = push(userRef);
-                set(newMessageRef, {
-                    username: user.displayName || user.email,
-                    message: mensaje
-                }).then(() => {
-                    document.getElementById("mensaje").value = "";
-                    cargarMensajes();
-                });
-            }
-        }
-
-        // Función para cargar los mensajes del chat
-        function cargarMensajes() {
-            const mensajesRef = ref(db, "mensajes");
-            get(mensajesRef).then((snapshot) => {
-                const mensajesDiv = document.getElementById("mensajes");
-                mensajesDiv.innerHTML = "";
-                snapshot.forEach((childSnapshot) => {
-                    const message = childSnapshot.val();
-                    const p = document.createElement("p");
-                    p.textContent = `${message.username}: ${message.message}`;
-                    mensajesDiv.appendChild(p);
-                });
-            });
-        }
-
-        // Detectar cambios de estado de autenticación
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                usuarioActual = user;
-                document.getElementById("registro").style.display = "none";
-                document.getElementById("chat").style.display = "block";
-                cargarMensajes();
-                // Obtener y mostrar el nombre de usuario desde la base de datos
-                const userRef = ref(db, "usuarios/" + user.uid);
-                get(userRef).then((snapshot) => {
-                    if (snapshot.exists()) {
-                        document.getElementById("nombreUsuario").innerText = snapshot.val().username;
-                    }
-                });
-            }
+            // Cargar mensajes del chat
+            cargarMensajes();
+          });
+        })
+        .catch(function(error) {
+          document.getElementById('error-message').textContent = error.message;
         });
-    </script>
+    });
+
+    // Enviar mensaje
+    document.getElementById('send-message').addEventListener('click', function() {
+      const messageInput = document.getElementById('message-input');
+      const message = messageInput.value.trim();
+
+      if (message) {
+        const user = auth.currentUser;
+        const username = user ? user.displayName : 'Invitado';
+
+        // Guardar el mensaje en la base de datos
+        database.ref('messages').push({
+          username: username,
+          message: message,
+          timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+
+        messageInput.value = ''; // Limpiar el campo de texto
+      }
+    });
+
+    // Cargar mensajes del chat
+    function cargarMensajes() {
+      const messagesRef = database.ref('messages');
+      messagesRef.orderByChild('timestamp').on('child_added', function(snapshot) {
+        const messageData = snapshot.val();
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+        messageElement.innerHTML = `<span class="username">${messageData.username}:</span> ${messageData.message}`;
+        document.getElementById('messages').appendChild(messageElement);
+      });
+    }
+  </script>
+
 </body>
 </html>
