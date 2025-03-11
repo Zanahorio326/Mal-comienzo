@@ -8,129 +8,37 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .chat-box {
-      margin-top: 20px;
-      padding: 20px;
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .messages {
-      max-height: 300px;
-      overflow-y: auto;
-    }
-    .message {
-      padding: 10px;
-      margin: 5px 0;
-      background-color: #e9ecef;
-      border-radius: 5px;
-    }
-    .message .username {
-      font-weight: bold;
-    }
-    .input-container {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-    }
-    .input-container input {
-      width: 80%;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    .input-container button {
-      width: 15%;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 5px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-    }
-    .input-container button:hover {
-      background-color: #0056b3;
-    }
-    /* Estilos para el formulario de registro */
-    .form-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .form-row label {
-      width: 40%;
-      text-align: left;
-    }
-    .form-row input {
-      width: 55%;
-      padding: 8px;
-      font-size: 14px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    .form-row button {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 5px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-    }
+    body { font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .chat-box { display: none; background: white; padding: 20px; border-radius: 10px; }
+    .messages { max-height: 300px; overflow-y: auto; margin-bottom: 10px; text-align: left; }
+    .message { padding: 5px; border-bottom: 1px solid #ddd; }
+    .message .username { font-weight: bold; }
+    .input-container { display: flex; }
+    .input-container input { flex: 1; padding: 10px; }
+    .input-container button { padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+    .input-container button:hover { background: #0056b3; }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- Pantalla de registro -->
-    <div id="registro" class="registro">
-      <h2>Registro</h2>
-      <form id="register-form">
-        <div class="form-row">
-          <label for="email">Correo electrónico:</label>
-          <input type="email" id="email" required>
-        </div>
+    <h2>Iniciar sesión con Google</h2>
+    <button id="login-google">Iniciar sesión con Google</button>
 
-        <div class="form-row">
-          <label for="password">Contraseña:</label>
-          <input type="password" id="password" required>
-        </div>
-
-        <div class="form-row">
-          <label for="username">Nombre de usuario:</label>
-          <input type="text" id="username" required>
-        </div>
-
-        <div class="form-row">
-          <button type="submit">Registrar</button>
-        </div>
-      </form>
+    <div id="username-setup" style="display: none;">
+      <h3>Elige un nombre de usuario</h3>
+      <input type="text" id="username" placeholder="Solo letras y números">
+      <button id="set-username">Guardar</button>
       <p id="error-message" style="color: red;"></p>
     </div>
 
-    <!-- Pantalla de chat -->
-    <div id="chat" class="chat-box" style="display: none;">
-      <h2>Bienvenido al chat, <span id="usuario-nombre"></span>!</h2>
-
-      <div class="messages" id="messages">
-        <!-- Los mensajes aparecerán aquí -->
-      </div>
-
+    <div id="chat" class="chat-box">
+      <h2>Bienvenido, <span id="user-name"></span></h2>
+      <div class="messages" id="messages"></div>
       <div class="input-container">
-        <input type="text" id="message-input" placeholder="Escribe un mensaje..." />
-        <button id="send-message">Enviar mensaje</button>
+        <input type="text" id="message-input" placeholder="Escribe un mensaje...">
+        <button id="send-message">Enviar</button>
       </div>
     </div>
   </div>
@@ -148,56 +56,70 @@
       measurementId: "G-9M3CBJ3LV9"
     };
 
-    const app = firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const database = firebase.database();
 
-    // Registro de usuario
-    document.getElementById('register-form').addEventListener('submit', function(event) {
-      event.preventDefault();
+    let currentUser = null;
+    let currentUsername = "";
 
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const username = document.getElementById('username').value;
+    // Iniciar sesión con Google
+    document.getElementById('login-google').addEventListener('click', function() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).then(result => {
+        currentUser = result.user;
+        checkUsername();
+      }).catch(error => {
+        console.error("Error en el inicio de sesión:", error);
+      });
+    });
 
-      // Validación del nombre de usuario (solo letras y números)
+    // Verificar si el usuario ya tiene un nombre de usuario
+    function checkUsername() {
+      if (currentUser) {
+        database.ref('users/' + currentUser.uid).once('value').then(snapshot => {
+          if (snapshot.exists()) {
+            currentUsername = snapshot.val().username;
+            showChat();
+          } else {
+            document.getElementById('username-setup').style.display = 'block';
+          }
+        });
+      }
+    }
+
+    // Guardar nombre de usuario
+    document.getElementById('set-username').addEventListener('click', function() {
+      const username = document.getElementById('username').value.trim();
+
+      // Validar que solo tenga letras y números
       if (!/^[a-zA-Z0-9]+$/.test(username)) {
-        document.getElementById('error-message').textContent = 'El nombre de usuario solo puede contener letras y números.';
+        document.getElementById('error-message').textContent = 'Solo se permiten letras y números.';
         return;
       }
 
-      // Registrar el usuario en Firebase Authentication
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(function(userCredential) {
-          const user = userCredential.user;
-
-          // Guardar el nombre de usuario en la base de datos
-          return database.ref('users/' + user.uid).set({
-            username: username
-          });
-        })
-        .then(function() {
-          // Redirigir al chat después de registrarse
-          document.getElementById('registro').style.display = 'none';
-          document.getElementById('chat').style.display = 'block';
-
-          // Obtener el nombre de usuario y mostrarlo en el chat
-          auth.onAuthStateChanged(function(user) {
-            if (user) {
-              database.ref('users/' + user.uid).once('value').then(function(snapshot) {
-                const username = snapshot.val().username;
-                document.getElementById('usuario-nombre').textContent = username;
-              });
-            }
-          });
-
-          // Cargar mensajes del chat
-          cargarMensajes();
-        })
-        .catch(function(error) {
-          document.getElementById('error-message').textContent = error.message;
+      // Verificar que el nombre de usuario no esté en uso
+      database.ref('users').orderByChild('username').equalTo(username).once('value')
+        .then(snapshot => {
+          if (snapshot.exists()) {
+            document.getElementById('error-message').textContent = 'Ese nombre de usuario ya está en uso.';
+          } else {
+            // Guardar el nombre de usuario
+            database.ref('users/' + currentUser.uid).set({ username: username });
+            currentUsername = username;
+            showChat();
+          }
         });
     });
+
+    // Mostrar la pantalla de chat
+    function showChat() {
+      document.getElementById('username-setup').style.display = 'none';
+      document.getElementById('login-google').style.display = 'none';
+      document.getElementById('chat').style.display = 'block';
+      document.getElementById('user-name').textContent = currentUsername;
+      loadMessages();
+    }
 
     // Enviar mensaje
     document.getElementById('send-message').addEventListener('click', function() {
@@ -205,22 +127,17 @@
       const message = messageInput.value.trim();
 
       if (message) {
-        const user = auth.currentUser;
-        const username = user ? user.displayName : 'Invitado';
-
-        // Guardar el mensaje en la base de datos
         database.ref('messages').push({
-          username: username,
+          username: currentUsername,
           message: message,
           timestamp: firebase.database.ServerValue.TIMESTAMP
         });
-
         messageInput.value = ''; // Limpiar el campo de texto
       }
     });
 
-    // Cargar mensajes del chat
-    function cargarMensajes() {
+    // Cargar mensajes en el chat
+    function loadMessages() {
       const messagesRef = database.ref('messages');
       messagesRef.orderByChild('timestamp').on('child_added', function(snapshot) {
         const messageData = snapshot.val();
