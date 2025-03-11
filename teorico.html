@@ -114,6 +114,7 @@
                 alert("Error al autenticar: " + error.message);
             });
 
+        // Función para iniciar sesión con Google y validar el nombre de usuario
         window.iniciarSesionConGoogle = async function () {
             const nombreUsuario = document.getElementById("nombreUsuario").value;
 
@@ -124,6 +125,7 @@
 
             const usuarioRef = ref(db, `usuarios/nombres/${nombreUsuario}`);
             const snapshot = await get(usuarioRef);
+
             if (snapshot.exists()) {
                 alert("El nombre de usuario ya está en uso. Elige otro.");
                 return;
@@ -137,6 +139,7 @@
             await signInWithRedirect(auth, provider);
         };
 
+        // Guardar el usuario en la base de datos
         async function guardarUsuarioEnDB(user, nombreUsuario) {
             await set(ref(db, `usuarios/${user.uid}`), {
                 nombre: user.displayName,
@@ -149,6 +152,7 @@
             alert(`¡Bienvenido, ${nombreUsuario}!`);
         }
 
+        // Mostrar el chat después de iniciar sesión correctamente
         function mostrarChat() {
             document.querySelector(".card").style.display = "none"; // Ocultar la tarjeta de registro
             document.getElementById("chat").style.display = "block"; // Mostrar el chat
@@ -167,6 +171,7 @@
             }
         };
 
+        // Leer y mostrar los mensajes en tiempo real
         const mensajesRef = ref(db, "mensajes");
         onValue(mensajesRef, (snapshot) => {
             const datos = snapshot.val();
