@@ -3,20 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escritura en Tiempo Real</title>
+    <title>Chat en Tiempo Real</title>
 </head>
 <body>
     <h2>Escribe algo y lo verán todos en tiempo real:</h2>
     <input type="text" id="mensaje" placeholder="Escribe aquí...">
     <button onclick="enviarTexto()">Enviar</button>
-    <p><strong>Texto compartido:</strong> <span id="textoCompartido"></span></p>
+    <div id="historial"></div>
 
     <script>
-        // Cargar Firebase
         import("https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js").then(({ initializeApp }) => {
-            import("https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js").then(({ getDatabase, ref, set, onValue }) => {
+            import("https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js").then(({ getDatabase, ref, push, onValue, set }) => {
 
-                // Configuración de Firebase
                 const firebaseConfig = {
                     apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
                     authDomain: "thegame-5afaa.firebaseapp.com",
@@ -28,21 +26,39 @@
                     measurementId: "G-9M3CBJ3LV9"
                 };
 
-                // Inicializar Firebase
                 const app = initializeApp(firebaseConfig);
                 const db = getDatabase(app);
-                const textRef = ref(db, "textoCompartido");
+                const mensajesRef = ref(db, "mensajes");
 
-                // Hacer la función accesible globalmente
+                // Enviar mensaje
                 window.enviarTexto = function () {
                     const texto = document.getElementById("mensaje").value;
-                    set(textRef, texto);
-                    document.getElementById("mensaje").value = ""; // Borra el campo después de enviar
+                    if (texto.trim() !== "") {
+                        push(mensajesRef, texto);
+                        document.getElementById("mensaje").value = "";
+                    }
                 };
 
-                // Escuchar cambios en la base de datos y actualizar en tiempo real
-                onValue(textRef, (snapshot) => {
-                    document.getElementById("textoCompartido").innerText = snapshot.val();
+                // Escuchar cambios y mostrar los últimos 5 mensajes
+                onValue(mensajesRef, (snapshot) => {
+                    const datos = snapshot.val();
+                    const historial = document.getElementById("historial");
+                    historial.innerHTML = ""; 
+
+                    if (datos) {
+                        const mensajes = Object.values(datos).slice(-5); // Tomar los últimos 5 mensajes
+                        mensajes.forEach(msg => {
+                            const p = document.createElement("p");
+                            p.textContent = msg;
+                            historial.appendChild(p);
+                        });
+
+                        // Limitar la base de datos a solo 5 mensajes
+                        if (Object.keys(datos).length > 5) {
+                            const primerasClaves = Object.keys(datos).slice(0, Object.keys(datos).length - 5);
+                            primerasClaves.forEach(clave => set(ref(db, `mensajes/${clave}`), null)); 
+                        }
+                    }
                 });
             });
         });
