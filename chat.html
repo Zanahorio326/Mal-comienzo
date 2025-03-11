@@ -26,57 +26,41 @@
     // Verificar si el usuario está autenticado
     auth.onAuthStateChanged((user) => {
       if (!user) {
-        // Si no está autenticado, redirigir al inicio de sesión
-        window.location.href = "https://zanahorio326.github.io/Mal-comienzo/index.html";
+        window.location.href = "https://zanahorio326.github.io/Mal-comienzo/login.html";
       } else {
-        // Obtener el nombre de usuario desde Firestore y mostrarlo
-        firestore.collection("users").doc(user.uid).get().then((doc) => {
-          document.getElementById("userName").textContent = doc.data().username;
-        });
+        // Obtener el nombre de usuario de Firestore
+        firestore.collection("users").doc(user.uid).get()
+          .then((doc) => {
+            const username = doc.data().username;
+            document.getElementById("welcomeMessage").innerText = "Bienvenido, " + username;
+          });
       }
     });
 
-    // Enviar un mensaje
+    // Función para enviar un mensaje
     function sendMessage() {
       const message = document.getElementById("message").value;
       const user = auth.currentUser;
-      if (message && user) {
-        firestore.collection("messages").add({
-          user: user.email.split('@')[0],
+
+      if (message) {
+        firestore.collection("chats").add({
+          username: user.displayName,
           message: message,
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
+
         document.getElementById("message").value = "";
       }
     }
-
-    // Obtener y mostrar los mensajes
-    function getMessages() {
-      firestore.collection("messages")
-        .orderBy("timestamp")
-        .onSnapshot((snapshot) => {
-          const messages = snapshot.docs.map(doc => doc.data());
-          const messagesContainer = document.getElementById("messagesContainer");
-          messagesContainer.innerHTML = "";
-          messages.forEach(msg => {
-            const msgElement = document.createElement("p");
-            msgElement.textContent = `${msg.user}: ${msg.message}`;
-            messagesContainer.appendChild(msgElement);
-          });
-        });
-    }
-
-    // Cargar los mensajes cuando la página se carga
-    window.onload = getMessages;
   </script>
 </head>
 <body>
-  <h2>Bienvenido, <span id="userName"></span></h2>
-  <div id="messagesContainer"></div>
-
-  <input type="text" id="message" placeholder="Escribe un mensaje...">
+  <h2 id="welcomeMessage">Cargando...</h2>
+  <div id="chatbox">
+    <!-- Aquí se mostrarán los mensajes -->
+  </div>
+  <textarea id="message" placeholder="Escribe tu mensaje..."></textarea>
   <button onclick="sendMessage()">Enviar</button>
-
   <button onclick="auth.signOut()">Cerrar sesión</button>
 </body>
 </html>
