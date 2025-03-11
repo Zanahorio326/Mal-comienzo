@@ -1,180 +1,131 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat con Identificación de Usuarios</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 300px;
-        }
-        input {
-            padding: 10px;
-            margin: 10px 0;
-            width: 100%;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #4285F4;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #357ABD;
-        }
-        #chat {
-            display: none; /* Ocultar el chat inicialmente */
-            margin-top: 20px;
-        }
-        #historial {
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-top: 10px;
-        }
-        .mensaje {
-            margin: 5px 0;
-        }
-        .usuario {
-            font-weight: bold;
-            color: #4285F4;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat con Firebase</title>
+  <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js"></script>
 </head>
 <body>
-    <div class="card" id="registroCard">
-        <h2>Registro con Correo Electrónico</h2>
-        <input type="email" id="email" placeholder="Correo electrónico">
-        <input type="password" id="password" placeholder="Contraseña">
-        <button onclick="registrarse()">Registrarse</button>
-        <br><br>
-        <button onclick="iniciarSesion()">Iniciar sesión</button>
-    </div>
+  <h1>Chat en Vivo</h1>
+  <!-- Autenticación -->
+  <div id="auth-container">
+    <button id="login-button">Iniciar Sesión</button>
+    <button id="logout-button" style="display: none;">Cerrar Sesión</button>
+  </div>
 
-    <div id="chat" class="card">
-        <h2>Chat en Tiempo Real</h2>
-        <input type="text" id="mensaje" placeholder="Escribe aquí...">
-        <button onclick="enviarTexto()">Enviar</button>
-        <div id="historial"></div>
-    </div>
+  <!-- Interfaz de chat -->
+  <div id="chat-container" style="display: none;">
+    <div id="chat-box"></div>
+    <input type="text" id="message-input" placeholder="Escribe un mensaje...">
+    <button id="send-message-button">Enviar</button>
+  </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
-        import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+  <!-- Eliminar cuenta -->
+  <div id="account-container" style="display: none;">
+    <button id="delete-account-button">Eliminar mi cuenta</button>
+  </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
-            authDomain: "thegame-5afaa.firebaseapp.com",
-            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
-            projectId: "thegame-5afaa",
-            storageBucket: "thegame-5afaa.firebasestorage.app",
-            messagingSenderId: "588556182984",
-            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
-            measurementId: "G-9M3CBJ3LV9"
-        };
+  <script>
+    // Configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+      authDomain: "thegame-5afaa.firebaseapp.com",
+      databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+      projectId: "thegame-5afaa",
+      storageBucket: "thegame-5afaa.firebasestorage.app",
+      messagingSenderId: "588556182984",
+      appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+      measurementId: "G-9M3CBJ3LV9"
+    };
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
+    // Función para iniciar sesión con Google
+    const loginButton = document.getElementById("login-button");
+    loginButton.addEventListener("click", function() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).then((result) => {
+        const user = result.user;
+        document.getElementById("auth-container").style.display = "none";
+        document.getElementById("chat-container").style.display = "block";
+        document.getElementById("logout-button").style.display = "block";
+        document.getElementById("account-container").style.display = "block";
 
-        let usuarioActual = null;
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                usuarioActual = user;
-                mostrarChat();
-            }
+        // Guardar usuario en la base de datos
+        const userRef = db.ref('usuarios/' + user.uid);
+        userRef.set({
+          username: user.displayName
         });
+      }).catch((error) => {
+        console.error(error);
+      });
+    });
 
-        window.registrarse = async function () {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
+    // Función para cerrar sesión
+    const logoutButton = document.getElementById("logout-button");
+    logoutButton.addEventListener("click", function() {
+      auth.signOut().then(() => {
+        document.getElementById("auth-container").style.display = "block";
+        document.getElementById("chat-container").style.display = "none";
+        document.getElementById("logout-button").style.display = "none";
+        document.getElementById("account-container").style.display = "none";
+      }).catch((error) => {
+        console.error(error);
+      });
+    });
 
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                alert(`¡Bienvenido, ${user.email}!`);
-                guardarUsuarioEnDB(user);
-            } catch (error) {
-                alert("Error al registrarse: " + error.message);
-            }
-        };
+    // Enviar mensaje al chat
+    const sendMessageButton = document.getElementById("send-message-button");
+    sendMessageButton.addEventListener("click", function() {
+      const messageInput = document.getElementById("message-input");
+      const message = messageInput.value.trim();
+      if (message) {
+        const user = auth.currentUser;
+        const messageRef = db.ref('chat').push();
+        messageRef.set({
+          username: user.displayName,
+          message: message
+        });
+        messageInput.value = "";
+      }
+    });
 
-        window.iniciarSesion = async function () {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
+    // Mostrar mensajes en el chat
+    const chatBox = document.getElementById("chat-box");
+    db.ref('chat').on('child_added', function(snapshot) {
+      const messageData = snapshot.val();
+      const messageElement = document.createElement("div");
+      messageElement.innerText = `${messageData.username}: ${messageData.message}`;
+      chatBox.appendChild(messageElement);
+    });
 
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                alert(`¡Bienvenido de nuevo, ${user.email}!`);
-                guardarUsuarioEnDB(user);
-            } catch (error) {
-                alert("Error al iniciar sesión: " + error.message);
-            }
-        };
-
-        async function guardarUsuarioEnDB(user) {
-            await set(ref(db, `usuarios/${user.uid}`), {
-                nombre: user.email,
-                email: user.email
+    // Eliminar cuenta
+    const deleteAccountButton = document.getElementById("delete-account-button");
+    deleteAccountButton.addEventListener("click", function() {
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = db.ref('usuarios/' + user.uid);
+        userRef.remove().then(() => {
+          user.delete().then(() => {
+            alert("Cuenta eliminada con éxito.");
+            auth.signOut().then(() => {
+              document.getElementById("auth-container").style.display = "block";
+              document.getElementById("chat-container").style.display = "none";
+              document.getElementById("logout-button").style.display = "none";
+              document.getElementById("account-container").style.display = "none";
             });
-            mostrarChat();
-        }
-
-        function mostrarChat() {
-            document.getElementById("registroCard").style.display = "none";
-            document.getElementById("chat").style.display = "block";
-        }
-
-        window.enviarTexto = function () {
-            const texto = document.getElementById("mensaje").value;
-            if (texto.trim() !== "" && usuarioActual) {
-                const mensajesRef = ref(db, "mensajes");
-                push(mensajesRef, {
-                    usuario: usuarioActual.email,
-                    mensaje: texto
-                });
-                document.getElementById("mensaje").value = "";
-            }
-        };
-
-        const mensajesRef = ref(db, "mensajes");
-        onValue(mensajesRef, (snapshot) => {
-            const datos = snapshot.val();
-            const historial = document.getElementById("historial");
-            historial.innerHTML = "";
-
-            if (datos) {
-                const mensajes = Object.values(datos).slice(-5).reverse();
-                mensajes.forEach(msg => {
-                    const div = document.createElement("div");
-                    div.className = "mensaje";
-                    div.innerHTML = `<span class="usuario">${msg.usuario}:</span> ${msg.mensaje}`;
-                    historial.appendChild(div);
-                });
-            }
+          }).catch((error) => {
+            console.error("Error al eliminar la cuenta:", error);
+          });
+        }).catch((error) => {
+          console.error("Error al eliminar los datos:", error);
         });
-    </script>
+      }
+    });
+  </script>
 </body>
 </html>
