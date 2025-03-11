@@ -4,40 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Escritura en Tiempo Real</title>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
+    <script type="module">
+        // Importar Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+            authDomain: "thegame-5afaa.firebaseapp.com",
+            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+            projectId: "thegame-5afaa",
+            storageBucket: "thegame-5afaa.firebasestorage.app",
+            messagingSenderId: "588556182984",
+            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+            measurementId: "G-9M3CBJ3LV9"
+        };
+
+        // Inicializar Firebase y la base de datos
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const textRef = ref(db, "textoCompartido");
+
+        // Actualizar el texto en Firebase cuando alguien escribe
+        function actualizarTexto() {
+            const texto = document.getElementById("mensaje").value;
+            set(textRef, texto);
+        }
+
+        // Escuchar cambios en la base de datos y actualizar en tiempo real
+        onValue(textRef, (snapshot) => {
+            document.getElementById("textoCompartido").innerText = snapshot.val();
+        });
+    </script>
 </head>
 <body>
     <h2>Escribe algo y lo verán todos en tiempo real:</h2>
     <input type="text" id="mensaje" oninput="actualizarTexto()" placeholder="Escribe aquí...">
     <p><strong>Texto compartido:</strong> <span id="textoCompartido"></span></p>
-
-    <script>
-        // Configuración de Firebase (usa la tuya)
-        const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "TU_PROYECTO.firebaseapp.com",
-            databaseURL: "https://TU_PROYECTO.firebaseio.com",
-            projectId: "TU_PROYECTO",
-            storageBucket: "TU_PROYECTO.appspot.com",
-            messagingSenderId: "TU_SENDER_ID",
-            appId: "TU_APP_ID"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const ref = db.ref("textoCompartido");
-
-        // Actualiza el texto en la base de datos cuando alguien escribe
-        function actualizarTexto() {
-            const texto = document.getElementById("mensaje").value;
-            ref.set(texto);
-        }
-
-        // Escucha cambios en la base de datos y actualiza en tiempo real
-        ref.on("value", (snapshot) => {
-            document.getElementById("textoCompartido").innerText = snapshot.val();
-        });
-    </script>
 </body>
 </html>
