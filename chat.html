@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat en Tiempo Real</title>
+    <style>
+        /* Estilos del chat */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+            max-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #357ABD;
+        }
+        #historial {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .mensaje {
+            margin: 5px 0;
+        }
+        .usuario {
+            font-weight: bold;
+            color: #4285F4;
+        }
+    </style>
+</head>
+<body>
+    <div class="card" id="chat">
+        <h2>Chat en Tiempo Real</h2>
+        <div id="historial"></div>
+        <input type="text" id="mensaje" placeholder="Escribe aquí..." autocomplete="off">
+        <button onclick="enviarTexto()">Enviar</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+        import { getDatabase, ref, set, push, get, onValue } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+            authDomain: "thegame-5afaa.firebaseapp.com",
+            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+            projectId: "thegame-5afaa",
+            storageBucket: "thegame-5afaa.firebasestorage.app",
+            messagingSenderId: "588556182984",
+            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+            measurementId: "G-9M3CBJ3LV9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // Comprobamos si el usuario está autenticado
+        const user = auth.currentUser;
+        if (!user) {
+            window.location.href = "login_register.html"; // Si no está logueado, redirigimos al login
+        }
+
+        // Obtener el nombre de usuario del usuario actual
+        const usuarioRef = ref(db, `usuarios/${user.uid}`);
+        let nombreUsuario;
+        get(usuarioRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                nombreUsuario = snapshot.val().nombreUsuario;
+            }
+        });
+
+        // Enviar mensaje
+        window.enviarTexto = async function () {
+            const mensaje = document.getElementById("mensaje").value;
+            if (mensaje.trim() === "") return; // Evitar enviar mensajes vacíos
+
+            const mensajesRef = ref(db, 'chat');
+            const nuevaMensajeRef = push(mensajesRef);
+
+            try {
+                // Guardar mensaje en la base de datos
+                await set(nuevaMensajeRef, {
+                    usuario: nombreUsuario,
+                    mensaje: mensaje,
+                    timestamp: Date.now()
+                });
+                document.getElementById("mensaje").value = ''; // Limpiar el campo de texto
+            } catch (error) {
+                alert("Error al enviar mensaje: " + error.message);
+            }
+        };
+
+        // Escuchar los mensajes y actualizar el historial
+        const mensajesRef = ref(db, 'chat');
+        onValue(mensajesRef, (snapshot) => {
+            const historial = document.getElementById("historial");
+            historial.innerHTML = ""; // Limpiar historial
+            snapshot.forEach((childSnapshot) => {
+                const mensajeData = childSnapshot.val();
+                const mensajeElement = document.createElement("div");
+                mensajeElement.classList.add("mensaje");
+                mensajeElement.innerHTML = `<span class="usuario">${mensajeData.usuario}</span>: ${mensajeData.mensaje}`;
+                historial.appendChild(mensajeElement);
+            });
+            // Desplazar el historial hacia abajo
+            historial.scrollTop = historial.scrollHeight;
+        });
+    </script>
+</body>
+</html>
