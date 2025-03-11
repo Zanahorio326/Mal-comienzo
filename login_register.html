@@ -1,169 +1,121 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #f0f0f0;
-    }
-    .container {
-      background-color: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      width: 300px;
-      text-align: center;
-    }
-    .button-group {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-    .button-group button {
-      flex: 1;
-      margin: 0 5px;
-      padding: 10px;
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .button-group button:hover {
-      background-color: #0056b3;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    .chat-btn {
-      width: 100%;
-      padding: 10px;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .chat-btn:hover {
-      background-color: #218838;
-    }
-    .error {
-      color: red;
-      font-size: 14px;
-      margin-top: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 300px;
+            background: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px gray;
+            border-radius: 10px;
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid gray;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="container">
-    <div class="button-group">
-      <button onclick="setMode('register')" id="registerBtn">Registrarse</button>
-      <button onclick="setMode('login')" id="loginBtn">Iniciar sesión</button>
-    </div>
+<div class="container">
+    <h2>Iniciar sesión / Registrarse</h2>
+    <input type="text" id="username" placeholder="Nombre de usuario">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button onclick="register()">Registrarse</button>
+    <button onclick="login()">Iniciar sesión</button>
+</div>
 
-    <input type="text" id="username" placeholder="Nombre de usuario" required>
-    <input type="password" id="password" placeholder="Contraseña" required>
-
-    <button class="chat-btn" onclick="handleChat()">Chat</button>
-    <p class="error" id="errorText"></p>
-  </div>
-
-  <script>
-    // Configuración Firebase
+<script>
+    // Configuración de Firebase
     const firebaseConfig = {
-      apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
-      authDomain: "thegame-5afaa.firebaseapp.com",
-      databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
-      projectId: "thegame-5afaa",
-      storageBucket: "thegame-5afaa.firebasestorage.app",
-      messagingSenderId: "588556182984",
-      appId: "1:588556182984:web:a0557067d35c18e3944cfd",
-      measurementId: "G-9M3CBJ3LV9"
+        apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+        authDomain: "thegame-5afaa.firebaseapp.com",
+        databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+        projectId: "thegame-5afaa",
+        storageBucket: "thegame-5afaa.appspot.com",
+        messagingSenderId: "588556182984",
+        appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+        measurementId: "G-9M3CBJ3LV9"
     };
-    
-    firebase.initializeApp(firebaseConfig);
+
+    // Inicializar Firebase
+    const app = firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    let mode = "register"; // Modo inicial
+    alert("Firebase cargado correctamente");
 
-    function setMode(newMode) {
-      mode = newMode;
-      console.log("Modo cambiado a:", mode);
-    }
+    function register() {
+        let username = document.getElementById("username").value;
+        let password = document.getElementById("password").value;
 
-    function handleChat() {
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const errorText = document.getElementById('errorText');
-
-      if (username === "" || password === "") {
-        errorText.textContent = "Por favor, completa ambos campos.";
-        return;
-      }
-
-      if (mode === "register") {
-        registerUser(username, password);
-      } else {
-        loginUser(username, password);
-      }
-    }
-
-    function registerUser(username, password) {
-      const userRef = database.ref("users/" + username);
-
-      userRef.once("value", snapshot => {
-        if (snapshot.exists()) {
-          document.getElementById("errorText").textContent = "Este usuario ya existe.";
-        } else {
-          userRef.set({ password })
-            .then(() => {
-              console.log("Usuario registrado:", username);
-              window.location.href = "https://zanahorio326.github.io/Mal-comienzo/chat.html";
-            })
-            .catch(error => {
-              console.error("Error al registrar:", error);
-              document.getElementById("errorText").textContent = "Error en el registro.";
-            });
+        if (username === "" || password === "") {
+            alert("Por favor, completa todos los campos.");
+            return;
         }
-      });
+
+        let userRef = database.ref("users/" + username);
+        
+        userRef.once("value", function(snapshot) {
+            if (snapshot.exists()) {
+                alert("Este nombre de usuario ya está en uso.");
+            } else {
+                userRef.set({
+                    password: password
+                });
+                alert("Registro exitoso. Redirigiendo al chat...");
+                window.location.href = "chat.html";
+            }
+        });
     }
 
-    function loginUser(username, password) {
-      const userRef = database.ref("users/" + username);
+    function login() {
+        let username = document.getElementById("username").value;
+        let password = document.getElementById("password").value;
 
-      userRef.once("value", snapshot => {
-        if (snapshot.exists()) {
-          const storedPassword = snapshot.val().password;
-          if (storedPassword === password) {
-            console.log("Inicio de sesión exitoso:", username);
-            window.location.href = "https://zanahorio326.github.io/Mal-comienzo/chat.html";
-          } else {
-            document.getElementById("errorText").textContent = "Contraseña incorrecta.";
-          }
-        } else {
-          document.getElementById("errorText").textContent = "El usuario no existe.";
+        if (username === "" || password === "") {
+            alert("Por favor, completa todos los campos.");
+            return;
         }
-      });
+
+        let userRef = database.ref("users/" + username);
+
+        userRef.once("value", function(snapshot) {
+            if (snapshot.exists() && snapshot.val().password === password) {
+                alert("Inicio de sesión exitoso. Redirigiendo al chat...");
+                window.location.href = "chat.html";
+            } else {
+                alert("Nombre de usuario o contraseña incorrectos.");
+            }
+        });
     }
-  </script>
+</script>
 
 </body>
 </html>
