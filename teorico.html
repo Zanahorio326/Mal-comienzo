@@ -36,11 +36,13 @@
         window.iniciarSesionConGoogle = async function () {
             const nombreUsuario = document.getElementById("nombreUsuario").value;
 
+            // Validar el nombre de usuario
             if (!/^[a-zA-Z0-9]+$/.test(nombreUsuario)) {
                 alert("El nombre de usuario solo puede contener letras y números.");
                 return;
             }
 
+            // Verificar si el nombre de usuario ya existe
             const usuarioRef = ref(db, `usuarios/nombres/${nombreUsuario}`);
             const snapshot = await get(usuarioRef);
             if (snapshot.exists()) {
@@ -48,11 +50,13 @@
                 return;
             }
 
+            // Autenticar con Google
             const provider = new GoogleAuthProvider();
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
 
+                // Guardar información del usuario en la base de datos
                 await set(ref(db, `usuarios/${user.uid}`), {
                     nombre: user.displayName,
                     email: user.email,
@@ -60,6 +64,7 @@
                     nombreUsuario: nombreUsuario
                 });
 
+                // Registrar el nombre de usuario como único
                 await set(ref(db, `usuarios/nombres/${nombreUsuario}`), user.uid);
                 alert(`¡Bienvenido, ${nombreUsuario}!`);
             } catch (error) {
