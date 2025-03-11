@@ -3,35 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat con Cambio de Nombre de Usuario</title>
+    <title>Cambiar Nombre de Usuario</title>
 </head>
 <body>
     <div class="card" id="registroCard">
-        <h2>Registro con Correo Electrónico</h2>
-        <input type="email" id="email" placeholder="Correo electrónico">
+        <h2>Cambiar Nombre de Usuario</h2>
+        <input type="email" id="email" placeholder="Correo electrónico" disabled>
         <input type="password" id="password" placeholder="Contraseña">
-        <input type="text" id="username" placeholder="Nombre de usuario (letras y números)">
-        <button onclick="registrarse()">Registrarse</button>
-        <br><br>
-        <button onclick="iniciarSesion()">Iniciar sesión</button>
-    </div>
-
-    <div id="chat" class="card">
-        <h2>Chat en Tiempo Real</h2>
-        <input type="text" id="mensaje" placeholder="Escribe aquí...">
-        <button onclick="enviarTexto()">Enviar</button>
-        <div id="historial"></div>
-
-        <!-- Cambiar nombre de usuario -->
-        <h3>Cambiar nombre de usuario</h3>
         <input type="text" id="nuevoUsername" placeholder="Nuevo nombre de usuario (letras y números)">
         <button onclick="cambiarNombreUsuario()">Cambiar nombre de usuario</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
-        import { getDatabase, ref, set, push, get, update } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+        import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
@@ -53,62 +39,18 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 usuarioActual = user;
-                mostrarChat();
+                document.getElementById("email").value = user.email;
             }
         });
 
-        window.registrarse = function() {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
-            const username = document.getElementById("username").value;
-
-            if (username.match(/^[a-zA-Z0-9]+$/)) {
-                createUserWithEmailAndPassword(auth, email, password)
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        set(ref(db, "usuarios/" + user.uid), {
-                            username: username,
-                            email: user.email
-                        });
-                    })
-                    .catch((error) => {
-                        const errorCode = error.code;
-                        const errorMessage = error.message;
-                        alert(errorMessage);
-                    });
-            } else {
-                alert("El nombre de usuario solo puede contener letras y números.");
-            }
-        }
-
-        window.iniciarSesion = function() {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
-
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    mostrarChat();
-                })
-                .catch((error) => {
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    alert(errorMessage);
-                });
-        }
-
-        function mostrarChat() {
-            document.getElementById("registroCard").style.display = "none";
-            document.getElementById("chat").style.display = "block";
-        }
-
-        window.cambiarNombreUsuario = function() {
+        function cambiarNombreUsuario() {
             const nuevoUsername = document.getElementById("nuevoUsername").value;
 
             if (nuevoUsername.match(/^[a-zA-Z0-9]+$/)) {
                 if (usuarioActual) {
-                    // Actualizar el nombre de usuario en Firebase
-                    update(ref(db, "usuarios/" + usuarioActual.uid), {
+                    const user = usuarioActual;
+                    const userRef = ref(db, "usuarios/" + user.uid);
+                    update(userRef, {
                         username: nuevoUsername
                     }).then(() => {
                         alert("Nombre de usuario actualizado correctamente.");
