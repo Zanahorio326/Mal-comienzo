@@ -115,6 +115,7 @@
             });  
   
         window.iniciarSesionConGoogle = async function () {  
+            console.log("Botón presionado, ejecutando función"); // Verifica si la función se ejecuta  
             const nombreUsuario = document.getElementById("nombreUsuario").value;  
   
             if (!/^[a-zA-Z0-9]+$/.test(nombreUsuario)) {  
@@ -134,6 +135,7 @@
   
             // Mostrar alerta antes de redirigir
             alert("Redirigiendo a Google para autenticación...");
+            console.log("Redirigiendo a Google..."); // Verifica que la redirección se esté llamando
 
             // Redirigir a Google para autenticación  
             const provider = new GoogleAuthProvider();  
