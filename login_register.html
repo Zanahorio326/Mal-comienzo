@@ -23,6 +23,7 @@
     const auth = firebase.auth();
     const firestore = firebase.firestore();
 
+    // Función para registrar usuario
     function registerUser() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
@@ -37,7 +38,7 @@
             username: username
           });
 
-          // Registro exitoso
+          // Redirigir al chat
           window.location.href = "https://zanahorio326.github.io/Mal-comienzo/chat.html";
         })
         .catch((error) => {
@@ -46,13 +47,14 @@
         });
     }
 
+    // Función para iniciar sesión
     function loginUser() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
 
       auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
-          // Inicio de sesión exitoso
+          // Redirigir al chat
           window.location.href = "https://zanahorio326.github.io/Mal-comienzo/chat.html";
         })
         .catch((error) => {
@@ -60,11 +62,16 @@
           alert("Error al iniciar sesión: " + error.message);
         });
     }
+
+    // Evitar el comportamiento por defecto de los formularios
+    function preventDefault(event) {
+      event.preventDefault();
+    }
   </script>
 </head>
 <body>
   <h2>Registro</h2>
-  <form id="registerForm">
+  <form id="registerForm" onsubmit="preventDefault(event)">
     <label for="email">Correo Electrónico:</label>
     <input type="email" id="email" required>
     <br><br>
@@ -78,7 +85,7 @@
   </form>
 
   <h2>Iniciar sesión</h2>
-  <form id="loginForm">
+  <form id="loginForm" onsubmit="preventDefault(event)">
     <label for="email">Correo Electrónico:</label>
     <input type="email" id="email" required>
     <br><br>
