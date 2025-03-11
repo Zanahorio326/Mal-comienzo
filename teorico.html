@@ -28,7 +28,7 @@
 
         let usuarioActual = null;
 
-        // Función para registrar usuario
+        // Registro de usuario con nombre de usuario único
         window.registrar = async function () {
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
@@ -54,7 +54,7 @@
             }
         };
 
-        // Función para iniciar sesión
+        // Inicio de sesión
         window.iniciarSesion = async function () {
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
@@ -66,7 +66,7 @@
             }
         };
 
-        // Función para enviar mensajes
+        // Envío de mensajes
         window.enviarTexto = async function () {
             const texto = document.getElementById("mensaje").value.trim();
 
