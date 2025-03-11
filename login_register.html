@@ -3,12 +3,101 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login y Registro</title>
+  <title>Login/Registro</title>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
 
+  <style>
+    /* Estilos para la página */
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 300px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input[type="text"], input[type="email"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .error {
+      color: red;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Iniciar sesión o Registrarse</h2>
+
+    <!-- Botones de selección de Login o Registro -->
+    <div>
+      <button onclick="showLogin()">Iniciar sesión</button>
+      <button onclick="showRegister()">Registrarse</button>
+    </div>
+
+    <!-- Formulario de Login -->
+    <div id="loginForm" style="display: none;">
+      <h3>Iniciar sesión</h3>
+      <label for="loginEmail">Correo electrónico</label>
+      <input type="email" id="loginEmail" placeholder="Correo electrónico" required>
+      
+      <label for="loginPassword">Contraseña</label>
+      <input type="password" id="loginPassword" placeholder="Contraseña" required>
+      
+      <button id="loginSubmit">Iniciar sesión</button>
+      <p class="error" id="loginError"></p>
+    </div>
+
+    <!-- Formulario de Registro -->
+    <div id="registerForm" style="display: none;">
+      <h3>Registrarse</h3>
+      <label for="username">Nombre de usuario</label>
+      <input type="text" id="username" placeholder="Nombre de usuario" required>
+      
+      <label for="registerEmail">Correo electrónico</label>
+      <input type="email" id="registerEmail" placeholder="Correo electrónico" required>
+      
+      <label for="registerPassword">Contraseña</label>
+      <input type="password" id="registerPassword" placeholder="Contraseña" required>
+      
+      <button id="registerSubmit">Registrarse</button>
+      <p class="error" id="registerError"></p>
+    </div>
+  </div>
+
+  <!-- Firebase SDK y código para autenticación -->
   <script>
     // Configuración de Firebase
     const firebaseConfig = {
@@ -20,119 +109,55 @@
       appId: "tu_appId"
     };
 
-    // Inicialización de Firebase
+    // Inicializar Firebase
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-  </script>
-</head>
-<body>
-  <h1>Bienvenido</h1>
 
-  <!-- Botones de inicio de sesión y registro -->
-  <div>
-    <button id="loginBtn">Iniciar sesión</button>
-    <button id="registerBtn">Registrarse</button>
-  </div>
+    // Función para mostrar el formulario de login
+    function showLogin() {
+      document.getElementById('loginForm').style.display = 'block';
+      document.getElementById('registerForm').style.display = 'none';
+    }
 
-  <!-- Contenedor de formularios -->
-  <div id="formContainer" style="display: none;">
-    <!-- Formulario de Inicio de sesión -->
-    <div id="loginForm" style="display: none;">
-      <h2>Iniciar sesión</h2>
-      <table>
-        <tr>
-          <td><label for="loginEmail">Correo Electrónico</label></td>
-          <td><input type="email" id="loginEmail" placeholder="Correo Electrónico" required></td>
-        </tr>
-        <tr>
-          <td><label for="loginPassword">Contraseña</label></td>
-          <td><input type="password" id="loginPassword" placeholder="Contraseña" required></td>
-        </tr>
-      </table>
-      <button id="loginSubmit">Iniciar sesión</button>
-      <p id="loginError" style="color: red;"></p> <!-- Mensaje de error -->
-    </div>
+    // Función para mostrar el formulario de registro
+    function showRegister() {
+      document.getElementById('registerForm').style.display = 'block';
+      document.getElementById('loginForm').style.display = 'none';
+    }
 
-    <!-- Formulario de Registro -->
-    <div id="registerForm" style="display: none;">
-      <h2>Registrarse</h2>
-      <table>
-        <tr>
-          <td><label for="username">Nombre de usuario</label></td>
-          <td><input type="text" id="username" placeholder="Nombre de usuario" required></td>
-        </tr>
-        <tr>
-          <td><label for="registerEmail">Correo Electrónico</label></td>
-          <td><input type="email" id="registerEmail" placeholder="Correo Electrónico" required></td>
-        </tr>
-        <tr>
-          <td><label for="registerPassword">Contraseña</label></td>
-          <td><input type="password" id="registerPassword" placeholder="Contraseña" required></td>
-        </tr>
-      </table>
-      <button id="registerSubmit">Registrarse</button>
-      <p id="registerError" style="color: red;"></p> <!-- Mensaje de error -->
-    </div>
-  </div>
-
-  <script>
-    // Variables de los botones
-    const loginBtn = document.getElementById('loginBtn');
-    const registerBtn = document.getElementById('registerBtn');
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const formContainer = document.getElementById('formContainer');
-    const loginError = document.getElementById('loginError');
-    const registerError = document.getElementById('registerError');
-
-    // Mostrar formulario de inicio de sesión cuando se hace clic en "Iniciar sesión"
-    loginBtn.addEventListener('click', () => {
-      formContainer.style.display = 'block';
-      loginForm.style.display = 'block';
-      registerForm.style.display = 'none';
-    });
-
-    // Mostrar formulario de registro cuando se hace clic en "Registrarse"
-    registerBtn.addEventListener('click', () => {
-      formContainer.style.display = 'block';
-      registerForm.style.display = 'block';
-      loginForm.style.display = 'none';
-    });
-
-    // Acción al presionar el botón de "Iniciar sesión"
-    document.getElementById('loginSubmit').addEventListener('click', () => {
+    // Iniciar sesión
+    document.getElementById('loginSubmit').addEventListener('click', function() {
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
 
-      // Llamada a Firebase para iniciar sesión
       auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
-          // Redirigir al chat en caso de éxito
+          // Redirigir a la página de chat si el login es exitoso
           window.location.href = "https://zanahorio326.github.io/Mal-comienzo/chat.html";
         })
         .catch((error) => {
-          // Mostrar mensaje de error
-          loginError.textContent = "Error al iniciar sesión: " + error.message;
+          const errorMessage = error.message;
+          document.getElementById('loginError').textContent = "Error: " + errorMessage;
         });
     });
 
-    // Acción al presionar el botón de "Registrarse"
-    document.getElementById('registerSubmit').addEventListener('click', () => {
+    // Registrarse
+    document.getElementById('registerSubmit').addEventListener('click', function() {
       const username = document.getElementById('username').value;
       const email = document.getElementById('registerEmail').value;
       const password = document.getElementById('registerPassword').value;
 
-      // Llamada a Firebase para crear cuenta de usuario
       auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
-          // Redirigir al chat en caso de éxito
+          // Redirigir a la página de chat si el registro es exitoso
           window.location.href = "https://zanahorio326.github.io/Mal-comienzo/chat.html";
         })
         .catch((error) => {
-          // Mostrar mensaje de error
-          registerError.textContent = "Error al registrarse: " + error.message;
+          const errorMessage = error.message;
+          document.getElementById('registerError').textContent = "Error: " + errorMessage;
         });
     });
   </script>
+  
 </body>
 </html>
