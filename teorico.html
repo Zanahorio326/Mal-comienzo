@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat en Tiempo Real</title>
+    <title>Registro con Google</title>
     <style>
         #historial {
             max-height: 300px;
@@ -18,65 +18,80 @@
     </style>
 </head>
 <body>
-    <h2>Dinner Code:</h2>
-    <input type="text" id="mensaje" placeholder="Escribe aquí...">
-    <button onclick="enviarTexto()">Enviar</button>
+    <h2>Registro con Google</h2>
+    <div>
+        <h3>Registrarse</h3>
+        <input type="text" id="nombreUsuario" placeholder="Nombre de usuario (solo texto y números)">
+        <button onclick="iniciarSesionConGoogle()">Registrarse con Google</button>
+    </div>
     <div id="historial"></div>
 
-    <script>
-        import("https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js").then(({ initializeApp }) => {
-            import("https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js").then(({ getDatabase, ref, push, onValue, set }) => {
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
 
-                // Configuración de Firebase
-                const firebaseConfig = {
-                    apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
-                    authDomain: "thegame-5afaa.firebaseapp.com",
-                    databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
-                    projectId: "thegame-5afaa",
-                    storageBucket: "thegame-5afaa.firebasestorage.app",
-                    messagingSenderId: "588556182984",
-                    appId: "1:588556182984:web:a0557067d35c18e3944cfd",
-                    measurementId: "G-9M3CBJ3LV9"
-                };
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+            authDomain: "thegame-5afaa.firebaseapp.com",
+            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+            projectId: "thegame-5afaa",
+            storageBucket: "thegame-5afaa.firebasestorage.app",
+            messagingSenderId: "588556182984",
+            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+            measurementId: "G-9M3CBJ3LV9"
+        };
 
-                // Inicializar Firebase
-                const app = initializeApp(firebaseConfig);
-                const db = getDatabase(app);
-                const mensajesRef = ref(db, "mensajes");
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
 
-                // Enviar mensaje
-                window.enviarTexto = function () {
-                    const texto = document.getElementById("mensaje").value;
-                    if (texto.trim() !== "") {
-                        push(mensajesRef, texto);
-                        document.getElementById("mensaje").value = "";
-                    }
-                };
+        // Autenticación con Google
+        window.iniciarSesionConGoogle = async function () {
+            const nombreUsuario = document.getElementById("nombreUsuario").value;
 
-                // Escuchar cambios y mostrar los últimos 5 mensajes
-                onValue(mensajesRef, (snapshot) => {
-                    const datos = snapshot.val();
-                    const historial = document.getElementById("historial");
-                    historial.innerHTML = ""; 
+            // Validar el nombre de usuario
+            if (!/^[a-zA-Z0-9]+$/.test(nombreUsuario)) {
+                alert("El nombre de usuario solo puede contener letras y números.");
+                return;
+            }
 
-                    if (datos) {
-                        // Mostrar los últimos 5 mensajes, invertidos para que los nuevos aparezcan arriba
-                        const mensajes = Object.values(datos).slice(-5).reverse(); 
-                        mensajes.forEach(msg => {
-                            const p = document.createElement("p");
-                            p.textContent = msg;
-                            historial.appendChild(p);
-                        });
+            // Verificar si el nombre de usuario ya existe
+            const usuarioRef = ref(db, `usuarios`);
+            const snapshot = await get(child(usuarioRef, `nombres/${nombreUsuario}`));
+            if (snapshot.exists()) {
+                alert("El nombre de usuario ya está en uso. Elige otro.");
+                return;
+            }
 
-                        // Limitar la base de datos a solo 5 mensajes
-                        if (Object.keys(datos).length > 5) {
-                            const primerasClaves = Object.keys(datos).slice(0, Object.keys(datos).length - 5);
-                            primerasClaves.forEach(clave => set(ref(db, `mensajes/${clave}`), null)); 
-                        }
-                    }
+            // Iniciar sesión con Google
+            const provider = new GoogleAuthProvider();
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    const user = result.user;
+
+                    // Guardar información del usuario en la base de datos
+                    set(ref(db, `usuarios/${user.uid}`), {
+                        nombre: user.displayName,
+                        email: user.email,
+                        foto: user.photoURL,
+                        nombreUsuario: nombreUsuario
+                    }).then(() => {
+                        // Registrar el nombre de usuario como único
+                        set(ref(db, `usuarios/nombres/${nombreUsuario}`), user.uid)
+                            .then(() => {
+                                alert(`¡Bienvenido, ${nombreUsuario}!`);
+                            });
+                    }).catch((error) => {
+                        console.error("Error al guardar datos:", error);
+                    });
+                })
+                .catch((error) => {
+                    alert("Error al autenticar: " + error.message);
                 });
-            });
-        });
+        };
     </script>
 </body>
 </html>
