@@ -63,8 +63,9 @@
 <body>
     <div class="card" id="registro">
         <h2>Registro con Correo</h2>
-        <input type="email" id="correo" placeholder="Correo electrónico">
-        <input type="text" id="nombreUsuario" placeholder="Nombre de usuario (solo texto y números)">
+        <input type="email" id="correo" placeholder="Correo electrónico" required>
+        <input type="text" id="nombreUsuario" placeholder="Nombre de usuario (solo texto y números)" required>
+        <input type="password" id="contraseña" placeholder="Contraseña" required>
         <button onclick="registrarse()">Registrarse</button>
     </div>
 
@@ -101,6 +102,7 @@
         window.registrarse = async function () {
             const correo = document.getElementById("correo").value;
             const nombreUsuario = document.getElementById("nombreUsuario").value;
+            const contraseña = document.getElementById("contraseña").value;
 
             if (!/^[a-zA-Z0-9]+$/.test(nombreUsuario)) {
                 alert("El nombre de usuario solo puede contener letras y números.");
@@ -115,9 +117,9 @@
                 return;
             }
 
-            // Crear cuenta con correo electrónico
+            // Crear cuenta con correo electrónico y contraseña
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, correo, "defaultpassword123");
+                const userCredential = await createUserWithEmailAndPassword(auth, correo, contraseña);
                 const user = userCredential.user;
                 // Guardar el nombre de usuario en la base de datos
                 await set(ref(db, `usuarios/${user.uid}`), {
