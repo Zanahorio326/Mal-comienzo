@@ -11,6 +11,8 @@
 <body>
     <h1>Eliminar cuenta y todos los datos asociados</h1>
     <button onclick="eliminarCuenta()">Eliminar Cuenta</button>
+    <button onclick="mostrarDatos()">Mostrar Datos Actuales</button>
+    <div id="mensaje"></div>
 
     <script>
         // Configuración de Firebase
@@ -41,13 +43,42 @@
                     // Eliminar la cuenta del usuario de Firebase Authentication
                     await user.delete();
 
-                    alert("Cuenta y todos los datos han sido eliminados correctamente.");
-                    // Redirigir o hacer lo que necesites después de eliminar la cuenta
+                    // Mostrar mensaje de éxito
+                    document.getElementById("mensaje").innerHTML = "Cuenta y todos los datos han sido eliminados correctamente.";
+                    document.getElementById("mensaje").style.color = "green";
                 } catch (error) {
-                    alert("Error al eliminar la cuenta: " + error.message);
+                    // Mostrar mensaje de error
+                    document.getElementById("mensaje").innerHTML = "Error al eliminar la cuenta: " + error.message;
+                    document.getElementById("mensaje").style.color = "red";
                 }
             } else {
-                alert("No hay usuario autenticado.");
+                document.getElementById("mensaje").innerHTML = "No hay usuario autenticado.";
+                document.getElementById("mensaje").style.color = "red";
+            }
+        }
+
+        // Función para mostrar los datos actuales asociados al usuario
+        function mostrarDatos() {
+            const user = auth.currentUser;
+            if (user) {
+                database.ref('usuarios/' + user.uid).get()
+                    .then((snapshot) => {
+                        if (snapshot.exists()) {
+                            const datos = snapshot.val();
+                            document.getElementById("mensaje").innerHTML = "Datos del usuario: " + JSON.stringify(datos, null, 2);
+                            document.getElementById("mensaje").style.color = "black";
+                        } else {
+                            document.getElementById("mensaje").innerHTML = "No se encontraron datos asociados a la cuenta.";
+                            document.getElementById("mensaje").style.color = "red";
+                        }
+                    })
+                    .catch((error) => {
+                        document.getElementById("mensaje").innerHTML = "Error al cargar los datos: " + error.message;
+                        document.getElementById("mensaje").style.color = "red";
+                    });
+            } else {
+                document.getElementById("mensaje").innerHTML = "No hay usuario autenticado.";
+                document.getElementById("mensaje").style.color = "red";
             }
         }
     </script>
