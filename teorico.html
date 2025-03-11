@@ -147,7 +147,7 @@
       appId: "1:588556182984:web:a0557067d35c18e3944cfd",
       measurementId: "G-9M3CBJ3LV9"
     };
-    
+
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const database = firebase.database();
@@ -172,17 +172,27 @@
           const user = userCredential.user;
 
           // Guardar el nombre de usuario en la base de datos
-          database.ref('users/' + user.uid).set({
+          return database.ref('users/' + user.uid).set({
             username: username
-          }).then(function() {
-            // Redirigir al chat después de registrarse
-            document.getElementById('registro').style.display = 'none';
-            document.getElementById('chat').style.display = 'block';
-            document.getElementById('usuario-nombre').textContent = username;
-
-            // Cargar mensajes del chat
-            cargarMensajes();
           });
+        })
+        .then(function() {
+          // Redirigir al chat después de registrarse
+          document.getElementById('registro').style.display = 'none';
+          document.getElementById('chat').style.display = 'block';
+
+          // Obtener el nombre de usuario y mostrarlo en el chat
+          auth.onAuthStateChanged(function(user) {
+            if (user) {
+              database.ref('users/' + user.uid).once('value').then(function(snapshot) {
+                const username = snapshot.val().username;
+                document.getElementById('usuario-nombre').textContent = username;
+              });
+            }
+          });
+
+          // Cargar mensajes del chat
+          cargarMensajes();
         })
         .catch(function(error) {
           document.getElementById('error-message').textContent = error.message;
