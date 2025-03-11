@@ -26,31 +26,31 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
-        alert("Firebase cargado correctamente"); // Verificar carga de Firebase
+        alert("Mundo cargado"); // Verificar carga de Firebase
 
         // Función de Registro
         document.addEventListener("DOMContentLoaded", function() {
             document.getElementById("btnRegistro").addEventListener("click", function() {
-                alert("Botón de registro presionado"); // Verificar clic
+                alert("Estás por crear tu Personaje"); // Verificar clic
 
                 const username = document.getElementById("username").value;
                 const password = document.getElementById("password").value;
 
                 if (username === "" || password === "") {
-                    alert("Por favor, completa todos los campos.");
+                    alert("Faltan datos");
                     return;
                 }
 
                 const userRef = ref(db, 'users/' + username);
                 get(child(ref(db), 'users/' + username)).then((snapshot) => {
                     if (snapshot.exists()) {
-                        alert("El nombre de usuario ya está registrado.");
+                        alert("Ese jugador ya fue creado");
                     } else {
                         set(userRef, {
                             username: username,
                             password: password
                         }).then(() => {
-                            alert("Registro exitoso, redirigiendo al chat...");
+                            alert("Personaje creado, en camino al mundo");
                             window.location.href = "chat.html";
                         }).catch((error) => {
                             alert("Error al registrar: " + error.message);
@@ -63,13 +63,13 @@
 
             // Función de Inicio de Sesión
             document.getElementById("btnLogin").addEventListener("click", function() {
-                alert("Botón de inicio de sesión presionado"); // Verificar clic
+                alert("Dirigiéndote a tu cuerpo"); // Verificar clic
 
                 const username = document.getElementById("username").value;
                 const password = document.getElementById("password").value;
 
                 if (username === "" || password === "") {
-                    alert("Por favor, completa todos los campos.");
+                    alert("Faltan datos");
                     return;
                 }
 
@@ -79,7 +79,7 @@
                         alert("Inicio de sesión exitoso, redirigiendo al chat...");
                         window.location.href = "chat.html";
                     } else {
-                        alert("Nombre de usuario o contraseña incorrectos.");
+                        alert("Jugador/usuario o contraseña incorrectos.");
                     }
                 }).catch((error) => {
                     alert("Error al verificar credenciales: " + error.message);
@@ -87,24 +87,111 @@
             });
         });
     </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #ff7e00, #3ba54a);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            width: 300px;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 16px;
+            color: black;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        #btnRegistro {
+            background: #ff9800;
+            color: white;
+        }
+
+        #btnRegistro:hover {
+            background: #e68900;
+        }
+
+        #btnLogin {
+            background: #4caf50;
+            color: white;
+        }
+
+        #btnLogin:hover {
+            background: #3e8e41;
+        }
+
+        #btnChat {
+            background: #007bff;
+            color: white;
+        }
+
+        #btnChat:hover {
+            background: #0056b3;
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 </head>
 <body>
-    <div style="width: 300px; margin: auto; padding: 20px; border: 1px solid #ccc; text-align: center;">
-        <button id="btnRegistro">Registrarse</button>
-        <button id="btnLogin">Iniciar Sesión</button>
-        <br><br>
-        <input type="text" id="username" placeholder="Nombre de usuario">
-        <br><br>
+
+    <div class="container">
+        <button id="btnRegistro">Crear</button>
+        <button id="btnLogin">Ir a mi cuerpo</button>
+        <br>
+        <input type="text" id="username" placeholder="Nombre del cuerpo">
+        <br>
         <input type="password" id="password" placeholder="Contraseña">
-        <br><br>
+        <br>
         <button id="btnChat">Chat</button>
     </div>
 
     <!-- Cuadro de texto informativo -->
-    <div style="width: 300px; margin: 20px auto; padding: 10px; border: 1px solid #ccc; font-size: 14px; text-align: center;">
-        <p style="color: #333; margin: 0;">
-            Información adicional: Aquí va el texto explicativo que puedes modificar para que los usuarios comprendan cómo funciona esta sección del sistema. 
+    <div class="info-box">
+        <p>
+            Al oprimir "Crear", estarás creando un personaje, asignándole un nombre y estableciendo una contraseña asociada.
+            <br><br>
+            Al oprimir "Ir a mi cuerpo", deberás ingresar el nombre de un personaje ya creado y su contraseña correspondiente.
+            <br><br>
+            Al oprimir "Chat", accederás al mundo con el personaje que creaste o con el cuerpo que seleccionaste.
         </p>
     </div>
+
 </body>
 </html>
