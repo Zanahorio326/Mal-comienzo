@@ -60,7 +60,21 @@
             const password = document.getElementById("password").value;
 
             try {
-                await signInWithEmailAndPassword(auth, email, password);
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Obtener nombre de usuario antes de mostrar el chat
+                const usuarioRef = ref(db, `usuarios/${user.uid}`);
+                const snapshot = await get(usuarioRef);
+
+                if (snapshot.exists()) {
+                    usuarioActual = { uid: user.uid, nombreUsuario: snapshot.val().nombreUsuario };
+                    document.getElementById("registro").style.display = "none";
+                    document.getElementById("chat").style.display = "block";
+                } else {
+                    alert("Error: No se encontró el nombre de usuario en la base de datos.");
+                    await signOut(auth);
+                }
             } catch (error) {
                 alert("Error al iniciar sesión: " + error.message);
             }
@@ -134,7 +148,7 @@
                     document.getElementById("chat").style.display = "block";
                 } else {
                     alert("Error: No se encontró el nombre de usuario en la base de datos.");
-                    auth.signOut();
+                    await signOut(auth);
                 }
             }
         });
