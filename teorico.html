@@ -4,45 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Escritura en Tiempo Real</title>
-    <script type="module">
-        // Importar Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
-
-        // Configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
-            authDomain: "thegame-5afaa.firebaseapp.com",
-            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
-            projectId: "thegame-5afaa",
-            storageBucket: "thegame-5afaa.firebasestorage.app",
-            messagingSenderId: "588556182984",
-            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
-            measurementId: "G-9M3CBJ3LV9"
-        };
-
-        // Inicializar Firebase y la base de datos
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const textRef = ref(db, "textoCompartido");
-
-        // Función para enviar el texto al presionar el botón
-        function enviarTexto() {
-            const texto = document.getElementById("mensaje").value;
-            set(textRef, texto);
-            document.getElementById("mensaje").value = ""; // Borra el campo después de enviar
-        }
-
-        // Escuchar cambios en la base de datos y actualizar en tiempo real
-        onValue(textRef, (snapshot) => {
-            document.getElementById("textoCompartido").innerText = snapshot.val();
-        });
-    </script>
 </head>
 <body>
     <h2>Escribe algo y lo verán todos en tiempo real:</h2>
     <input type="text" id="mensaje" placeholder="Escribe aquí...">
     <button onclick="enviarTexto()">Enviar</button>
     <p><strong>Texto compartido:</strong> <span id="textoCompartido"></span></p>
+
+    <script>
+        // Cargar Firebase
+        import("https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js").then(({ initializeApp }) => {
+            import("https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js").then(({ getDatabase, ref, set, onValue }) => {
+
+                // Configuración de Firebase
+                const firebaseConfig = {
+                    apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+                    authDomain: "thegame-5afaa.firebaseapp.com",
+                    databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+                    projectId: "thegame-5afaa",
+                    storageBucket: "thegame-5afaa.firebasestorage.app",
+                    messagingSenderId: "588556182984",
+                    appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+                    measurementId: "G-9M3CBJ3LV9"
+                };
+
+                // Inicializar Firebase
+                const app = initializeApp(firebaseConfig);
+                const db = getDatabase(app);
+                const textRef = ref(db, "textoCompartido");
+
+                // Hacer la función accesible globalmente
+                window.enviarTexto = function () {
+                    const texto = document.getElementById("mensaje").value;
+                    set(textRef, texto);
+                    document.getElementById("mensaje").value = ""; // Borra el campo después de enviar
+                };
+
+                // Escuchar cambios en la base de datos y actualizar en tiempo real
+                onValue(textRef, (snapshot) => {
+                    document.getElementById("textoCompartido").innerText = snapshot.val();
+                });
+            });
+        });
+    </script>
 </body>
 </html>
