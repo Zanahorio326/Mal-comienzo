@@ -1,153 +1,167 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat con autenticación Firebase</title>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .chat-box { display: none; background: white; padding: 20px; border-radius: 10px; }
-    .messages { max-height: 300px; overflow-y: auto; margin-bottom: 10px; text-align: left; }
-    .message { padding: 5px; border-bottom: 1px solid #ddd; }
-    .message .username { font-weight: bold; }
-    .input-container { display: flex; }
-    .input-container input { flex: 1; padding: 10px; }
-    .input-container button { padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
-    .input-container button:hover { background: #0056b3; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat con Registro y Nombre de Usuario</title>
 </head>
 <body>
+    <h2>Bienvenido al chat</h2>
 
-  <div class="container">
-    <h2>Iniciar sesión con Google</h2>
-    <button id="login-google">Iniciar sesión con Google</button>
-
-    <div id="username-setup" style="display: none;">
-      <h3>Elige un nombre de usuario</h3>
-      <input type="text" id="username" placeholder="Solo letras y números">
-      <button id="set-username">Guardar</button>
-      <p id="error-message" style="color: red;"></p>
+    <!-- Sección de registro -->
+    <div id="registro">
+        <h3>Regístrate para participar</h3>
+        <input type="email" id="email" placeholder="Correo electrónico">
+        <input type="password" id="password" placeholder="Contraseña">
+        <input type="text" id="username" placeholder="Nombre de usuario (letras y números)">
+        <button onclick="registrarUsuario()">Registrar</button>
+        <p id="errorRegistro"></p>
     </div>
 
-    <div id="chat" class="chat-box">
-      <h2>Bienvenido, <span id="user-name"></span></h2>
-      <div class="messages" id="messages"></div>
-      <div class="input-container">
-        <input type="text" id="message-input" placeholder="Escribe un mensaje...">
-        <button id="send-message">Enviar</button>
-      </div>
+    <!-- Sección de chat -->
+    <div id="chat" style="display:none;">
+        <h3>Bienvenido al chat</h3>
+        <p>Nombre de usuario: <span id="nombreUsuario"></span></p>
+        <textarea id="mensaje" placeholder="Escribe un mensaje..."></textarea><br>
+        <button onclick="enviarMensaje()">Enviar mensaje</button>
+        <div id="mensajes"></div>
+        <button onclick="cerrarSesion()">Cerrar sesión</button>
     </div>
-  </div>
 
-  <script>
-    // Configuración de Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
-      authDomain: "thegame-5afaa.firebaseapp.com",
-      databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
-      projectId: "thegame-5afaa",
-      storageBucket: "thegame-5afaa.appspot.com",
-      messagingSenderId: "588556182984",
-      appId: "1:588556182984:web:a0557067d35c18e3944cfd",
-      measurementId: "G-9M3CBJ3LV9"
-    };
+    <script type="module">
+        // Importar las funciones necesarias de Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+        import { getDatabase, ref, set, push, get, child } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const database = firebase.database();
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+            authDomain: "thegame-5afaa.firebaseapp.com",
+            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+            projectId: "thegame-5afaa",
+            storageBucket: "thegame-5afaa.firebasestorage.app",
+            messagingSenderId: "588556182984",
+            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+            measurementId: "G-9M3CBJ3LV9"
+        };
 
-    let currentUser = null;
-    let currentUsername = "";
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
 
-    // Iniciar sesión con Google
-    document.getElementById('login-google').addEventListener('click', function() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).then(result => {
-        currentUser = result.user;
-        checkUsername();
-      }).catch(error => {
-        console.error("Error en el inicio de sesión:", error);
-      });
-    });
+        let usuarioActual = null;
 
-    // Verificar si el usuario ya tiene un nombre de usuario
-    function checkUsername() {
-      if (currentUser) {
-        database.ref('users/' + currentUser.uid).once('value').then(snapshot => {
-          if (snapshot.exists()) {
-            currentUsername = snapshot.val().username;
-            showChat();
-          } else {
-            document.getElementById('username-setup').style.display = 'block';
-          }
+        // Función para registrar un nuevo usuario
+        function registrarUsuario() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const username = document.getElementById("username").value;
+
+            // Verificar que el nombre de usuario solo contenga letras y números
+            if (!username.match(/^[a-zA-Z0-9]+$/)) {
+                document.getElementById("errorRegistro").innerText = "El nombre de usuario solo puede contener letras y números.";
+                return;
+            }
+
+            // Verificar que el nombre de usuario no esté registrado
+            const userRef = ref(db, "usuarios");
+            get(userRef).then((snapshot) => {
+                let usernameTaken = false;
+                snapshot.forEach((childSnapshot) => {
+                    if (childSnapshot.val().username === username) {
+                        usernameTaken = true;
+                    }
+                });
+
+                if (usernameTaken) {
+                    document.getElementById("errorRegistro").innerText = "Este nombre de usuario ya está en uso.";
+                    return;
+                }
+
+                // Crear el nuevo usuario en Firebase
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
+                        // Guardar el nombre de usuario en la base de datos
+                        set(ref(db, 'usuarios/' + user.uid), {
+                            username: username,
+                            email: user.email
+                        }).then(() => {
+                            usuarioActual = user;
+                            document.getElementById("registro").style.display = "none";
+                            document.getElementById("chat").style.display = "block";
+                            document.getElementById("nombreUsuario").innerText = username;
+                        });
+                    })
+                    .catch((error) => {
+                        document.getElementById("errorRegistro").innerText = "Error al registrar: " + error.message;
+                    });
+            });
+        }
+
+        // Función para enviar un mensaje
+        function enviarMensaje() {
+            const mensaje = document.getElementById("mensaje").value;
+            if (mensaje.trim() !== "") {
+                const user = usuarioActual;
+                const userRef = ref(db, "mensajes");
+                const newMessageRef = push(userRef);
+                set(newMessageRef, {
+                    username: user.email,
+                    message: mensaje
+                }).then(() => {
+                    document.getElementById("mensaje").value = "";
+                    cargarMensajes();
+                });
+            }
+        }
+
+        // Función para cargar los mensajes del chat
+        function cargarMensajes() {
+            const mensajesRef = ref(db, "mensajes");
+            get(mensajesRef).then((snapshot) => {
+                const mensajesDiv = document.getElementById("mensajes");
+                mensajesDiv.innerHTML = "";
+                snapshot.forEach((childSnapshot) => {
+                    const message = childSnapshot.val();
+                    const p = document.createElement("p");
+                    p.textContent = `${message.username}: ${message.message}`;
+                    mensajesDiv.appendChild(p);
+                });
+            });
+        }
+
+        // Función para cerrar sesión
+        function cerrarSesion() {
+            signOut(auth).then(() => {
+                document.getElementById("chat").style.display = "none";
+                document.getElementById("registro").style.display = "block";
+                document.getElementById("email").value = "";
+                document.getElementById("password").value = "";
+                document.getElementById("username").value = "";
+            }).catch((error) => {
+                console.log("Error al cerrar sesión: ", error);
+            });
+        }
+
+        // Detectar cambios de estado de autenticación
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                usuarioActual = user;
+                document.getElementById("registro").style.display = "none";
+                document.getElementById("chat").style.display = "block";
+                cargarMensajes();
+                // Mostrar el nombre de usuario en el chat
+                const userRef = ref(db, "usuarios/" + user.uid);
+                get(userRef).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        document.getElementById("nombreUsuario").innerText = snapshot.val().username;
+                    }
+                });
+            }
         });
-      }
-    }
-
-    // Guardar nombre de usuario
-    document.getElementById('set-username').addEventListener('click', function() {
-      const username = document.getElementById('username').value.trim();
-
-      // Validar que solo tenga letras y números
-      if (!/^[a-zA-Z0-9]+$/.test(username)) {
-        document.getElementById('error-message').textContent = 'Solo se permiten letras y números.';
-        return;
-      }
-
-      // Verificar que el nombre de usuario no esté en uso
-      database.ref('users').orderByChild('username').equalTo(username).once('value')
-        .then(snapshot => {
-          if (snapshot.exists()) {
-            document.getElementById('error-message').textContent = 'Ese nombre de usuario ya está en uso.';
-          } else {
-            // Guardar el nombre de usuario
-            database.ref('users/' + currentUser.uid).set({ username: username });
-            currentUsername = username;
-            showChat();
-          }
-        });
-    });
-
-    // Mostrar la pantalla de chat
-    function showChat() {
-      document.getElementById('username-setup').style.display = 'none';
-      document.getElementById('login-google').style.display = 'none';
-      document.getElementById('chat').style.display = 'block';
-      document.getElementById('user-name').textContent = currentUsername;
-      loadMessages();
-    }
-
-    // Enviar mensaje
-    document.getElementById('send-message').addEventListener('click', function() {
-      const messageInput = document.getElementById('message-input');
-      const message = messageInput.value.trim();
-
-      if (message) {
-        database.ref('messages').push({
-          username: currentUsername,
-          message: message,
-          timestamp: firebase.database.ServerValue.TIMESTAMP
-        });
-        messageInput.value = ''; // Limpiar el campo de texto
-      }
-    });
-
-    // Cargar mensajes en el chat
-    function loadMessages() {
-      const messagesRef = database.ref('messages');
-      messagesRef.orderByChild('timestamp').on('child_added', function(snapshot) {
-        const messageData = snapshot.val();
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
-        messageElement.innerHTML = `<span class="username">${messageData.username}:</span> ${messageData.message}`;
-        document.getElementById('messages').appendChild(messageElement);
-      });
-    }
-  </script>
-
+    </script>
 </body>
 </html>
