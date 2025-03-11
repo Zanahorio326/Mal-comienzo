@@ -26,10 +26,11 @@
         const db = getDatabase(app);
         const textRef = ref(db, "textoCompartido");
 
-        // Actualizar el texto en Firebase cuando alguien escribe
-        function actualizarTexto() {
+        // Función para enviar el texto al presionar el botón
+        function enviarTexto() {
             const texto = document.getElementById("mensaje").value;
             set(textRef, texto);
+            document.getElementById("mensaje").value = ""; // Borra el campo después de enviar
         }
 
         // Escuchar cambios en la base de datos y actualizar en tiempo real
@@ -40,7 +41,8 @@
 </head>
 <body>
     <h2>Escribe algo y lo verán todos en tiempo real:</h2>
-    <input type="text" id="mensaje" oninput="actualizarTexto()" placeholder="Escribe aquí...">
+    <input type="text" id="mensaje" placeholder="Escribe aquí...">
+    <button onclick="enviarTexto()">Enviar</button>
     <p><strong>Texto compartido:</strong> <span id="textoCompartido"></span></p>
 </body>
 </html>
