@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login y Registro</title>
-  
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
@@ -104,6 +104,7 @@
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
 
+      // Llamada a Firebase para iniciar sesión
       auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
           // Redirigir al chat en caso de éxito
@@ -121,6 +122,7 @@
       const email = document.getElementById('registerEmail').value;
       const password = document.getElementById('registerPassword').value;
 
+      // Llamada a Firebase para crear cuenta de usuario
       auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
           // Redirigir al chat en caso de éxito
