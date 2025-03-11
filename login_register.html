@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login/Registro</title>
+  <title>Login</title>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 
   <style>
     body {
@@ -26,80 +25,69 @@
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       width: 300px;
-    }
-    h2 {
       text-align: center;
+    }
+    .button-group {
+      display: flex;
+      justify-content: space-between;
       margin-bottom: 20px;
     }
-    input[type="text"], input[type="email"], input[type="password"] {
+    .button-group button {
+      flex: 1;
+      margin: 0 5px;
+      padding: 10px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .button-group button:hover {
+      background-color: #0056b3;
+    }
+    input {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
       border-radius: 5px;
       border: 1px solid #ccc;
     }
-    button {
+    .chat-btn {
       width: 100%;
       padding: 10px;
-      background-color: #4CAF50;
+      background-color: #28a745;
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
-    button:hover {
-      background-color: #45a049;
+    .chat-btn:hover {
+      background-color: #218838;
     }
     .error {
       color: red;
-      text-align: center;
+      font-size: 14px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h2>Iniciar sesión o Registrarse</h2>
-
-    <!-- Botones de selección de Login o Registro -->
-    <div>
-      <button onclick="showLogin()">Iniciar sesión</button>
-      <button onclick="showRegister()">Registrarse</button>
+    <div class="button-group">
+      <button onclick="setMode('register')" id="registerBtn">Registrarse</button>
+      <button onclick="setMode('login')" id="loginBtn">Iniciar sesión</button>
     </div>
 
-    <!-- Formulario de Login -->
-    <div id="loginForm" style="display: none;">
-      <h3>Iniciar sesión</h3>
-      <label for="loginEmail">Correo electrónico</label>
-      <input type="email" id="loginEmail" placeholder="Correo electrónico" required>
-      
-      <label for="loginPassword">Contraseña</label>
-      <input type="password" id="loginPassword" placeholder="Contraseña" required>
-      
-      <button id="loginSubmit">Iniciar sesión</button>
-      <p class="error" id="loginError"></p>
-    </div>
+    <input type="text" id="username" placeholder="Nombre de usuario" required>
+    <input type="password" id="password" placeholder="Contraseña" required>
 
-    <!-- Formulario de Registro -->
-    <div id="registerForm" style="display: none;">
-      <h3>Registrarse</h3>
-      <label for="username">Nombre de usuario</label>
-      <input type="text" id="username" placeholder="Nombre de usuario" required>
-      
-      <label for="registerEmail">Correo electrónico</label>
-      <input type="email" id="registerEmail" placeholder="Correo electrónico" required>
-      
-      <label for="registerPassword">Contraseña</label>
-      <input type="password" id="registerPassword" placeholder="Contraseña" required>
-      
-      <button id="registerSubmit">Registrarse</button>
-      <p class="error" id="registerError"></p>
-    </div>
+    <button class="chat-btn" onclick="handleChat()">Chat</button>
+    <p class="error" id="errorText"></p>
   </div>
 
-  <!-- Firebase SDK y código para autenticación -->
   <script>
-    // Configuración de Firebase
+    // Configuración Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
       authDomain: "thegame-5afaa.firebaseapp.com",
@@ -110,60 +98,72 @@
       appId: "1:588556182984:web:a0557067d35c18e3944cfd",
       measurementId: "G-9M3CBJ3LV9"
     };
+    
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
-    // Inicializar Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+    let mode = "register"; // Modo inicial
 
-    // Función para mostrar el formulario de login
-    function showLogin() {
-      document.getElementById('loginForm').style.display = 'block';
-      document.getElementById('registerForm').style.display = 'none';
+    function setMode(newMode) {
+      mode = newMode;
+      console.log("Modo cambiado a:", mode);
     }
 
-    // Función para mostrar el formulario de registro
-    function showRegister() {
-      document.getElementById('registerForm').style.display = 'block';
-      document.getElementById('loginForm').style.display = 'none';
+    function handleChat() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const errorText = document.getElementById('errorText');
+
+      if (username === "" || password === "") {
+        errorText.textContent = "Por favor, completa ambos campos.";
+        return;
+      }
+
+      if (mode === "register") {
+        registerUser(username, password);
+      } else {
+        loginUser(username, password);
+      }
     }
 
-    // Iniciar sesión
-    document.getElementById('loginSubmit').addEventListener('click', function() {
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      console.log('Intentando iniciar sesión...'); // Debugging
+    function registerUser(username, password) {
+      const userRef = database.ref("users/" + username);
 
-      auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          console.log('Login exitoso!'); // Debugging
-          window.location.href = "https://zanahorio326.github.io/Mal-comienzo/chat.html";
-        })
-        .catch((error) => {
-          const errorMessage = error.message;
-          console.log('Error en login:', errorMessage); // Debugging
-          document.getElementById('loginError').textContent = "Error: " + errorMessage;
-        });
-    });
+      userRef.once("value", snapshot => {
+        if (snapshot.exists()) {
+          document.getElementById("errorText").textContent = "Este usuario ya existe.";
+        } else {
+          userRef.set({ password })
+            .then(() => {
+              console.log("Usuario registrado:", username);
+              window.location.href = "https://zanahorio326.github.io/Mal-comienzo/chat.html";
+            })
+            .catch(error => {
+              console.error("Error al registrar:", error);
+              document.getElementById("errorText").textContent = "Error en el registro.";
+            });
+        }
+      });
+    }
 
-    // Registrarse
-    document.getElementById('registerSubmit').addEventListener('click', function() {
-      const username = document.getElementById('username').value;
-      const email = document.getElementById('registerEmail').value;
-      const password = document.getElementById('registerPassword').value;
-      console.log('Intentando registrarse...'); // Debugging
+    function loginUser(username, password) {
+      const userRef = database.ref("users/" + username);
 
-      auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          console.log('Registro exitoso!'); // Debugging
-          window.location.href = "https://zanahorio326.github.io/Mal-comienzo/chat.html";
-        })
-        .catch((error) => {
-          const errorMessage = error.message;
-          console.log('Error en registro:', errorMessage); // Debugging
-          document.getElementById('registerError').textContent = "Error: " + errorMessage;
-        });
-    });
+      userRef.once("value", snapshot => {
+        if (snapshot.exists()) {
+          const storedPassword = snapshot.val().password;
+          if (storedPassword === password) {
+            console.log("Inicio de sesión exitoso:", username);
+            window.location.href = "https://zanahorio326.github.io/Mal-comienzo/chat.html";
+          } else {
+            document.getElementById("errorText").textContent = "Contraseña incorrecta.";
+          }
+        } else {
+          document.getElementById("errorText").textContent = "El usuario no existe.";
+        }
+      });
+    }
   </script>
-  
+
 </body>
 </html>
