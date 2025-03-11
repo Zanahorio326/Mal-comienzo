@@ -3,21 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cambiar Nombre de Usuario</title>
+    <title>Chat con Identificación de Usuarios</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+        }
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #357ABD;
+        }
+        #chat {
+            display: none; /* Ocultar el chat inicialmente */
+            margin-top: 20px;
+        }
+        #historial {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .mensaje {
+            margin: 5px 0;
+        }
+        .usuario {
+            font-weight: bold;
+            color: #4285F4;
+        }
+    </style>
 </head>
 <body>
     <div class="card" id="registroCard">
-        <h2>Cambiar Nombre de Usuario</h2>
-        <input type="email" id="email" placeholder="Correo electrónico" disabled>
+        <h2>Registro con Correo Electrónico</h2>
+        <input type="email" id="email" placeholder="Correo electrónico">
         <input type="password" id="password" placeholder="Contraseña">
-        <input type="text" id="nuevoUsername" placeholder="Nuevo nombre de usuario (letras y números)">
-        <button onclick="cambiarNombreUsuario()">Cambiar nombre de usuario</button>
+        <input type="text" id="username" placeholder="Nombre de usuario (letras y números)">
+        <button onclick="registrarse()">Registrarse</button>
+        <br><br>
+        <button onclick="iniciarSesion()">Iniciar sesión</button>
+    </div>
+
+    <div id="chat" class="card">
+        <h2>Chat en Tiempo Real</h2>
+        <input type="text" id="mensaje" placeholder="Escribe aquí...">
+        <button onclick="enviarTexto()">Enviar</button>
+        <div id="historial"></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
-        import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+        import { getDatabase, ref, set, push, onValue, get } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
@@ -39,29 +103,100 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 usuarioActual = user;
-                document.getElementById("email").value = user.email;
+                mostrarChat();
             }
         });
 
-        function cambiarNombreUsuario() {
-            const nuevoUsername = document.getElementById("nuevoUsername").value;
+        window.registrarse = async function () {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const username = document.getElementById("username").value;
 
-            if (nuevoUsername.match(/^[a-zA-Z0-9]+$/)) {
-                if (usuarioActual) {
-                    const user = usuarioActual;
-                    const userRef = ref(db, "usuarios/" + user.uid);
-                    update(userRef, {
-                        username: nuevoUsername
-                    }).then(() => {
-                        alert("Nombre de usuario actualizado correctamente.");
-                    }).catch((error) => {
-                        alert("Error al actualizar el nombre de usuario: " + error.message);
-                    });
-                }
-            } else {
+            if (!username.match(/^[a-zA-Z0-9]+$/)) {
                 alert("El nombre de usuario solo puede contener letras y números.");
+                return;
             }
+
+            // Verificar si el nombre de usuario ya está en uso
+            const usuarioRef = ref(db, `usuarios/`);
+            const snapshot = await get(usuarioRef);
+            const usuariosExistentes = snapshot.val();
+
+            if (usuariosExistentes) {
+                for (let key in usuariosExistentes) {
+                    if (usuariosExistentes[key].username === username) {
+                        alert("Este nombre de usuario ya está en uso.");
+                        return;
+                    }
+                }
+            }
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                alert(`¡Bienvenido, ${user.email}!`);
+                guardarUsuarioEnDB(user, username);
+            } catch (error) {
+                alert("Error al registrarse: " + error.message);
+            }
+        };
+
+        window.iniciarSesion = async function () {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                alert(`¡Bienvenido de nuevo, ${user.email}!`);
+                mostrarChat();
+            } catch (error) {
+                alert("Error al iniciar sesión: " + error.message);
+            }
+        };
+
+        async function guardarUsuarioEnDB(user, username) {
+            await set(ref(db, `usuarios/${user.uid}`), {
+                nombre: user.email,
+                email: user.email,
+                username: username
+            });
+            mostrarChat();
         }
+
+        function mostrarChat() {
+            document.getElementById("registroCard").style.display = "none";
+            document.getElementById("chat").style.display = "block";
+        }
+
+        window.enviarTexto = function () {
+            const texto = document.getElementById("mensaje").value;
+            if (texto.trim() !== "" && usuarioActual) {
+                const mensajesRef = ref(db, "mensajes");
+                push(mensajesRef, {
+                    usuario: usuarioActual.email,
+                    mensaje: texto
+                });
+                document.getElementById("mensaje").value = "";
+            }
+        };
+
+        const mensajesRef = ref(db, "mensajes");
+        onValue(mensajesRef, (snapshot) => {
+            const datos = snapshot.val();
+            const historial = document.getElementById("historial");
+            historial.innerHTML = "";
+
+            if (datos) {
+                const mensajes = Object.values(datos).slice(-5).reverse();
+                mensajes.forEach(msg => {
+                    const div = document.createElement("div");
+                    div.className = "mensaje";
+                    div.innerHTML = `<span class="usuario">${msg.usuario}:</span> ${msg.mensaje}`;
+                    historial.appendChild(div);
+                });
+            }
+        });
     </script>
 </body>
 </html>
