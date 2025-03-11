@@ -25,7 +25,6 @@
         <textarea id="mensaje" placeholder="Escribe un mensaje..."></textarea><br>
         <button onclick="enviarMensaje()">Enviar mensaje</button>
         <div id="mensajes"></div>
-        <button onclick="cerrarSesion()">Cerrar sesión</button>
     </div>
 
     <script type="module">
@@ -130,19 +129,6 @@
                     p.textContent = `${message.username}: ${message.message}`;
                     mensajesDiv.appendChild(p);
                 });
-            });
-        }
-
-        // Función para cerrar sesión
-        function cerrarSesion() {
-            signOut(auth).then(() => {
-                document.getElementById("chat").style.display = "none";
-                document.getElementById("registro").style.display = "block";
-                document.getElementById("email").value = "";
-                document.getElementById("password").value = "";
-                document.getElementById("username").value = "";
-            }).catch((error) => {
-                console.log("Error al cerrar sesión: ", error);
             });
         }
 
