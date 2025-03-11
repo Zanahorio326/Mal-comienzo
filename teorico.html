@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat en Tiempo Real</title>
+    <style>
+        #historial {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        p {
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
     <h2>Escribe algo y lo verán todos en tiempo real:</h2>
@@ -15,6 +27,7 @@
         import("https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js").then(({ initializeApp }) => {
             import("https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js").then(({ getDatabase, ref, push, onValue, set }) => {
 
+                // Configuración de Firebase
                 const firebaseConfig = {
                     apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
                     authDomain: "thegame-5afaa.firebaseapp.com",
@@ -26,6 +39,7 @@
                     measurementId: "G-9M3CBJ3LV9"
                 };
 
+                // Inicializar Firebase
                 const app = initializeApp(firebaseConfig);
                 const db = getDatabase(app);
                 const mensajesRef = ref(db, "mensajes");
@@ -46,7 +60,8 @@
                     historial.innerHTML = ""; 
 
                     if (datos) {
-                        const mensajes = Object.values(datos).slice(-5); // Tomar los últimos 5 mensajes
+                        // Mostrar los últimos 5 mensajes, invertidos para que los nuevos aparezcan arriba
+                        const mensajes = Object.values(datos).slice(-5).reverse(); 
                         mensajes.forEach(msg => {
                             const p = document.createElement("p");
                             p.textContent = msg;
