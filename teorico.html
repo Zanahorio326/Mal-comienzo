@@ -4,18 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro con Google</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #357ABD;
+        }
+    </style>
 </head>
 <body>
-    <h2>Registro con Google</h2>
-    <div>
-        <h3>Registrarse</h3>
+    <div class="card">
+        <h2>Registro con Google</h2>
         <input type="text" id="nombreUsuario" placeholder="Nombre de usuario (solo texto y números)">
         <button onclick="iniciarSesionConGoogle()">Registrarse con Google</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+        import { getAuth, signInWithRedirect, GoogleAuthProvider, getRedirectResult } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
         import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -33,16 +68,30 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
 
+        // Manejar el resultado de la redirección de Google
+        getRedirectResult(auth)
+            .then((result) => {
+                if (result) {
+                    const user = result.user;
+                    const nombreUsuario = localStorage.getItem("nombreUsuarioTemp");
+                    if (nombreUsuario) {
+                        guardarUsuarioEnDB(user, nombreUsuario);
+                        localStorage.removeItem("nombreUsuarioTemp");
+                    }
+                }
+            })
+            .catch((error) => {
+                alert("Error al autenticar: " + error.message);
+            });
+
         window.iniciarSesionConGoogle = async function () {
             const nombreUsuario = document.getElementById("nombreUsuario").value;
 
-            // Validar el nombre de usuario
             if (!/^[a-zA-Z0-9]+$/.test(nombreUsuario)) {
                 alert("El nombre de usuario solo puede contener letras y números.");
                 return;
             }
 
-            // Verificar si el nombre de usuario ya existe
             const usuarioRef = ref(db, `usuarios/nombres/${nombreUsuario}`);
             const snapshot = await get(usuarioRef);
             if (snapshot.exists()) {
@@ -50,27 +99,25 @@
                 return;
             }
 
-            // Autenticar con Google
+            // Guardar el nombre de usuario temporalmente
+            localStorage.setItem("nombreUsuarioTemp", nombreUsuario);
+
+            // Redirigir a Google para autenticación
             const provider = new GoogleAuthProvider();
-            try {
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-
-                // Guardar información del usuario en la base de datos
-                await set(ref(db, `usuarios/${user.uid}`), {
-                    nombre: user.displayName,
-                    email: user.email,
-                    foto: user.photoURL,
-                    nombreUsuario: nombreUsuario
-                });
-
-                // Registrar el nombre de usuario como único
-                await set(ref(db, `usuarios/nombres/${nombreUsuario}`), user.uid);
-                alert(`¡Bienvenido, ${nombreUsuario}!`);
-            } catch (error) {
-                alert("Error al autenticar: " + error.message);
-            }
+            await signInWithRedirect(auth, provider);
         };
+
+        async function guardarUsuarioEnDB(user, nombreUsuario) {
+            await set(ref(db, `usuarios/${user.uid}`), {
+                nombre: user.displayName,
+                email: user.email,
+                foto: user.photoURL,
+                nombreUsuario: nombreUsuario
+            });
+
+            await set(ref(db, `usuarios/nombres/${nombreUsuario}`), user.uid);
+            alert(`¡Bienvenido, ${nombreUsuario}!`);
+        }
     </script>
 </body>
 </html>
