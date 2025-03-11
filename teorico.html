@@ -70,8 +70,8 @@
         window.enviarTexto = async function () {
             const texto = document.getElementById("mensaje").value.trim();
 
-            if (!usuarioActual) {
-                alert("Debes iniciar sesión para enviar mensajes.");
+            if (!usuarioActual || !usuarioActual.nombreUsuario) {
+                alert("Error: No se encontró el nombre de usuario. Recarga la página o vuelve a iniciar sesión.");
                 return;
             }
 
@@ -115,10 +115,14 @@
             if (user) {
                 const usuarioRef = ref(db, `usuarios/${user.uid}`);
                 const snapshot = await get(usuarioRef);
+
                 if (snapshot.exists()) {
                     usuarioActual = { uid: user.uid, nombreUsuario: snapshot.val().nombreUsuario };
                     document.getElementById("registro").style.display = "none";
                     document.getElementById("chat").style.display = "block";
+                } else {
+                    alert("Error: No se encontró el nombre de usuario en la base de datos.");
+                    auth.signOut();
                 }
             }
         });
