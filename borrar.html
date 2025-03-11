@@ -3,50 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Borrar Cuenta y Datos</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 300px;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #FF6347;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #E53E3E;
-        }
-    </style>
+    <title>Eliminar cuenta y datos</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 </head>
 <body>
-    <div class="card">
-        <h2>Eliminar Cuenta y Datos</h2>
-        <p>Al hacer clic en "Eliminar cuenta", se borrarán todos los datos asociados a tu cuenta de Firebase y tu cuenta de usuario.</p>
-        <button onclick="eliminarCuenta()">Eliminar Cuenta</button>
-    </div>
+    <h1>Eliminar cuenta y todos los datos asociados</h1>
+    <button onclick="eliminarCuenta()">Eliminar Cuenta</button>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-        import { getAuth, deleteUser } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
-        import { getDatabase, ref, remove } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
-
+    <script>
         // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
@@ -59,34 +25,29 @@
             measurementId: "G-9M3CBJ3LV9"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
+        // Inicializar Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
 
-        function eliminarCuenta() {
+        // Función para eliminar la cuenta y todos los datos asociados
+        async function eliminarCuenta() {
             const user = auth.currentUser;
             if (user) {
-                // Eliminar los datos del usuario en la base de datos
-                const userRef = ref(db, 'usuarios/' + user.uid);
-                remove(userRef)
-                    .then(() => {
-                        console.log('Datos eliminados correctamente');
-                    })
-                    .catch((error) => {
-                        console.error('Error al eliminar los datos:', error);
-                    });
+                try {
+                    // Borrar los datos asociados al usuario desde la base de datos
+                    await database.ref('usuarios/' + user.uid).remove();
 
-                // Eliminar la cuenta del usuario
-                deleteUser(user).then(() => {
-                    console.log('Cuenta eliminada correctamente');
-                    alert('Tu cuenta y todos los datos asociados han sido eliminados.');
-                    window.location.href = "index.html"; // Redirigir a la página principal después de eliminar la cuenta
-                }).catch((error) => {
-                    console.error('Error al eliminar la cuenta:', error);
-                    alert('Ocurrió un error al eliminar tu cuenta.');
-                });
+                    // Eliminar la cuenta del usuario de Firebase Authentication
+                    await user.delete();
+
+                    alert("Cuenta y todos los datos han sido eliminados correctamente.");
+                    // Redirigir o hacer lo que necesites después de eliminar la cuenta
+                } catch (error) {
+                    alert("Error al eliminar la cuenta: " + error.message);
+                }
             } else {
-                alert('No hay usuario autenticado.');
+                alert("No hay usuario autenticado.");
             }
         }
     </script>
