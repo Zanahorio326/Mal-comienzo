@@ -3,13 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat</title>
+    <title>Chat con Identificación de Usuarios</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+        }
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #357ABD;
+        }
+        #chat {
+            display: none; /* Ocultar el chat inicialmente */
+            margin-top: 20px;
+        }
+        #historial {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .mensaje {
+            margin: 5px 0;
+        }
+        .usuario {
+            font-weight: bold;
+            color: #4285F4;
+        }
+    </style>
+</head>
+<body>
+    <div class="card" id="registroCard">
+        <h2>Registro con Correo Electrónico</h2>
+        <input type="email" id="email" placeholder="Correo electrónico">
+        <input type="password" id="password" placeholder="Contraseña">
+        <button onclick="registrarse()">Registrarse</button>
+        <br><br>
+        <button onclick="iniciarSesion()">Iniciar sesión</button>
+    </div>
+
+    <div id="chat" class="card">
+        <h2>Chat en Tiempo Real</h2>
+        <input type="text" id="mensaje" placeholder="Escribe aquí...">
+        <button onclick="enviarTexto()">Enviar</button>
+        <div id="historial"></div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
-        import { getDatabase, ref, set, get, push, onValue } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+        import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
 
-        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
             authDomain: "thegame-5afaa.firebaseapp.com",
@@ -21,40 +93,33 @@
             measurementId: "G-9M3CBJ3LV9"
         };
 
-        // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
 
         let usuarioActual = null;
 
-        // Registro de usuario con nombre único
-        window.registrar = async function () {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                usuarioActual = user;
+                mostrarChat();
+            }
+        });
+
+        window.registrarse = async function () {
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
-            const nombreUsuario = document.getElementById("nombreUsuario").value.trim();
-
-            if (!/^[a-zA-Z0-9]+$/.test(nombreUsuario)) {
-                alert("El nombre de usuario solo puede contener letras y números.");
-                return;
-            }
 
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-
-                await set(ref(db, `usuarios/${user.uid}`), { nombreUsuario });
-
-                alert("Registro exitoso, ahora inicia sesión.");
-                document.getElementById("email").value = "";
-                document.getElementById("password").value = "";
-                document.getElementById("nombreUsuario").value = "";
+                alert(`¡Bienvenido, ${user.email}!`);
+                guardarUsuarioEnDB(user);
             } catch (error) {
-                alert("Error en el registro: " + error.message);
+                alert("Error al registrarse: " + error.message);
             }
         };
 
-        // Inicio de sesión
         window.iniciarSesion = async function () {
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
@@ -62,64 +127,38 @@
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-
-                // Obtener nombre de usuario antes de mostrar el chat
-                const usuarioRef = ref(db, `usuarios/${user.uid}`);
-                const snapshot = await get(usuarioRef);
-
-                if (snapshot.exists()) {
-                    usuarioActual = { uid: user.uid, nombreUsuario: snapshot.val().nombreUsuario };
-                    document.getElementById("registro").style.display = "none";
-                    document.getElementById("chat").style.display = "block";
-                } else {
-                    alert("Error: No se encontró el nombre de usuario en la base de datos.");
-                    await signOut(auth);
-                }
+                alert(`¡Bienvenido de nuevo, ${user.email}!`);
+                guardarUsuarioEnDB(user);
             } catch (error) {
                 alert("Error al iniciar sesión: " + error.message);
             }
         };
 
-        // Cerrar sesión
-        window.cerrarSesion = async function () {
-            try {
-                await signOut(auth);
-                usuarioActual = null;
-                document.getElementById("chat").style.display = "none";
-                document.getElementById("registro").style.display = "block";
-            } catch (error) {
-                alert("Error al cerrar sesión: " + error.message);
-            }
-        };
+        async function guardarUsuarioEnDB(user) {
+            await set(ref(db, `usuarios/${user.uid}`), {
+                nombre: user.email,
+                email: user.email
+            });
+            mostrarChat();
+        }
 
-        // Envío de mensajes
-        window.enviarTexto = async function () {
-            const texto = document.getElementById("mensaje").value.trim();
+        function mostrarChat() {
+            document.getElementById("registroCard").style.display = "none";
+            document.getElementById("chat").style.display = "block";
+        }
 
-            if (!usuarioActual || !usuarioActual.nombreUsuario) {
-                alert("Error: No se encontró el nombre de usuario. Recarga la página o vuelve a iniciar sesión.");
-                return;
-            }
-
-            if (texto === "") {
-                alert("No puedes enviar un mensaje vacío.");
-                return;
-            }
-
-            try {
+        window.enviarTexto = function () {
+            const texto = document.getElementById("mensaje").value;
+            if (texto.trim() !== "" && usuarioActual) {
                 const mensajesRef = ref(db, "mensajes");
-                await push(mensajesRef, {
-                    usuario: usuarioActual.nombreUsuario,
+                push(mensajesRef, {
+                    usuario: usuarioActual.email,
                     mensaje: texto
                 });
-
                 document.getElementById("mensaje").value = "";
-            } catch (error) {
-                alert("Error al enviar mensaje: " + error.message);
             }
         };
 
-        // Escuchar mensajes en tiempo real
         const mensajesRef = ref(db, "mensajes");
         onValue(mensajesRef, (snapshot) => {
             const datos = snapshot.val();
@@ -127,7 +166,8 @@
             historial.innerHTML = "";
 
             if (datos) {
-                Object.values(datos).slice(-5).reverse().forEach(msg => {
+                const mensajes = Object.values(datos).slice(-5).reverse();
+                mensajes.forEach(msg => {
                     const div = document.createElement("div");
                     div.className = "mensaje";
                     div.innerHTML = `<span class="usuario">${msg.usuario}:</span> ${msg.mensaje}`;
@@ -135,44 +175,6 @@
                 });
             }
         });
-
-        // Detectar cambios en la autenticación
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const usuarioRef = ref(db, `usuarios/${user.uid}`);
-                const snapshot = await get(usuarioRef);
-
-                if (snapshot.exists()) {
-                    usuarioActual = { uid: user.uid, nombreUsuario: snapshot.val().nombreUsuario };
-                    document.getElementById("registro").style.display = "none";
-                    document.getElementById("chat").style.display = "block";
-                } else {
-                    alert("Error: No se encontró el nombre de usuario en la base de datos.");
-                    await signOut(auth);
-                }
-            }
-        });
-
     </script>
-</head>
-<body>
-    <!-- Formulario de registro / inicio de sesión -->
-    <div id="registro">
-        <h2>Registro / Inicio de Sesión</h2>
-        <input type="email" id="email" placeholder="Correo electrónico" required>
-        <input type="password" id="password" placeholder="Contraseña" required>
-        <input type="text" id="nombreUsuario" placeholder="Nombre de usuario" required>
-        <button onclick="registrar()">Registrarse</button>
-        <button onclick="iniciarSesion()">Iniciar Sesión</button>
-    </div>
-
-    <!-- Chat -->
-    <div id="chat" style="display: none;">
-        <h2>Chat</h2>
-        <div id="historial"></div>
-        <input type="text" id="mensaje" placeholder="Escribe tu mensaje">
-        <button onclick="enviarTexto()">Enviar</button>
-        <button onclick="cerrarSesion()">Cerrar Sesión</button>
-    </div>
 </body>
 </html>
