@@ -7,7 +7,7 @@
     <script type="module">
         // Importar Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getDatabase, ref, push, onChildAdded, set, get, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
         // Configuración de Firebase
         const firebaseConfig = {
@@ -42,14 +42,6 @@
                     document.getElementById("inputMensaje").value = "";
                 }
             });
-
-            // Cargar el contenido de teorico.html dentro de la tarjeta
-            fetch("teorico.html")
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById("tarjeta").innerHTML = html;
-                })
-                .catch(error => console.error("Error al cargar la tarjeta:", error));
         });
 
         // Mostrar mensajes en tiempo real
@@ -99,7 +91,8 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            max-height: calc(100dvh - 180px); /* Ajuste para incluir la tarjeta */
+            max-height: calc(100dvh - 120px); /* Ajuste dinámico según el tamaño del dispositivo */
+            margin-top: 5px; /* Reducción del margen superior */
         }
 
         .mensaje {
@@ -108,15 +101,6 @@
             margin: 5px;
             border-radius: 5px;
             width: fit-content;
-        }
-
-        #tarjeta {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 10px;
-            border-radius: 10px;
-            margin: 10px 0;
-            max-height: 150px; /* Límite para evitar que ocupe demasiado espacio */
-            overflow-y: auto;
         }
 
         #entrada {
@@ -157,17 +141,12 @@
             #btnEnviar {
                 font-size: 14px;
             }
-
-            #tarjeta {
-                max-height: 120px; /* Ajuste menor en pantallas pequeñas */
-            }
         }
     </style>
 </head>
 <body>
     <div id="titulo">Zanahorio Codderbone</div>
     <div id="mensajes"></div>
-    <div id="tarjeta">Cargando contenido...</div>
     <div id="entrada">
         <input type="text" id="inputMensaje" placeholder="Escribe un mensaje...">
         <button id="btnEnviar">Enviar</button>
