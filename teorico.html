@@ -3,98 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario de Minerales</title>
+    <title>Teorico - Inventario</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            background-color: #f4f4f4;
             margin: 0;
-            background-color: #f0f0f0;
-        }
-        .container {
-            display: flex;
-            align-items: center;
-            background-color: #fff;
-            padding: 2%;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 800px;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 2 columnas */
-            grid-template-rows: repeat(6, 1fr); /* 6 filas */
-            gap: 1px;
-            background-color: #ddd;
-            border: 1px solid #ddd;
-            width: 100%;
-            height: 50vh;
-        }
-        .grid-item {
-            background-color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: clamp(12px, 2vw, 16px);
-            border: 1px solid #ccc;
-        }
-        .button {
-            background-color: #008CBA;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: clamp(12px, 2vw, 16px);
-            transition: background-color 0.3s ease;
-            white-space: nowrap;
-        }
-        .button:hover {
-            background-color: #007B9E;
-        }
-        .left-button {
-            margin-right: 2%;
-        }
-        .right-button {
-            margin-left: 2%;
+            padding: 0;
         }
 
-        /* Estilos para pantallas pequeñas */
+        .contenedor {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .cuadro {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 150px;
+        }
+
+        .cuadro h3 {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .cuadro p {
+            font-size: 14px;
+            color: #555;
+            margin-top: 10px;
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cuadro img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        /* Ajustes responsivos */
         @media (max-width: 600px) {
-            .container {
-                padding: 5%;
-            }
-            .grid {
-                height: 40vh;
-            }
-            .button {
-                padding: 8px 12px;
+            .cuadro {
+                height: 120px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <button class="button left-button">Izquierda</button>
-        <div class="grid">
-            <div class="grid-item">Piedra caliza</div>
-            <div class="grid-item">0</div>
-            <div class="grid-item">Carbón</div>
-            <div class="grid-item">0</div>
-            <div class="grid-item">Hierro</div>
-            <div class="grid-item">0</div>
-            <div class="grid-item">Cobre</div>
-            <div class="grid-item">0</div>
-            <div class="grid-item">Estaño</div>
-            <div class="grid-item">0</div>
-            <div class="grid-item">Plata</div>
-            <div class="grid-item">0</div>
+    <div class="contenedor">
+        <div class="cuadro">
+            <img src="https://via.placeholder.com/50" alt="Icono 1">
+            <h3>Elemento 1</h3>
+            <p>Descripción del primer elemento en el inventario. Esto es solo un ejemplo.</p>
         </div>
-        <button class="button right-button">Derecha</button>
+        <div class="cuadro">
+            <img src="https://via.placeholder.com/50" alt="Icono 2">
+            <h3>Elemento 2</h3>
+            <p>Descripción del segundo elemento. Puedes colocar más detalles aquí.</p>
+        </div>
+        <div class="cuadro">
+            <img src="https://via.placeholder.com/50" alt="Icono 3">
+            <h3>Elemento 3</h3>
+            <p>Un tercer elemento en el inventario. Texto de ejemplo.</p>
+        </div>
+        <!-- Agregar más cuadros según sea necesario -->
     </div>
 </body>
 </html>
