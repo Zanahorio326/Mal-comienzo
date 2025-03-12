@@ -51,6 +51,8 @@
                             password: password
                         }).then(() => {
                             alert("Personaje creado, en camino al mundo");
+                            // Guardar el nombre de usuario en localStorage
+                            localStorage.setItem('username', username);
                             window.location.href = "chat.html";
                         }).catch((error) => {
                             alert("Error al registrar: " + error.message);
@@ -77,6 +79,8 @@
                 get(child(ref(db), 'users/' + username)).then((snapshot) => {
                     if (snapshot.exists() && snapshot.val().password === password) {
                         alert("Inicio de sesión exitoso, redirigiendo al chat...");
+                        // Guardar el nombre de usuario en localStorage
+                        localStorage.setItem('username', username);
                         window.location.href = "chat.html";
                     } else {
                         alert("Jugador/usuario o contraseña incorrectos.");
