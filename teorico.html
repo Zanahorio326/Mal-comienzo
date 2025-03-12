@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuadrícula 6x2 Responsiva</title>
+    <title>Cuadrícula 6x2 Responsiva con Botones Laterales</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -66,14 +66,13 @@
         /* Estilos para pantallas pequeñas (móviles) */
         @media (max-width: 600px) {
             .container {
-                flex-direction: column; /* Cambia a disposición vertical en móviles */
                 padding: 5%;
-            }
-            .left-button, .right-button {
-                margin: 10px 0; /* Espaciado vertical para los botones */
             }
             .grid {
                 height: 40vh; /* Ajusta la altura para móviles */
+            }
+            .button {
+                padding: 8px 12px; /* Botones más pequeños en móviles */
             }
         }
     </style>
