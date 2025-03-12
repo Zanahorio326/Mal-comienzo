@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario - Cuadrícula Responsiva</title>
+    <title>Chat con Identificación de Usuarios</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,103 +14,175 @@
             margin: 0;
             background-color: #f0f0f0;
         }
-        .container {
-            display: flex;
-            align-items: center;
-            background-color: #fff;
-            padding: 2%;
+        .card {
+            background: white;
+            padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 800px;
+            text-align: center;
+            width: 300px;
         }
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* Dos columnas: una para el nombre y otra para la cantidad */
-            grid-template-rows: repeat(6, 1fr); /* 6 filas */
-            gap: 10px;
-            background-color: #ddd;
-            border: 1px solid #ddd;
-            width: 100%;
-            height: 50vh;
-        }
-        .grid-item {
-            background-color: #fff;
-            display: flex;
-            justify-content: space-between; /* Separa el contenido a la izquierda y derecha */
-            align-items: center;
-            font-size: clamp(12px, 2vw, 16px);
-            border: 1px solid #ccc;
+        input {
             padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
-        .grid-item span {
-            font-weight: bold;
-        }
-        .button {
-            background-color: #008CBA;
+        button {
+            padding: 10px 20px;
+            background-color: #4285F4;
             color: white;
             border: none;
-            padding: 10px 15px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: clamp(12px, 2vw, 16px);
-            transition: background-color 0.3s ease;
-            white-space: nowrap;
         }
-        .button:hover {
-            background-color: #007B9E;
+        button:hover {
+            background-color: #357ABD;
         }
-        .left-button {
-            margin-right: 2%;
+        #chat {
+            display: none; /* Ocultar el chat inicialmente */
+            margin-top: 20px;
         }
-        .right-button {
-            margin-left: 2%;
+        #historial {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
         }
-
-        /* Estilos para pantallas pequeñas (móviles) */
-        @media (max-width: 600px) {
-            .container {
-                padding: 5%;
-            }
-            .grid {
-                height: 40vh;
-            }
-            .button {
-                padding: 8px 12px;
-            }
+        .mensaje {
+            margin: 5px 0;
+        }
+        .usuario {
+            font-weight: bold;
+            color: #4285F4;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <button class="button left-button">Izquierda</button>
-        <div class="grid">
-            <div class="grid-item">
-                <span>Item 1</span>
-                <span>Cantidad: 5</span>
-            </div>
-            <div class="grid-item">
-                <span>Item 2</span>
-                <span>Cantidad: 3</span>
-            </div>
-            <div class="grid-item">
-                <span>Item 3</span>
-                <span>Cantidad: 7</span>
-            </div>
-            <div class="grid-item">
-                <span>Item 4</span>
-                <span>Cantidad: 10</span>
-            </div>
-            <div class="grid-item">
-                <span>Item 5</span>
-                <span>Cantidad: 2</span>
-            </div>
-            <div class="grid-item">
-                <span>Item 6</span>
-                <span>Cantidad: 12</span>
-            </div>
-        </div>
-        <button class="button right-button">Derecha</button>
+    <div class="card">
+        <h2>Registro con Google</h2>
+        <input type="text" id="nombreUsuario" placeholder="Nombre de usuario (solo texto y números)">
+        <button onclick="iniciarSesionConGoogle()">Registrarse con Google</button>
     </div>
+
+    <div id="chat" class="card">
+        <h2>Chat en Tiempo Real</h2>
+        <input type="text" id="mensaje" placeholder="Escribe aquí...">
+        <button onclick="enviarTexto()">Enviar</button>
+        <div id="historial"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+        import { getAuth, signInWithRedirect, GoogleAuthProvider, getRedirectResult } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+        import { getDatabase, ref, set, get, push, onValue } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+            authDomain: "thegame-5afaa.firebaseapp.com",
+            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+            projectId: "thegame-5afaa",
+            storageBucket: "thegame-5afaa.firebasestorage.app",
+            messagingSenderId: "588556182984",
+            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+            measurementId: "G-9M3CBJ3LV9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let usuarioActual = null;
+
+        // Manejar el resultado de la redirección de Google
+        getRedirectResult(auth)
+            .then((result) => {
+                if (result) {
+                    const user = result.user;
+                    const nombreUsuario = localStorage.getItem("nombreUsuarioTemp");
+                    if (nombreUsuario) {
+                        guardarUsuarioEnDB(user, nombreUsuario);
+                        localStorage.removeItem("nombreUsuarioTemp");
+                        usuarioActual = { uid: user.uid, nombreUsuario: nombreUsuario };
+                        mostrarChat();
+                    }
+                }
+            })
+            .catch((error) => {
+                alert("Error al autenticar: " + error.message);
+            });
+
+        window.iniciarSesionConGoogle = async function () {
+            const nombreUsuario = document.getElementById("nombreUsuario").value;
+
+            if (!/^[a-zA-Z0-9]+$/.test(nombreUsuario)) {
+                alert("El nombre de usuario solo puede contener letras y números.");
+                return;
+            }
+
+            const usuarioRef = ref(db, `usuarios/nombres/${nombreUsuario}`);
+            const snapshot = await get(usuarioRef);
+            if (snapshot.exists()) {
+                alert("El nombre de usuario ya está en uso. Elige otro.");
+                return;
+            }
+
+            // Guardar el nombre de usuario temporalmente
+            localStorage.setItem("nombreUsuarioTemp", nombreUsuario);
+
+            // Redirigir a Google para autenticación
+            const provider = new GoogleAuthProvider();
+            await signInWithRedirect(auth, provider);
+        };
+
+        async function guardarUsuarioEnDB(user, nombreUsuario) {
+            await set(ref(db, `usuarios/${user.uid}`), {
+                nombre: user.displayName,
+                email: user.email,
+                foto: user.photoURL,
+                nombreUsuario: nombreUsuario
+            });
+
+            await set(ref(db, `usuarios/nombres/${nombreUsuario}`), user.uid);
+            alert(`¡Bienvenido, ${nombreUsuario}!`);
+        }
+
+        function mostrarChat() {
+            document.querySelector(".card").style.display = "none"; // Ocultar la tarjeta de registro
+            document.getElementById("chat").style.display = "block"; // Mostrar el chat
+        }
+
+        // Funcionalidad del chat
+        window.enviarTexto = function () {
+            const texto = document.getElementById("mensaje").value;
+            if (texto.trim() !== "" && usuarioActual) {
+                const mensajesRef = ref(db, "mensajes");
+                push(mensajesRef, {
+                    usuario: usuarioActual.nombreUsuario,
+                    mensaje: texto
+                });
+                document.getElementById("mensaje").value = "";
+            }
+        };
+
+        const mensajesRef = ref(db, "mensajes");
+        onValue(mensajesRef, (snapshot) => {
+            const datos = snapshot.val();
+            const historial = document.getElementById("historial");
+            historial.innerHTML = "";
+
+            if (datos) {
+                const mensajes = Object.values(datos).slice(-5).reverse();
+                mensajes.forEach(msg => {
+                    const div = document.createElement("div");
+                    div.className = "mensaje";
+                    div.innerHTML = `<span class="usuario">${msg.usuario}:</span> ${msg.mensaje}`;
+                    historial.appendChild(div);
+                });
+            }
+        });
+    </script>
 </body>
 </html>
