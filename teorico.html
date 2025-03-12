@@ -14,8 +14,8 @@
 
         .contenedor {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
             padding: 20px;
         }
 
@@ -23,17 +23,19 @@
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
+            padding: 10px;
             text-align: center;
             display: flex;
             flex-direction: column;
+            align-items: center;
             justify-content: space-between;
-            height: 150px;
+            height: 180px;
         }
 
         .cuadro h3 {
-            font-size: 18px;
+            font-size: 16px;
             color: #333;
+            margin-bottom: 5px;
         }
 
         .cuadro p {
@@ -41,9 +43,6 @@
             color: #555;
             margin-top: 10px;
             flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
         .cuadro img {
@@ -53,32 +52,49 @@
             margin-bottom: 10px;
         }
 
-        /* Ajustes responsivos */
         @media (max-width: 600px) {
             .cuadro {
-                height: 120px;
+                height: 160px;
             }
         }
     </style>
 </head>
 <body>
     <div class="contenedor">
+        <!-- Mineral 1 -->
         <div class="cuadro">
-            <img src="https://via.placeholder.com/50" alt="Icono 1">
-            <h3>Elemento 1</h3>
-            <p>Descripción del primer elemento en el inventario. Esto es solo un ejemplo.</p>
+            <img src="https://via.placeholder.com/50" alt="Mineral 1">
+            <h3>Mineral A</h3>
+            <p>Descripción breve del Mineral A. Características y usos.</p>
         </div>
+
+        <!-- Mineral 2 -->
         <div class="cuadro">
-            <img src="https://via.placeholder.com/50" alt="Icono 2">
-            <h3>Elemento 2</h3>
-            <p>Descripción del segundo elemento. Puedes colocar más detalles aquí.</p>
+            <img src="https://via.placeholder.com/50" alt="Mineral 2">
+            <h3>Mineral B</h3>
+            <p>Descripción breve del Mineral B. Características y usos.</p>
         </div>
+
+        <!-- Mineral 3 -->
         <div class="cuadro">
-            <img src="https://via.placeholder.com/50" alt="Icono 3">
-            <h3>Elemento 3</h3>
-            <p>Un tercer elemento en el inventario. Texto de ejemplo.</p>
+            <img src="https://via.placeholder.com/50" alt="Mineral 3">
+            <h3>Mineral C</h3>
+            <p>Descripción breve del Mineral C. Características y usos.</p>
         </div>
-        <!-- Agregar más cuadros según sea necesario -->
+
+        <!-- Mineral 4 -->
+        <div class="cuadro">
+            <img src="https://via.placeholder.com/50" alt="Mineral 4">
+            <h3>Mineral D</h3>
+            <p>Descripción breve del Mineral D. Características y usos.</p>
+        </div>
+
+        <!-- Mineral 5 -->
+        <div class="cuadro">
+            <img src="https://via.placeholder.com/50" alt="Mineral 5">
+            <h3>Mineral E</h3>
+            <p>Descripción breve del Mineral E. Características y usos.</p>
+        </div>
     </div>
 </body>
 </html>
