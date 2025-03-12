@@ -5,55 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teorico - Inventario</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-
-        .contenedor {
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
+        /* Asegura que los estilos se apliquen aunque se cargue dinámicamente */
+        #teorico-contenido {
+            font-family: Arial, sans-serif !important;
+            background-color: #f4f4f4 !important;
+            padding: 20px !important;
+            width: 100% !important;
         }
 
         .recuadro {
-            display: flex;
-            justify-content: space-between;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            padding: 8px;
-            margin-bottom: 5px;
-            border-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex !important;
+            justify-content: space-between !important;
+            background-color: #fff !important;
+            border: 1px solid #ccc !important;
+            padding: 8px !important;
+            margin-bottom: 5px !important;
+            border-radius: 5px !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
         }
 
         .recuadro p {
-            margin: 0;
+            margin: 0 !important;
+            font-size: 16px !important;
+            color: black !important;
         }
 
         .nombre {
-            font-weight: bold;
+            font-weight: bold !important;
         }
 
         .cantidad {
-            color: #4CAF50;
+            color: #4CAF50 !important;
         }
 
         @media (max-width: 600px) {
-            .contenedor {
-                padding: 10px;
+            #teorico-contenido {
+                padding: 10px !important;
             }
 
             .recuadro {
-                padding: 6px;
+                padding: 6px !important;
             }
         }
     </style>
 </head>
 <body>
-    <div class="contenedor">
+    <div id="teorico-contenido">
         <!-- Mineral 1: Carbón -->
         <div class="recuadro">
             <p class="nombre">Carbón</p>
