@@ -153,13 +153,29 @@
     </div>
     
     <!-- Cargar el contenido de teorico.html en un iframe -->
-    <iframe id="iframeTeorico" src="https://zanahorio326.github.io/Mal-comienzo/teorico.html" width="100%" height="300px" style="border: none; margin-top: 20px;"></iframe>
+    <div id="iframeContainer">
+        <iframe id="iframeTeorico" src="https://zanahorio326.github.io/Mal-comienzo/teorico.html" width="100%" height="300px" style="border: none; margin-top: 20px;"></iframe>
+    </div>
 
-    <!-- Recargar el iframe cada 5 segundos -->
+    <!-- Recargar el iframe cada 1 segundo -->
     <script>
-        setInterval(function() {
-            document.getElementById('iframeTeorico').src = 'https://zanahorio326.github.io/Mal-comienzo/teorico.html';
-        }, 5000); // Recargar cada 5 segundos
+        function refreshIframe() {
+            const iframe = document.getElementById('iframeTeorico');
+            const iframeContainer = document.getElementById('iframeContainer');
+            
+            // Eliminar y recrear el iframe para forzar su recarga
+            iframeContainer.removeChild(iframe);
+            const newIframe = document.createElement('iframe');
+            newIframe.id = 'iframeTeorico';
+            newIframe.src = 'https://zanahorio326.github.io/Mal-comienzo/teorico.html';
+            newIframe.width = '100%';
+            newIframe.height = '300px';
+            newIframe.style.border = 'none';
+            newIframe.style.marginTop = '20px';
+            iframeContainer.appendChild(newIframe);
+        }
+
+        setInterval(refreshIframe, 1000); // Recargar cada 1 segundo
     </script>
 </body>
 </html>
