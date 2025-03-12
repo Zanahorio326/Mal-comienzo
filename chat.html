@@ -14,17 +14,53 @@
             margin: 0;
             background-color: #f0f0f0;
         }
-        .container {
-            display: flex;
-            align-items: center;
+        .chat-container {
+            width: 90%;
+            max-width: 800px;
             background-color: #fff;
             padding: 2%;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 800px;
         }
-        .grid {
+        .chat-box {
+            height: 400px;
+            overflow-y: scroll;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .input-box {
+            display: flex;
+            justify-content: space-between;
+        }
+        .input-box input {
+            width: 85%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .input-box button {
+            padding: 10px 15px;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .input-box button:hover {
+            background-color: #007B9E;
+        }
+
+        /* Estilos para el inventario */
+        .inventory-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .inventory-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             grid-template-rows: repeat(6, 1fr);
@@ -32,49 +68,42 @@
             background-color: #ddd;
             border: 1px solid #ddd;
             width: 100%;
-            height: 50vh;
+            max-width: 300px;
+            margin-top: 10px;
         }
-        .grid-item {
+        .inventory-item {
             background-color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: clamp(12px, 2vw, 16px);
+            font-size: 14px;
             border: 1px solid #ccc;
+            padding: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="grid" id="grid-container">
-            <!-- Aquí se llenarán las celdas del inventario -->
+    <div class="chat-container">
+        <div class="chat-box" id="chat-box">
+            <!-- Aquí aparecerán los mensajes del chat -->
+        </div>
+
+        <div class="input-box">
+            <input type="text" id="user-message" placeholder="Escribe un mensaje..." />
+            <button onclick="sendMessage()">Enviar</button>
+        </div>
+
+        <!-- Contenedor del Inventario -->
+        <div class="inventory-container">
+            <h3>Inventario de Minerales</h3>
+            <div class="inventory-grid" id="inventory-grid">
+                <!-- El inventario se llenará aquí -->
+            </div>
         </div>
     </div>
 
     <script>
-        // Función para obtener el inventario del almacenamiento local y actualizarlo
-        function actualizarInventario() {
-            const inventario = JSON.parse(localStorage.getItem("inventarioMinerales"));
-            const gridContainer = document.getElementById('grid-container');
-
-            // Limpiar la cuadrícula antes de actualizar
-            gridContainer.innerHTML = '';
-
-            // Llenar la cuadrícula con los datos del inventario
-            if (inventario) {
-                inventario.forEach(item => {
-                    gridContainer.innerHTML += `
-                        <div class="grid-item">${item.nombre}</div>
-                        <div class="grid-item">${item.cantidad}</div>
-                    `;
-                });
-            }
-        }
-
-        // Actualizar el inventario cada segundo (recomendable para tiempo real)
-        setInterval(actualizarInventario, 1000);
-
-        // Inicialización: Si no existe inventario en localStorage, lo crea
+        // Inicialización de inventario en localStorage si no existe
         if (!localStorage.getItem("inventarioMinerales")) {
             const inventarioInicial = [
                 { nombre: "Piedra caliza", cantidad: 0 },
@@ -87,7 +116,38 @@
             localStorage.setItem("inventarioMinerales", JSON.stringify(inventarioInicial));
         }
 
-        // Llamar a la función para actualizar la cuadrícula en cuanto cargue
+        // Función para actualizar el inventario en la interfaz
+        function actualizarInventario() {
+            const inventario = JSON.parse(localStorage.getItem("inventarioMinerales"));
+            const inventoryGrid = document.getElementById('inventory-grid');
+            inventoryGrid.innerHTML = '';  // Limpiar inventario actual
+
+            // Agregar los items del inventario a la cuadrícula
+            inventario.forEach(item => {
+                inventoryGrid.innerHTML += `
+                    <div class="inventory-item">${item.nombre}</div>
+                    <div class="inventory-item">${item.cantidad}</div>
+                `;
+            });
+        }
+
+        // Actualizar inventario cada segundo
+        setInterval(actualizarInventario, 1000);
+
+        // Función para enviar mensaje en el chat
+        function sendMessage() {
+            const messageInput = document.getElementById('user-message');
+            const message = messageInput.value;
+
+            if (message.trim()) {
+                const chatBox = document.getElementById('chat-box');
+                chatBox.innerHTML += `<div>${message}</div>`;
+                messageInput.value = '';  // Limpiar el campo de texto después de enviar
+                chatBox.scrollTop = chatBox.scrollHeight;  // Hacer scroll hacia el fondo
+            }
+        }
+
+        // Inicializar la visualización del inventario
         actualizarInventario();
     </script>
 </body>
