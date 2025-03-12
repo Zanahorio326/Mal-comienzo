@@ -13,87 +13,75 @@
         }
 
         .contenedor {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
+            display: flex;
+            flex-direction: column;
             padding: 20px;
         }
 
-        .cuadro {
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 10px;
-            text-align: center;
+        .recuadro {
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: space-between;
-            height: 180px;
-        }
-
-        .cuadro h3 {
-            font-size: 16px;
-            color: #333;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 8px;
             margin-bottom: 5px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        .cuadro p {
-            font-size: 14px;
-            color: #555;
-            margin-top: 10px;
-            flex-grow: 1;
+        .recuadro p {
+            margin: 0;
         }
 
-        .cuadro img {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            margin-bottom: 10px;
+        .nombre {
+            font-weight: bold;
+        }
+
+        .cantidad {
+            color: #4CAF50;
         }
 
         @media (max-width: 600px) {
-            .cuadro {
-                height: 160px;
+            .contenedor {
+                padding: 10px;
+            }
+
+            .recuadro {
+                padding: 6px;
             }
         }
     </style>
 </head>
 <body>
     <div class="contenedor">
-        <!-- Mineral 1 -->
-        <div class="cuadro">
-            <img src="https://via.placeholder.com/50" alt="Mineral 1">
-            <h3>Mineral A</h3>
-            <p>Descripción breve del Mineral A. Características y usos.</p>
+        <!-- Mineral 1: Carbón -->
+        <div class="recuadro">
+            <p class="nombre">Carbón</p>
+            <p class="cantidad">0</p>
         </div>
 
-        <!-- Mineral 2 -->
-        <div class="cuadro">
-            <img src="https://via.placeholder.com/50" alt="Mineral 2">
-            <h3>Mineral B</h3>
-            <p>Descripción breve del Mineral B. Características y usos.</p>
+        <!-- Mineral 2: Cobre -->
+        <div class="recuadro">
+            <p class="nombre">Cobre</p>
+            <p class="cantidad">0</p>
         </div>
 
-        <!-- Mineral 3 -->
-        <div class="cuadro">
-            <img src="https://via.placeholder.com/50" alt="Mineral 3">
-            <h3>Mineral C</h3>
-            <p>Descripción breve del Mineral C. Características y usos.</p>
+        <!-- Mineral 3: Hierro -->
+        <div class="recuadro">
+            <p class="nombre">Hierro</p>
+            <p class="cantidad">0</p>
         </div>
 
-        <!-- Mineral 4 -->
-        <div class="cuadro">
-            <img src="https://via.placeholder.com/50" alt="Mineral 4">
-            <h3>Mineral D</h3>
-            <p>Descripción breve del Mineral D. Características y usos.</p>
+        <!-- Mineral 4: Plata -->
+        <div class="recuadro">
+            <p class="nombre">Plata</p>
+            <p class="cantidad">0</p>
         </div>
 
-        <!-- Mineral 5 -->
-        <div class="cuadro">
-            <img src="https://via.placeholder.com/50" alt="Mineral 5">
-            <h3>Mineral E</h3>
-            <p>Descripción breve del Mineral E. Características y usos.</p>
+        <!-- Mineral 5: Oro -->
+        <div class="recuadro">
+            <p class="nombre">Oro</p>
+            <p class="cantidad">0</p>
         </div>
     </div>
 </body>
