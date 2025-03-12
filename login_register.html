@@ -46,11 +46,13 @@
                     if (snapshot.exists()) {
                         alert("Ese jugador ya fue creado");
                     } else {
+                        // Crear el usuario y su inventario vacío
                         set(userRef, {
                             username: username,
-                            password: password
+                            password: password,
+                            inventory: {} // Inventario vacío
                         }).then(() => {
-                            alert("Personaje creado, en camino al mundo");
+                            alert("Personaje creado con inventario vacío, en camino al mundo");
                             // Guardar el nombre de usuario en localStorage
                             localStorage.setItem('username', username);
                             window.location.href = "chat.html";
@@ -78,7 +80,13 @@
                 const userRef = ref(db, 'users/' + username);
                 get(child(ref(db), 'users/' + username)).then((snapshot) => {
                     if (snapshot.exists() && snapshot.val().password === password) {
-                        alert("Inicio de sesión exitoso, redirigiendo al chat...");
+                        // Verificar si el inventario existe
+                        const inventory = snapshot.val().inventory;
+                        if (inventory) {
+                            alert("Inicio de sesión exitoso, inventario cargado, redirigiendo al chat...");
+                        } else {
+                            alert("Inventario no encontrado, se creará uno vacío.");
+                        }
                         // Guardar el nombre de usuario en localStorage
                         localStorage.setItem('username', username);
                         window.location.href = "chat.html";
