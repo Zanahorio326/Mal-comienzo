@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuadrícula 6x2 tipo Excel</title>
+    <title>Cuadrícula 6x2 Responsiva</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,24 +18,28 @@
             display: flex;
             align-items: center;
             background-color: #fff;
-            padding: 20px;
+            padding: 2%;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px; /* Ancho máximo para pantallas grandes */
         }
         .grid {
             display: grid;
-            grid-template-columns: repeat(2, 100px); /* 2 columnas */
-            grid-template-rows: repeat(6, 50px); /* 6 filas */
+            grid-template-columns: repeat(2, 1fr); /* 2 columnas de tamaño flexible */
+            grid-template-rows: repeat(6, 1fr); /* 6 filas de tamaño flexible */
             gap: 1px;
             background-color: #ddd;
             border: 1px solid #ddd;
+            width: 100%;
+            height: 50vh; /* Altura relativa a la pantalla */
         }
         .grid-item {
             background-color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 14px;
+            font-size: clamp(12px, 2vw, 16px); /* Tamaño de fuente responsivo */
             border: 1px solid #ccc;
         }
         .button {
@@ -45,17 +49,32 @@
             padding: 10px 15px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: clamp(12px, 2vw, 16px); /* Tamaño de fuente responsivo */
             transition: background-color 0.3s ease;
+            white-space: nowrap; /* Evita que el texto del botón se divida */
         }
         .button:hover {
             background-color: #007B9E;
         }
         .left-button {
-            margin-right: 20px;
+            margin-right: 2%;
         }
         .right-button {
-            margin-left: 20px;
+            margin-left: 2%;
+        }
+
+        /* Estilos para pantallas pequeñas (móviles) */
+        @media (max-width: 600px) {
+            .container {
+                flex-direction: column; /* Cambia a disposición vertical en móviles */
+                padding: 5%;
+            }
+            .left-button, .right-button {
+                margin: 10px 0; /* Espaciado vertical para los botones */
+            }
+            .grid {
+                height: 40vh; /* Ajusta la altura para móviles */
+            }
         }
     </style>
 </head>
