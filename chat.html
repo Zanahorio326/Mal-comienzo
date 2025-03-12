@@ -73,37 +73,29 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            align-items: center;
             height: 100vh;
             margin: 0;
-            padding: 0;
             background: linear-gradient(to bottom, #ff7f00, #008f39);
             color: white;
             overflow: hidden;
+            width: 100vw;
         }
 
         #titulo {
             text-align: center;
-            font-size: 5vw;
+            font-size: 24px;
             font-weight: bold;
             margin-top: 10px;
-            max-width: 90%;
-            text-wrap: balance;
         }
 
         #mensajes {
             flex-grow: 1;
-            width: 90%;
-            max-width: 600px;
             overflow-y: auto;
             padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            border-radius: 10px;
-            background: rgba(0, 0, 0, 0.2);
-            height: 60vh;
-            max-height: 60vh;
+            max-height: 75vh;
         }
 
         .mensaje {
@@ -112,17 +104,15 @@
             margin: 5px;
             border-radius: 5px;
             width: fit-content;
-            max-width: 80%;
+            max-width: 90%;
             word-wrap: break-word;
         }
 
         #entrada {
             display: flex;
-            width: 90%;
-            max-width: 600px;
             padding: 10px;
             background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
+            width: 100%;
         }
 
         #inputMensaje {
@@ -131,7 +121,6 @@
             border: none;
             border-radius: 5px;
             font-size: 16px;
-            width: 100%;
         }
 
         #btnEnviar {
@@ -142,51 +131,6 @@
             background: #ffcc00;
             cursor: pointer;
             font-size: 16px;
-            white-space: nowrap;
-        }
-
-        /* Ajustes responsivos */
-        @media (max-width: 768px) {
-            #titulo {
-                font-size: 6vw;
-            }
-
-            #mensajes {
-                width: 95%;
-                height: 65vh;
-                max-height: 65vh;
-            }
-
-            #entrada {
-                width: 95%;
-            }
-
-            #btnEnviar {
-                font-size: 14px;
-                padding: 8px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            #titulo {
-                font-size: 7vw;
-            }
-
-            #mensajes {
-                height: 60vh;
-                max-height: 60vh;
-            }
-
-            #entrada {
-                flex-direction: column;
-                align-items: center;
-                gap: 5px;
-            }
-
-            #btnEnviar {
-                width: 100%;
-                margin-left: 0;
-            }
         }
     </style>
 </head>
