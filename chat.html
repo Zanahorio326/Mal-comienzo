@@ -153,6 +153,13 @@
     </div>
     
     <!-- Cargar el contenido de teorico.html en un iframe -->
-    <iframe src="https://zanahorio326.github.io/Mal-comienzo/teorico.html" width="100%" height="300px" style="border: none; margin-top: 20px;"></iframe>
+    <iframe id="iframeTeorico" src="https://zanahorio326.github.io/Mal-comienzo/teorico.html" width="100%" height="300px" style="border: none; margin-top: 20px;"></iframe>
+
+    <!-- Recargar el iframe cada 5 segundos -->
+    <script>
+        setInterval(function() {
+            document.getElementById('iframeTeorico').src = 'https://zanahorio326.github.io/Mal-comienzo/teorico.html';
+        }, 5000); // Recargar cada 5 segundos
+    </script>
 </body>
 </html>
