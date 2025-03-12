@@ -59,6 +59,19 @@
             }
         });
 
+        // Función para cargar teórico.html de manera modular
+        function cargarTeorico() {
+            fetch('https://zanahorio326.github.io/Mal-comienzo/teorico.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('contenedorTeorico').innerHTML = data;
+                })
+                .catch(error => console.error('Error al cargar teórico.html:', error));
+        }
+
+        // Llamar a la función para cargar teórico.html
+        document.addEventListener("DOMContentLoaded", cargarTeorico);
+
     </script>
     <style>
         * {
@@ -142,6 +155,15 @@
                 font-size: 14px;
             }
         }
+
+        #contenedorTeorico {
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+            overflow-y: auto;
+            max-height: 400px; /* Limita la altura */
+        }
     </style>
 </head>
 <body>
@@ -151,11 +173,9 @@
         <input type="text" id="inputMensaje" placeholder="Escribe un mensaje...">
         <button id="btnEnviar">Enviar</button>
     </div>
-    
-    <!-- Incluir el archivo teorico.html de forma modular -->
-    <div id="inventario">
-        <iframe src="https://zanahorio326.github.io/Mal-comienzo/teorico.html" width="100%" height="300px" style="border: none; margin-top: 20px;"></iframe>
-    </div>
+
+    <!-- Contenedor para cargar teórico.html -->
+    <div id="contenedorTeorico"></div>
 
 </body>
 </html>
