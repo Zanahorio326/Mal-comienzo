@@ -2,7 +2,12 @@
 const chatRef = firebase.database().ref('chat');
 
 // Función que maneja el envío del mensaje
-function enviarMensaje() {
+function enviarMensaje(event) {
+    // Prevenir el comportamiento predeterminado si se presiona "Enter"
+    if (event && event.key === "Enter") {
+        event.preventDefault();
+    }
+    
     const mensaje = document.getElementById("inputMensaje").value.trim();
     
     if (mensaje !== "") {
@@ -37,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Detectar cuando se presione "Enter" en el campo de mensaje
     document.getElementById("inputMensaje").addEventListener("keydown", function(event) {
         if (event.key === "Enter") {
-            enviarMensaje();
+            enviarMensaje(event);
         }
     });
 });
