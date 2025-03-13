@@ -21,7 +21,24 @@ document.addEventListener("DOMContentLoaded", function () {
     // Observar el campo de entrada de mensajes para responder a los comandos
     const inputMensaje = document.getElementById("inputMensaje");
 
-    // Escuchar cuando el usuario presione la tecla "Enter"
+    // Escuchar cuando el usuario haga click en "Enviar" o presione la tecla "Enter"
+    document.getElementById("btnEnviar").addEventListener("click", function() {
+        const mensaje = inputMensaje.value.trim();
+
+        // Comando /hola
+        if (mensaje === "/hola") {
+            enviarMensaje("¡Hola! ¿En qué puedo ayudarte?");
+        }
+        // Comando /help
+        else if (mensaje === "/help") {
+            enviarMensaje("Te ayudaré aventurero, lista de comandos:\n/help\n/hola");
+        }
+        
+        // Limpiar el campo de entrada después de enviar el mensaje
+        inputMensaje.value = "";
+    });
+
+    // Detectar tecla "Enter" para enviar mensajes
     inputMensaje.addEventListener("keydown", function (event) {
         if (event.key === "Enter") {
             const mensaje = inputMensaje.value.trim();
@@ -29,13 +46,14 @@ document.addEventListener("DOMContentLoaded", function () {
             // Comando /hola
             if (mensaje === "/hola") {
                 enviarMensaje("¡Hola! ¿En qué puedo ayudarte?");
-                inputMensaje.value = ""; // Limpiar el campo de entrada
             }
             // Comando /help
             else if (mensaje === "/help") {
                 enviarMensaje("Te ayudaré aventurero, lista de comandos:\n/help\n/hola");
-                inputMensaje.value = ""; // Limpiar el campo de entrada
             }
+            
+            // Limpiar el campo de entrada después de enviar el mensaje
+            inputMensaje.value = "";
         }
     });
 });
