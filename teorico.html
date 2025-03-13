@@ -1,43 +1,155 @@
-import { initializeApp } from "firebase/app";
-import { getDatabase, ref, push, onChildAdded } from "firebase/database";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot de Chat - Zanahorio Codderbone</title>
+    <script type="module">
+        // Importar Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-// Configuración de Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
-    authDomain: "thegame-5afaa.firebaseapp.com",
-    databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
-    projectId: "thegame-5afaa",
-    storageBucket: "thegame-5afaa.firebasestorage.app",
-    messagingSenderId: "588556182984",
-    appId: "1:588556182984:web:a0557067d35c18e3944cfd",
-    measurementId: "G-9M3CBJ3LV9"
-};
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+            authDomain: "thegame-5afaa.firebaseapp.com",
+            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+            projectId: "thegame-5afaa",
+            storageBucket: "thegame-5afaa.firebasestorage.app",
+            messagingSenderId: "588556182984",
+            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+            measurementId: "G-9M3CBJ3LV9"
+        };
 
-// Inicializar Firebase
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const chatRef = ref(db, 'chat');
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const chatRef = ref(db, 'chat');
 
-// Función para que el bot envíe un mensaje
-function enviarMensajeBot(texto) {
-    push(chatRef, {
-        usuario: "Narrador",
-        texto: texto,
-        timestamp: Date.now()
-    });
-}
+        // Obtener el nombre del usuario desde el almacenamiento local
+        const username = localStorage.getItem("username") || "Desconocido";
 
-// Escuchar mensajes en tiempo real
-onChildAdded(chatRef, (snapshot) => {
-    const data = snapshot.val();
-    if (!data || !data.texto) return;
+        // Función para enviar mensajes
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("btnEnviar").addEventListener("click", function() {
+                const mensaje = document.getElementById("inputMensaje").value.trim();
+                if (mensaje !== "") {
+                    push(chatRef, {
+                        usuario: username,
+                        texto: mensaje,
+                        timestamp: Date.now()
+                    });
+                    document.getElementById("inputMensaje").value = "";
+                }
+            });
+        });
 
-    const mensaje = data.texto.trim().toLowerCase();
+        // Mostrar mensajes en tiempo real
+        onChildAdded(chatRef, (snapshot) => {
+            const data = snapshot.val();
+            const mensajeElemento = document.createElement("div");
+            mensajeElemento.textContent = `${data.usuario}: ${data.texto}`;
+            mensajeElemento.classList.add("mensaje");
+            document.getElementById("mensajes").appendChild(mensajeElemento);
 
-    if (mensaje === "/hola") {
-        enviarMensajeBot("Bienvenido");
-    }
-});
+            // Mantener solo los últimos 6 mensajes
+            const mensajes = document.getElementById("mensajes").children;
+            if (mensajes.length > 6) {
+                document.getElementById("mensajes").removeChild(mensajes[0]);
+            }
+        });
 
-// Mantener el proceso activo
-console.log("Bot Narrador ejecutándose...");
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100dvh; /* Usa altura real del dispositivo */
+            margin: 0;
+            padding: 10px; /* Margen para que el contenido no toque los bordes */
+            background: linear-gradient(to bottom, #ff7f00, #008f39);
+            color: white;
+        }
+
+        #titulo {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        #mensajes {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            max-height: calc(100dvh - 120px); /* Ajuste dinámico según el tamaño del dispositivo */
+            margin-top: 5px; /* Reducción del margen superior */
+        }
+
+        .mensaje {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px;
+            margin: 5px;
+            border-radius: 5px;
+            width: fit-content;
+        }
+
+        #entrada {
+            display: flex;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        #inputMensaje {
+            flex-grow: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        #btnEnviar {
+            padding: 8px 15px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #ffcc00;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Ajuste responsivo */
+        @media (max-width: 600px) {
+            #titulo {
+                font-size: 20px;
+            }
+
+            #inputMensaje {
+                font-size: 14px;
+            }
+
+            #btnEnviar {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="titulo">Bot de Chat - Zanahorio Codderbone</div>
+    <div id="mensajes"></div>
+    <div id="entrada">
+        <input type="text" id="inputMensaje" placeholder="Escribe un mensaje...">
+        <button id="btnEnviar">Enviar</button>
+    </div>
+</body>
+</html>
