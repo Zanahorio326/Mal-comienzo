@@ -89,40 +89,6 @@
         // Llamar a la función para cargar el inventario al cargar la página
         document.addEventListener("DOMContentLoaded", cargarInventario);
 
-        // Variable global para verificar si la ventana help ya está abierta
-        let ventanaHelpAbierta = false;
-
-        // Función para mostrar la ventana emergente con los comandos
-        function mostrarVentanaHelp() {
-            if (ventanaHelpAbierta) {
-                return;  // Si la ventana ya está abierta, no hacer nada
-            }
-            ventanaHelpAbierta = true;  // Marcar que la ventana está abierta
-
-            const ventanaHelp = document.createElement("div");
-            ventanaHelp.id = "ventanaHelp";
-            ventanaHelp.innerHTML = `
-                <div class="popup-content">
-                    <h2>Comandos Disponibles</h2>
-                    <ul>
-                        <li><strong>/help</strong> - Muestra esta lista de comandos.</li>
-                        <li><strong>/hola</strong> - Saluda al jugador. ¡Úsalo para interactuar conmigo!</li>
-                    </ul>
-                    <button onclick="cerrarVentanaHelp()">Cerrar</button>
-                </div>
-            `;
-            document.body.appendChild(ventanaHelp);
-        }
-
-        // Función para cerrar la ventana emergente
-        function cerrarVentanaHelp() {
-            const ventanaHelp = document.getElementById("ventanaHelp");
-            if (ventanaHelp) {
-                document.body.removeChild(ventanaHelp);
-                ventanaHelpAbierta = false;  // Restablecer la variable para permitir abrirla de nuevo
-            }
-        }
-
         // Comandos del bot
         onChildAdded(chatRef, (snapshot) => {
             const data = snapshot.val();
@@ -133,7 +99,8 @@
                     timestamp: Date.now()
                 });
             } else if (data.texto.toLowerCase() === "/help") {
-                mostrarVentanaHelp();
+                // Redirigir al usuario a la página de ayuda
+                window.location.href = "https://zanahorio326.github.io/Mal-comienzo/teorico.html";
             }
         });
     </script>
@@ -245,26 +212,15 @@
         .cantidad {
             color: #4CAF50;
         }
-
-        /* Estilos para la ventana emergente */
-        #ventanaHelp {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .popup-content {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            width: 300px;
-            text-align: center;
-            color: #333;
-        }
+    </style>
+</head>
+<body>
+    <div id="titulo">Inventario</div>
+    <div id="mensajes"></div>
+    <div id="entrada">
+        <input type="text" id="inputMensaje" placeholder="Escribe un mensaje..." />
+        <button id="btnEnviar">Enviar</button>
+    </div>
+    <div id="inventario"></div>
+</body>
+</html>
