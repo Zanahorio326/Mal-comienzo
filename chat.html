@@ -89,18 +89,30 @@
             });
         }
 
+        // Función para mostrar comandos (solo de ejemplo, no hace nada)
+        function mostrarComando() {
+            const contenedorComando = document.getElementById('comando');
+            contenedorComando.innerHTML = `
+                <button class="boton-comando">Comando de ejemplo</button>
+            `;
+        }
+
         // Llamar a la función para cargar el inventario al cargar la página
         document.addEventListener("DOMContentLoaded", cargarInventario);
 
-        // Función para manejar la visibilidad del inventario y comandos
-        function mostrarInventario() {
-            document.getElementById("inventario").style.display = "block";
-            document.getElementById("comandos").style.display = "none";
-        }
+        // Función para alternar entre inventario y comandos
+        function toggleInventarioComandos(tipo) {
+            const inventario = document.getElementById('inventario');
+            const comando = document.getElementById('comando');
 
-        function mostrarComandos() {
-            document.getElementById("inventario").style.display = "none";
-            document.getElementById("comandos").style.display = "block";
+            if (tipo === 'inventario') {
+                inventario.style.display = 'block';
+                comando.style.display = 'none';
+            } else if (tipo === 'comando') {
+                inventario.style.display = 'none';
+                comando.style.display = 'block';
+                mostrarComando();  // Solo para mostrar un comando de ejemplo
+            }
         }
     </script>
     <style>
@@ -186,14 +198,13 @@
             }
         }
 
-        #inventario {
+        #inventario, #comando {
             margin-top: 20px;
             background: rgba(0, 0, 0, 0.2);
             padding: 10px;
             border-radius: 10px;
             overflow-y: auto;
             max-height: 400px;
-            display: none;
         }
 
         .recuadro {
@@ -214,14 +225,16 @@
             color: #4CAF50;
         }
 
-        #comandos {
-            display: none;
-            margin-top: 20px;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 10px;
-            border-radius: 10px;
-            text-align: center;
+        .boton-comando {
+            padding: 8px 15px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #ffcc00;
+            cursor: pointer;
+            font-size: 16px;
         }
+
     </style>
 </head>
 <body>
@@ -232,19 +245,14 @@
         <button id="btnEnviar">Enviar</button>
     </div>
 
-    <!-- Contenedor de botones para elegir entre Inventario y Comandos -->
-    <div id="botones">
-        <button onclick="mostrarInventario()">Inventario</button>
-        <button onclick="mostrarComandos()">Comandos</button>
-    </div>
+    <button onclick="toggleInventarioComandos('inventario')">Inventario</button>
+    <button onclick="toggleInventarioComandos('comando')">Comandos</button>
 
     <!-- Contenedor para mostrar el inventario -->
     <div id="inventario"></div>
 
-    <!-- Contenedor para mostrar comandos -->
-    <div id="comandos">
-        <button>No hace nada</button>
-    </div>
+    <!-- Contenedor para mostrar los comandos (solo de ejemplo) -->
+    <div id="comando" style="display: none;"></div>
 
 </body>
 </html>
