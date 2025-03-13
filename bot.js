@@ -1,29 +1,48 @@
+// Espera que el DOM se cargue completamente antes de ejecutar el código
 document.addEventListener("DOMContentLoaded", function () {
-    const chatRef = firebase.database().ref("chat");
+    // Alerta de carga del bot (Narrador)
+    alert("Narrador: ¡Hola, viajero! El bot se ha cargado y está listo para interactuar.");
 
-    // Alerta cuando el bot se cargue localmente
-    alert("Narrador: ¡Bienvenido! El bot se ha cargado correctamente y está listo para interactuar.");
+    // Lógica adicional para manejar el funcionamiento del bot
+    // Asegurarse de que el bot funcione localmente si es necesario
+    const chatContainer = document.getElementById("mensajes");
 
-    // Escuchar los mensajes en tiempo real
-    chatRef.on("child_added", function (snapshot) {
-        const data = snapshot.val();
+    // Función para mostrar un mensaje del bot
+    function mostrarMensajeDelBot(mensaje) {
+        const mensajeElemento = document.createElement("div");
+        mensajeElemento.textContent = `Bot: ${mensaje}`;
+        mensajeElemento.classList.add("mensaje");
+        chatContainer.appendChild(mensajeElemento);
 
-        // Verificar si el mensaje es el comando "/hola"
-        if (data.texto === "/hola") {
-            // Responder con el mensaje de bienvenida
-            chatRef.push({
-                usuario: "Narrador",
-                texto: "¡Hola, aventurero! ¿Qué deseas saber hoy?",
-                timestamp: Date.now()
-            });
+        // Mantener solo los últimos 6 mensajes
+        const mensajes = chatContainer.children;
+        if (mensajes.length > 6) {
+            chatContainer.removeChild(mensajes[0]);
         }
-        // Otros comandos que el bot puede manejar (agrega más comandos según sea necesario)
-        else if (data.texto === "/adios") {
-            chatRef.push({
-                usuario: "Narrador",
-                texto: "Hasta luego, que tengas un gran viaje.",
-                timestamp: Date.now()
-            });
+    }
+
+    // Ejemplo de responder al mensaje del usuario
+    function responderMensajeDelUsuario(mensaje) {
+        // Aquí el bot podría hacer algo con el mensaje del usuario
+        // Por ejemplo, simplemente responder con una respuesta predeterminada
+        mostrarMensajeDelBot("¡Gracias por tu mensaje! Estoy aprendiendo a interactuar.");
+    }
+
+    // Función para escuchar los mensajes de los usuarios y generar respuestas
+    document.getElementById("btnEnviar").addEventListener("click", function () {
+        const mensajeUsuario = document.getElementById("inputMensaje").value.trim();
+        if (mensajeUsuario !== "") {
+            // Mostrar el mensaje del usuario en el chat
+            const mensajeElemento = document.createElement("div");
+            mensajeElemento.textContent = `Tú: ${mensajeUsuario}`;
+            mensajeElemento.classList.add("mensaje");
+            chatContainer.appendChild(mensajeElemento);
+
+            // Responder automáticamente después de que el usuario envíe el mensaje
+            responderMensajeDelUsuario(mensajeUsuario);
+
+            // Limpiar el campo de entrada
+            document.getElementById("inputMensaje").value = "";
         }
     });
 });
