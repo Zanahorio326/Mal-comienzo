@@ -7,7 +7,7 @@
     <script type="module">
         // Importar Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, set, get, remove, onChildRemoved } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getDatabase, ref, push, onChildAdded, remove, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
         // Configuración de Firebase
         const firebaseConfig = {
@@ -44,42 +44,34 @@
             });
         });
 
-        // Mostrar mensajes en tiempo real
-        onChildAdded(chatRef, (snapshot) => {
+        // Mostrar los últimos 8 mensajes en tiempo real
+        onChildAdded(query(chatRef, orderByChild("timestamp"), limitToLast(8)), (snapshot) => {
             const data = snapshot.val();
             const mensajeElemento = document.createElement("div");
             mensajeElemento.textContent = `${data.usuario}: ${data.texto}`;
             mensajeElemento.classList.add("mensaje");
             document.getElementById("mensajes").appendChild(mensajeElemento);
 
-            // Mantener solo los últimos 8 mensajes
-            const mensajes = document.getElementById("mensajes").children;
-            if (mensajes.length > 8) {
-                // Eliminar el mensaje de la pantalla
-                document.getElementById("mensajes").removeChild(mensajes[0]);
-
-                // Eliminar el mensaje más antiguo de la base de datos
-                const mensajeAEliminar = mensajes[0];
-                const mensajeId = mensajeAEliminar.getAttribute('data-id');
-                remove(ref(db, 'chat/' + mensajeId));
-            }
+            // Eliminar mensajes más antiguos en la base de datos
+            limpiarMensajesExcedentes();
         });
 
-        // Eliminar mensajes de la base de datos cuando se eliminen de la pantalla
-        onChildRemoved(chatRef, (snapshot) => {
-            const mensajeId = snapshot.key;
-            const mensajes = document.getElementById("mensajes").children;
-            for (let i = 0; i < mensajes.length; i++) {
-                const mensajeElemento = mensajes[i];
-                if (mensajeElemento.getAttribute('data-id') === mensajeId) {
-                    mensajeElemento.remove();
+        // Función para eliminar mensajes más antiguos
+        function limpiarMensajesExcedentes() {
+            get(chatRef).then((snapshot) => {
+                const mensajes = snapshot.val();
+                if (mensajes) {
+                    const ids = Object.keys(mensajes);
+                    if (ids.length > 8) {
+                        const idEliminar = ids[0]; // Eliminar el más antiguo
+                        remove(ref(db, `chat/${idEliminar}`));
+                    }
                 }
-            }
-        });
+            });
+        }
 
         // Función para cargar el inventario
         function cargarInventario() {
-            // Definir los materiales con cantidad 0
             const materiales = [
                 { nombre: "Carbón", cantidad: 0 },
                 { nombre: "Cobre", cantidad: 0 },
@@ -89,9 +81,8 @@
             ];
 
             const contenedorInventario = document.getElementById('inventario');
-            contenedorInventario.innerHTML = '';  // Limpiar contenido previo
+            contenedorInventario.innerHTML = '';
 
-            // Mostrar todos los materiales en el inventario con cantidad 0
             materiales.forEach((material) => {
                 const articuloElemento = document.createElement("div");
                 articuloElemento.classList.add("recuadro");
@@ -103,34 +94,24 @@
             });
         }
 
-        // Llamar a la función para cargar el inventario al cargar la página
+        // Cargar inventario al iniciar
         document.addEventListener("DOMContentLoaded", cargarInventario);
 
     </script>
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
+        * { box-sizing: border-box; }
         body {
             font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            height: 100dvh; /* Usa altura real del dispositivo */
+            height: 100vh;
             margin: 0;
-            padding: 10px; /* Margen para que el contenido no toque los bordes */
+            padding: 10px;
             background: linear-gradient(to bottom, #ff7f00, #008f39);
             color: white;
         }
-
-        #titulo {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-
+        #titulo { text-align: center; font-size: 24px; font-weight: bold; margin-top: 10px; }
         #mensajes {
             flex-grow: 1;
             overflow-y: auto;
@@ -138,10 +119,8 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            max-height: calc(100dvh - 120px); /* Ajuste dinámico según el tamaño del dispositivo */
-            margin-top: 5px; /* Reducción del margen superior */
+            max-height: calc(100vh - 120px);
         }
-
         .mensaje {
             background: rgba(255, 255, 255, 0.2);
             padding: 8px;
@@ -149,14 +128,12 @@
             border-radius: 5px;
             width: fit-content;
         }
-
         #entrada {
             display: flex;
             padding: 10px;
             background: rgba(0, 0, 0, 0.2);
             border-radius: 10px;
         }
-
         #inputMensaje {
             flex-grow: 1;
             padding: 8px;
@@ -164,7 +141,6 @@
             border-radius: 5px;
             font-size: 16px;
         }
-
         #btnEnviar {
             padding: 8px 15px;
             margin-left: 10px;
@@ -174,31 +150,19 @@
             cursor: pointer;
             font-size: 16px;
         }
-
-        /* Ajuste responsivo */
         @media (max-width: 600px) {
-            #titulo {
-                font-size: 20px;
-            }
-
-            #inputMensaje {
-                font-size: 14px;
-            }
-
-            #btnEnviar {
-                font-size: 14px;
-            }
+            #titulo { font-size: 20px; }
+            #inputMensaje { font-size: 14px; }
+            #btnEnviar { font-size: 14px; }
         }
-
         #inventario {
             margin-top: 20px;
             background: rgba(0, 0, 0, 0.2);
             padding: 10px;
             border-radius: 10px;
             overflow-y: auto;
-            max-height: 400px; /* Limita la altura */
+            max-height: 400px;
         }
-
         .recuadro {
             display: flex;
             justify-content: space-between;
@@ -208,14 +172,8 @@
             margin-bottom: 5px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
-
-        .nombre {
-            font-weight: bold;
-        }
-
-        .cantidad {
-            color: #4CAF50;
-        }
+        .nombre { font-weight: bold; }
+        .cantidad { color: #4CAF50; }
     </style>
 </head>
 <body>
@@ -225,12 +183,7 @@
         <input type="text" id="inputMensaje" placeholder="Escribe un mensaje...">
         <button id="btnEnviar">Enviar</button>
     </div>
-
-    <!-- Contenedor para mostrar el inventario -->
     <div id="inventario"></div>
-
-    <!-- Enlace al bot -->
     <script src="https://zanahorio326.github.io/Mal-comienzo/bot.js" defer></script>
-
 </body>
 </html>
