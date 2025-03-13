@@ -1,44 +1,59 @@
-(function() {
-    // Definir nombre del bot
-    const botName = "Bot";
-    const chatRef = ref(db, 'chat'); // Aquí debes definir tu referencia a la base de datos de Firebase
+// Importar Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-    // Crear y añadir estilo para los mensajes del bot
-    const style = document.createElement("style");
-    style.innerHTML = `
-        .botMessage {
-            background: rgba(255, 255, 255, 0.4);
-            color: #ffcc00;
-            padding: 8px;
-            margin: 5px;
-            border-radius: 5px;
-            width: fit-content;
-        }
-    `;
-    document.head.appendChild(style);
+// Configuración de Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+    authDomain: "thegame-5afaa.firebaseapp.com",
+    databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+    projectId: "thegame-5afaa",
+    storageBucket: "thegame-5afaa.firebasestorage.app",
+    messagingSenderId: "588556182984",
+    appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+    measurementId: "G-9M3CBJ3LV9"
+};
 
-    // Función para manejar los mensajes de la base de datos
-    onChildAdded(chatRef, (snapshot) => {
-        const data = snapshot.val();
-        
-        // Responder al comando /hola
-        if (data.texto === "/hola") {
-            const respuesta = "Bot: bienvenido";
+// Inicializar Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const chatRef = ref(db, 'chat');
 
-            // Crear un nuevo div para mostrar la respuesta del bot
-            const mensajeElemento = document.createElement("div");
-            mensajeElemento.textContent = respuesta;
-            mensajeElemento.classList.add("botMessage");
+// Obtener el nombre del usuario desde el almacenamiento local
+const username = localStorage.getItem("username") || "Desconocido";
 
-            // Agregar el mensaje al chat
-            document.getElementById("mensajes").appendChild(mensajeElemento);
-
-            // Mantener solo los últimos 6 mensajes en el chat
-            const mensajes = document.getElementById("mensajes").children;
-            if (mensajes.length > 6) {
-                document.getElementById("mensajes").removeChild(mensajes[0]);
-            }
+// Función para enviar mensajes
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("btnEnviar").addEventListener("click", function() {
+        const mensaje = document.getElementById("inputMensaje").value.trim();
+        if (mensaje !== "") {
+            push(chatRef, {
+                usuario: username,
+                texto: mensaje,
+                timestamp: Date.now()
+            });
+            document.getElementById("inputMensaje").value = "";
         }
     });
+});
 
-})();
+// Mostrar mensajes en tiempo real
+onChildAdded(chatRef, (snapshot) => {
+    const data = snapshot.val();
+    const mensajeElemento = document.createElement("div");
+    mensajeElemento.textContent = `${data.usuario}: ${data.texto}`;
+    mensajeElemento.classList.add("mensaje");
+    document.getElementById("mensajes").appendChild(mensajeElemento);
+
+    // Mantener solo los últimos 8 mensajes
+    const mensajes = document.getElementById("mensajes").children;
+    if (mensajes.length > 8) {
+        // Eliminar el mensaje de la pantalla
+        document.getElementById("mensajes").removeChild(mensajes[0]);
+
+        // Eliminar el mensaje más antiguo de la base de datos
+        const mensajeAEliminar = mensajes[0];
+        const mensajeId = mensajeAEliminar.getAttribute('data-id');
+        remove(ref(db, 'chat/' + mensajeId));
+    }
+});
