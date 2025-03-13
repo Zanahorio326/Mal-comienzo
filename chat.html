@@ -7,7 +7,7 @@
     <script type="module">
         // Importar Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, push, get, orderByChild, limitToLast, child } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getDatabase, ref, push, onChildAdded, set, get, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
         // Configuración de Firebase
         const firebaseConfig = {
@@ -24,6 +24,7 @@
         // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const inventarioRef = ref(db, 'inventarios');
         const chatRef = ref(db, 'chat');
 
         // Obtener el nombre del usuario desde el almacenamiento local
@@ -45,57 +46,72 @@
         });
 
         // Mostrar mensajes en tiempo real
-        function mostrarMensajes() {
-            get(chatRef).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const mensajes = snapshot.val();
-                    const mensajesArray = Object.values(mensajes);
-                    const ultimoMensaje = mensajesArray[mensajesArray.length - 1];
+        onChildAdded(chatRef, (snapshot) => {
+            const data = snapshot.val();
+            const mensajeElemento = document.createElement("div");
+            mensajeElemento.textContent = `${data.usuario}: ${data.texto}`;
+            mensajeElemento.classList.add("mensaje");
+            document.getElementById("mensajes").appendChild(mensajeElemento);
 
-                    // Mostrar el último mensaje en el chat
-                    const mensajeElemento = document.createElement("div");
-                    mensajeElemento.textContent = `${ultimoMensaje.usuario}: ${ultimoMensaje.texto}`;
-                    mensajeElemento.classList.add("mensaje");
-                    document.getElementById("mensajes").appendChild(mensajeElemento);
+            // Mantener solo los últimos 8 mensajes
+            const mensajes = document.getElementById("mensajes").children;
+            if (mensajes.length > 8) {
+                document.getElementById("mensajes").removeChild(mensajes[0]);
+            }
+        });
 
-                    // Mantener solo los últimos 6 mensajes
-                    const mensajesDOM = document.getElementById("mensajes").children;
-                    if (mensajesDOM.length > 6) {
-                        document.getElementById("mensajes").removeChild(mensajesDOM[0]);
-                    }
+        // Función para cargar el inventario
+        function cargarInventario() {
+            // Definir los materiales con cantidad 0
+            const materiales = [
+                { nombre: "Carbón", cantidad: 0 },
+                { nombre: "Cobre", cantidad: 0 },
+                { nombre: "Hierro", cantidad: 0 },
+                { nombre: "Plata", cantidad: 0 },
+                { nombre: "Oro", cantidad: 0 }
+            ];
 
-                    // Responder al último mensaje si es un comando
-                    if (ultimoMensaje.texto.toLowerCase() === "/hola") {
-                        setTimeout(() => {
-                            push(chatRef, {
-                                usuario: "Narrador",
-                                texto: "¡Hola, " + ultimoMensaje.usuario + "! Bienvenido a la aventura.",
-                                timestamp: Date.now()
-                            });
-                        }, 500); // Respuesta con un retraso de 500ms
-                    } else if (ultimoMensaje.texto.toLowerCase() === "/help") {
-                        setTimeout(() => {
-                            push(chatRef, {
-                                usuario: "Narrador",
-                                texto: 
-                                    "¡Hola! Soy el Narrador del juego. Aquí están los comandos disponibles:\n\n" +
-                                    "1. /help\n" +
-                                    "   Muestra esta lista de comandos.\n\n" +
-                                    "2. /hola\n" +
-                                    "   Saluda al jugador. ¡Úsalo para interactuar conmigo!\n\n" +
-                                    "¡Que comience la aventura!",
-                                timestamp: Date.now()
-                            });
-                        }, 500); // Respuesta con un retraso de 500ms
-                    }
-                }
-            }).catch((error) => {
-                console.error("Error al leer los mensajes: ", error);
+            const contenedorInventario = document.getElementById('inventario');
+            contenedorInventario.innerHTML = '';  // Limpiar contenido previo
+
+            // Mostrar todos los materiales en el inventario con cantidad 0
+            materiales.forEach((material) => {
+                const articuloElemento = document.createElement("div");
+                articuloElemento.classList.add("recuadro");
+                articuloElemento.innerHTML = `
+                    <p class="nombre">${material.nombre}</p>
+                    <p class="cantidad">${material.cantidad}</p>
+                `;
+                contenedorInventario.appendChild(articuloElemento);
             });
         }
 
-        // Llamar a la función para mostrar el último mensaje
-        setInterval(mostrarMensajes, 1000);  // Llamar cada segundo para revisar si hay nuevos mensajes
+        // Llamar a la función para cargar el inventario al cargar la página
+        document.addEventListener("DOMContentLoaded", cargarInventario);
+
+        // Comandos del bot
+        onChildAdded(chatRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data.texto.toLowerCase() === "/hola") {
+                push(chatRef, {
+                    usuario: "Narrador",
+                    texto: "¡Hola, " + data.usuario + "! Bienvenido a la aventura.",
+                    timestamp: Date.now()
+                });
+            } else if (data.texto.toLowerCase() === "/help") {
+                push(chatRef, {
+                    usuario: "Narrador",
+                    texto: 
+                    "¡Hola! Soy el Narrador del juego. Aquí están los comandos disponibles:\n\n" +
+                    "1. /help\n" +
+                    "   Muestra esta lista de comandos.\n\n" +
+                    "2. /hola\n" +
+                    "   Saluda al jugador. ¡Úsalo para interactuar conmigo!\n\n" +
+                    "¡Que comience la aventura!",
+                    timestamp: Date.now()
+                });
+            }
+        });
     </script>
     <style>
         * {
