@@ -89,26 +89,24 @@
             });
         }
 
-        // Función para alternar entre chat e inventario
-        function alternarVista() {
-            const chatView = document.getElementById("chatVista");
-            const inventarioView = document.getElementById("inventarioVista");
-            const boton = document.getElementById("btnAlternar");
-
-            if (chatView.style.display === "none") {
-                chatView.style.display = "block";
-                inventarioView.style.display = "none";
-                boton.innerText = "Ver Inventario";
-            } else {
-                chatView.style.display = "none";
-                inventarioView.style.display = "block";
-                boton.innerText = "Ver Chat";
-            }
-        }
-
         // Llamar a la función para cargar el inventario al cargar la página
         document.addEventListener("DOMContentLoaded", cargarInventario);
 
+        // Función para alternar la vista entre inventario y botones de comandos
+        function alternarVista() {
+            const inventario = document.getElementById('inventario');
+            const botonesComandos = document.getElementById('botonesComandos');
+
+            if (inventario.style.display === 'none') {
+                // Mostrar inventario
+                inventario.style.display = 'block';
+                botonesComandos.style.display = 'none';
+            } else {
+                // Mostrar botones de comandos
+                inventario.style.display = 'none';
+                botonesComandos.style.display = 'block';
+            }
+        }
     </script>
     <style>
         * {
@@ -178,16 +176,6 @@
             font-size: 16px;
         }
 
-        #btnAlternar {
-            margin-top: 10px;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            background: #ffcc00;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
         /* Ajuste responsivo */
         @media (max-width: 600px) {
             #titulo {
@@ -201,14 +189,9 @@
             #btnEnviar {
                 font-size: 14px;
             }
-
-            #btnAlternar {
-                font-size: 14px;
-            }
         }
 
-        #inventarioVista {
-            display: none;
+        #inventario {
             margin-top: 20px;
             background: rgba(0, 0, 0, 0.2);
             padding: 10px;
@@ -235,27 +218,50 @@
             color: #4CAF50;
         }
 
-        #chatVista {
-            display: block;
+        /* Botones de comandos */
+        #botonesComandos {
+            display: none;
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .botonComando {
+            background: #ffcc00;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .botonComando:hover {
+            background: #e6b800;
         }
     </style>
 </head>
 <body>
     <div id="titulo">Zanahorio Codderbone</div>
-
-    <!-- Vista del chat -->
-    <div id="chatVista">
-        <div id="mensajes"></div>
-        <div id="entrada">
-            <input type="text" id="inputMensaje" placeholder="Escribe un mensaje...">
-            <button id="btnEnviar">Enviar</button>
-        </div>
+    <div id="mensajes"></div>
+    <div id="entrada">
+        <input type="text" id="inputMensaje" placeholder="Escribe un mensaje...">
+        <button id="btnEnviar">Enviar</button>
     </div>
 
-    <!-- Vista del inventario -->
-    <div id="inventarioVista"></div>
+    <!-- Contenedor para mostrar el inventario -->
+    <div id="inventario"></div>
 
-    <!-- Botón para alternar entre chat e inventario -->
-    <button id="btnAlternar" onclick="alternarVista()">Ver Inventario</button>
+    <!-- Botón Mochila -->
+    <button onclick="alternarVista()" class="botonComando">Mochila</button>
+
+    <!-- Contenedor para los botones de comandos -->
+    <div id="botonesComandos">
+        <button class="botonComando">Comando 1</button>
+        <button class="botonComando">Comando 2</button>
+        <button class="botonComando">Comando 3</button>
+    </div>
+
 </body>
 </html>
