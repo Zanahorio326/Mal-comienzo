@@ -7,7 +7,7 @@
     <script type="module">
         // Importar Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, set, get, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getDatabase, ref, push, onChildAdded, set, get, remove, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
         // Configuración de Firebase
         const firebaseConfig = {
@@ -24,7 +24,6 @@
         // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        const inventarioRef = ref(db, 'inventarios');
         const chatRef = ref(db, 'chat');
 
         // Obtener el nombre del usuario desde el almacenamiento local
@@ -58,25 +57,6 @@
             if (mensajes.length > 6) {
                 document.getElementById("mensajes").removeChild(mensajes[0]);
             }
-
-            // Esperar medio segundo y hacer que el bot lea el último mensaje
-            setTimeout(() => {
-                const ultimoMensaje = mensajes[mensajes.length - 1]; // Obtener el último mensaje
-                if (ultimoMensaje) {
-                    // Aquí el bot lee el último mensaje
-                    const textoUltimoMensaje = ultimoMensaje.textContent.trim().toLowerCase();
-                    if (textoUltimoMensaje === "/hola") {
-                        push(chatRef, {
-                            usuario: "Narrador",
-                            texto: "¡Hola, " + data.usuario + "! Bienvenido a la aventura.",
-                            timestamp: Date.now()
-                        });
-                    } else if (textoUltimoMensaje === "/help") {
-                        // Redirigir al usuario a la página de comandos
-                        window.location.href = "https://zanahorio326.github.io/Mal-comienzo/teorico.html";
-                    }
-                }
-            }, 500); // 500ms = 0.5 segundos
         });
 
         // Función para cargar el inventario
@@ -108,6 +88,47 @@
         // Llamar a la función para cargar el inventario al cargar la página
         document.addEventListener("DOMContentLoaded", cargarInventario);
 
+        // Comandos del bot: Responder solo al último mensaje
+        onChildAdded(chatRef, (snapshot) => {
+            const data = snapshot.val();
+            // Obtener el último mensaje
+            get(query(chatRef, orderByChild("timestamp"), limitToLast(1)))
+                .then(snapshot => {
+                    const lastMessage = snapshot.val();
+                    if (lastMessage) {
+                        const message = Object.values(lastMessage).pop();  // Obtener el último mensaje
+                        const texto = message.texto.toLowerCase();
+
+                        // Si el mensaje es un comando
+                        if (texto === "/hola") {
+                            setTimeout(() => {
+                                push(chatRef, {
+                                    usuario: "Narrador",
+                                    texto: "¡Hola, " + message.usuario + "! Bienvenido a la aventura.",
+                                    timestamp: Date.now()
+                                });
+                            }, 500); // Respuesta con un retraso de 500ms
+                        } else if (texto === "/help") {
+                            setTimeout(() => {
+                                push(chatRef, {
+                                    usuario: "Narrador",
+                                    texto:
+                                    "¡Hola! Soy el Narrador del juego. Aquí están los comandos disponibles:\n\n" +
+                                    "1. /help\n" +
+                                    "   Muestra esta lista de comandos.\n\n" +
+                                    "2. /hola\n" +
+                                    "   Saluda al jugador. ¡Úsalo para interactuar conmigo!\n\n" +
+                                    "¡Que comience la aventura!",
+                                    timestamp: Date.now()
+                                });
+                            }, 500); // Respuesta con un retraso de 500ms
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al obtener el último mensaje: ", error);
+                });
+        });
     </script>
     <style>
         * {
@@ -119,9 +140,9 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            height: 100dvh;
+            height: 100dvh; /* Usa altura real del dispositivo */
             margin: 0;
-            padding: 10px;
+            padding: 10px; /* Margen para que el contenido no toque los bordes */
             background: linear-gradient(to bottom, #ff7f00, #008f39);
             color: white;
         }
@@ -140,8 +161,8 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            max-height: calc(100dvh - 120px);
-            margin-top: 5px;
+            max-height: calc(100dvh - 120px); /* Ajuste dinámico según el tamaño del dispositivo */
+            margin-top: 5px; /* Reducción del margen superior */
         }
 
         .mensaje {
@@ -177,6 +198,7 @@
             font-size: 16px;
         }
 
+        /* Ajuste responsivo */
         @media (max-width: 600px) {
             #titulo {
                 font-size: 20px;
@@ -197,7 +219,7 @@
             padding: 10px;
             border-radius: 10px;
             overflow-y: auto;
-            max-height: 400px;
+            max-height: 400px; /* Limita la altura */
         }
 
         .recuadro {
@@ -220,12 +242,18 @@
     </style>
 </head>
 <body>
-    <div id="titulo">Inventario - Zanahorio Codderbone</div>
+    <div id="titulo">Zanahorio Codderbone</div>
     <div id="mensajes"></div>
     <div id="entrada">
         <input type="text" id="inputMensaje" placeholder="Escribe un mensaje...">
         <button id="btnEnviar">Enviar</button>
     </div>
+
+    <!-- Contenedor para mostrar el inventario -->
     <div id="inventario"></div>
+
+    <!-- Enlace al bot -->
+    <script src="https://zanahorio326.github.io/Mal-comienzo/bot.js" defer></script>
+
 </body>
 </html>
