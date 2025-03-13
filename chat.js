@@ -1,133 +1,59 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario - Zanahorio Codderbone</title>
-    
-    <!-- Enlace al script de chat -->
-    <script type="module" src="https://zanahorio326.github.io/Mal-comienzo/chat.js"></script>
+// Importar Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-    <style>
-        * {
-            box-sizing: border-box;
+// Configuración de Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+    authDomain: "thegame-5afaa.firebaseapp.com",
+    databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+    projectId: "thegame-5afaa",
+    storageBucket: "thegame-5afaa.firebasestorage.app",
+    messagingSenderId: "588556182984",
+    appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+    measurementId: "G-9M3CBJ3LV9"
+};
+
+// Inicializar Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const chatRef = ref(db, 'chat');
+
+// Obtener el nombre del usuario desde el almacenamiento local
+const username = localStorage.getItem("username") || "Desconocido";
+
+// Función para enviar mensajes
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("btnEnviar").addEventListener("click", function() {
+        const mensaje = document.getElementById("inputMensaje").value.trim();
+        if (mensaje !== "") {
+            push(chatRef, {
+                usuario: username,
+                texto: mensaje,
+                timestamp: Date.now()
+            });
+            document.getElementById("inputMensaje").value = "";
         }
+    });
+});
 
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100dvh;
-            margin: 0;
-            padding: 10px;
-            background: linear-gradient(to bottom, #ff7f00, #008f39);
-            color: white;
-        }
+// Mostrar mensajes en tiempo real
+onChildAdded(chatRef, (snapshot) => {
+    const data = snapshot.val();
+    const mensajeElemento = document.createElement("div");
+    mensajeElemento.textContent = `${data.usuario}: ${data.texto}`;
+    mensajeElemento.classList.add("mensaje");
+    document.getElementById("mensajes").appendChild(mensajeElemento);
 
-        #titulo {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
+    // Mantener solo los últimos 8 mensajes
+    const mensajes = document.getElementById("mensajes").children;
+    if (mensajes.length > 8) {
+        // Eliminar el mensaje de la pantalla
+        document.getElementById("mensajes").removeChild(mensajes[0]);
 
-        #mensajes {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            max-height: calc(100dvh - 120px);
-            margin-top: 5px;
-        }
-
-        .mensaje {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 8px;
-            margin: 5px;
-            border-radius: 5px;
-            width: fit-content;
-        }
-
-        #entrada {
-            display: flex;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-        }
-
-        #inputMensaje {
-            flex-grow: 1;
-            padding: 8px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        #btnEnviar {
-            padding: 8px 15px;
-            margin-left: 10px;
-            border: none;
-            border-radius: 5px;
-            background: #ffcc00;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        @media (max-width: 600px) {
-            #titulo {
-                font-size: 20px;
-            }
-
-            #inputMensaje {
-                font-size: 14px;
-            }
-
-            #btnEnviar {
-                font-size: 14px;
-            }
-        }
-
-        #inventario {
-            margin-top: 20px;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 10px;
-            border-radius: 10px;
-            overflow-y: auto;
-            max-height: 400px;
-        }
-
-        .recuadro {
-            display: flex;
-            justify-content: space-between;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            padding: 8px;
-            margin-bottom: 5px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .nombre {
-            font-weight: bold;
-        }
-
-        .cantidad {
-            color: #4CAF50;
-        }
-    </style>
-</head>
-<body>
-    <div id="titulo">Zanahorio Codderbone</div>
-    <div id="mensajes"></div>
-    <div id="entrada">
-        <input type="text" id="inputMensaje" placeholder="Escribe un mensaje...">
-        <button id="btnEnviar">Enviar</button>
-    </div>
-
-    <div id="inventario"></div>
-
-    <script src="https://zanahorio326.github.io/Mal-comienzo/bot.js" defer></script>
-</body>
-</html>
+        // Eliminar el mensaje más antiguo de la base de datos
+        const mensajeAEliminar = mensajes[0];
+        const mensajeId = mensajeAEliminar.getAttribute('data-id');
+        remove(ref(db, 'chat/' + mensajeId));
+    }
+});
