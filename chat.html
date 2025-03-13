@@ -89,31 +89,8 @@
             });
         }
 
-        // Función para mostrar comandos (solo de ejemplo, no hace nada)
-        function mostrarComando() {
-            const contenedorComando = document.getElementById('comando');
-            contenedorComando.innerHTML = `
-                <button class="boton-comando">Comando de ejemplo</button>
-            `;
-        }
-
         // Llamar a la función para cargar el inventario al cargar la página
         document.addEventListener("DOMContentLoaded", cargarInventario);
-
-        // Función para alternar entre inventario y comandos
-        function toggleInventarioComandos(tipo) {
-            const inventario = document.getElementById('inventario');
-            const comando = document.getElementById('comando');
-
-            if (tipo === 'inventario') {
-                inventario.style.display = 'block';
-                comando.style.display = 'none';
-            } else if (tipo === 'comando') {
-                inventario.style.display = 'none';
-                comando.style.display = 'block';
-                mostrarComando();  // Solo para mostrar un comando de ejemplo
-            }
-        }
     </script>
     <style>
         * {
@@ -198,7 +175,7 @@
             }
         }
 
-        #inventario, #comando {
+        #inventario {
             margin-top: 20px;
             background: rgba(0, 0, 0, 0.2);
             padding: 10px;
@@ -224,17 +201,6 @@
         .cantidad {
             color: #4CAF50;
         }
-
-        .boton-comando {
-            padding: 8px 15px;
-            margin-top: 10px;
-            border: none;
-            border-radius: 5px;
-            background: #ffcc00;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
     </style>
 </head>
 <body>
@@ -245,14 +211,8 @@
         <button id="btnEnviar">Enviar</button>
     </div>
 
-    <button onclick="toggleInventarioComandos('inventario')">Inventario</button>
-    <button onclick="toggleInventarioComandos('comando')">Comandos</button>
-
     <!-- Contenedor para mostrar el inventario -->
     <div id="inventario"></div>
-
-    <!-- Contenedor para mostrar los comandos (solo de ejemplo) -->
-    <div id="comando" style="display: none;"></div>
 
 </body>
 </html>
