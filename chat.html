@@ -25,6 +25,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const chatRef = ref(db, 'chat');
+        const inventarioRef = ref(db, 'inventario');
 
         // Obtener el nombre del usuario desde el almacenamiento local
         const username = localStorage.getItem("username") || "Desconocido";
@@ -42,9 +43,38 @@
                     document.getElementById("inputMensaje").value = "";
                 }
             });
+
+            // Cargar inventario del usuario
+            cargarInventario();
         });
 
-        // Mostrar mensajes en tiempo real
+        // Función para cargar el inventario del usuario
+        function cargarInventario() {
+            get(ref(db, 'inventario/' + username)).then(snapshot => {
+                const inventario = snapshot.val();
+                if (inventario) {
+                    mostrarInventario(inventario);
+                } else {
+                    // Si no existe inventario, creamos uno vacío
+                    set(ref(db, 'inventario/' + username), []);
+                    mostrarInventario([]);
+                }
+            }).catch(error => console.error('Error al cargar inventario:', error));
+        }
+
+        // Función para mostrar el inventario en la página
+        function mostrarInventario(inventario) {
+            const contenedorInventario = document.getElementById("inventario");
+            contenedorInventario.innerHTML = "<h3>Inventario de " + username + "</h3>";
+            inventario.forEach(item => {
+                const itemElemento = document.createElement("div");
+                itemElemento.textContent = item;
+                itemElemento.classList.add("item");
+                contenedorInventario.appendChild(itemElemento);
+            });
+        }
+
+        // Función para mostrar mensajes en tiempo real
         onChildAdded(chatRef, (snapshot) => {
             const data = snapshot.val();
             const mensajeElemento = document.createElement("div");
@@ -164,6 +194,22 @@
             overflow-y: auto;
             max-height: 400px; /* Limita la altura */
         }
+
+        #inventario {
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px;
+            margin: 5px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -176,6 +222,9 @@
 
     <!-- Contenedor para cargar teórico.html -->
     <div id="contenedorTeorico"></div>
+
+    <!-- Contenedor para el inventario -->
+    <div id="inventario"></div>
 
 </body>
 </html>
