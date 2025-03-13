@@ -89,28 +89,43 @@
             });
         }
 
-        // Alternar entre mostrar inventario y la tarjeta con botones de comandos
-        function alternarVista() {
-            const inventario = document.getElementById("inventario");
-            const tarjetaComandos = document.getElementById("tarjetaComandos");
-            const mostrarInventario = inventario.style.display !== "none";
+        // Función para cargar los botones de comandos
+        function cargarComandos() {
+            const contenedorInventario = document.getElementById('inventario');
+            contenedorInventario.innerHTML = '';  // Limpiar contenido previo
 
-            // Alternar entre el inventario y la tarjeta de comandos
-            if (mostrarInventario) {
-                inventario.style.display = "none";
-                tarjetaComandos.style.display = "block";
+            const botonesComando = [
+                { nombre: "Usar Carbón", accion: "usarCarbon()" },
+                { nombre: "Usar Cobre", accion: "usarCobre()" },
+                { nombre: "Usar Hierro", accion: "usarHierro()" },
+                { nombre: "Usar Plata", accion: "usarPlata()" },
+                { nombre: "Usar Oro", accion: "usarOro()" }
+            ];
+
+            botonesComando.forEach((comando) => {
+                const botonElemento = document.createElement("button");
+                botonElemento.textContent = comando.nombre;
+                botonElemento.onclick = function() {
+                    alert(`Ejecutando comando: ${comando.nombre}`);
+                };
+                contenedorInventario.appendChild(botonElemento);
+            });
+        }
+
+        // Alternar entre inventario y comandos
+        let mostrandoInventario = true;
+        function alternarInventarioComandos() {
+            const contenedorInventario = document.getElementById('inventario');
+            if (mostrandoInventario) {
+                cargarComandos();
             } else {
-                inventario.style.display = "block";
-                tarjetaComandos.style.display = "none";
+                cargarInventario();
             }
+            mostrandoInventario = !mostrandoInventario;
         }
 
         // Llamar a la función para cargar el inventario al cargar la página
-        document.addEventListener("DOMContentLoaded", () => {
-            cargarInventario();
-            document.getElementById("inventario").style.display = "block";  // Mostrar inventario por defecto
-            document.getElementById("tarjetaComandos").style.display = "none";  // Esconder tarjeta de comandos por defecto
-        });
+        document.addEventListener("DOMContentLoaded", cargarInventario);
 
     </script>
     <style>
@@ -223,20 +238,14 @@
             color: #4CAF50;
         }
 
-        #tarjetaComandos {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 20px;
-            border-radius: 10px;
-        }
-
-        .botonComando {
-            background-color: #ffcc00;
-            border: none;
-            padding: 10px;
+        button {
+            padding: 8px;
             margin: 5px;
-            cursor: pointer;
-            font-size: 16px;
+            border: none;
             border-radius: 5px;
+            background-color: rgba(0, 0, 0, 0.2);
+            color: white;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -248,18 +257,11 @@
         <button id="btnEnviar">Enviar</button>
     </div>
 
-    <!-- Contenedor para mostrar el inventario -->
-    <div id="inventario"></div>
-
-    <!-- Tarjeta de comandos -->
-    <div id="tarjetaComandos">
-        <button class="botonComando">Comando 1</button>
-        <button class="botonComando">Comando 2</button>
-        <button class="botonComando">Comando 3</button>
-    </div>
-
     <!-- Botón Mochila -->
-    <button id="btnMochila" onclick="alternarVista()">Mochila</button>
+    <button onclick="alternarInventarioComandos()">Mochila</button>
+
+    <!-- Contenedor para mostrar el inventario o los comandos -->
+    <div id="inventario"></div>
 
 </body>
 </html>
