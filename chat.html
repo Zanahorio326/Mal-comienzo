@@ -89,6 +89,31 @@
         // Llamar a la función para cargar el inventario al cargar la página
         document.addEventListener("DOMContentLoaded", cargarInventario);
 
+        // Función para mostrar la ventana emergente con los comandos
+        function mostrarVentanaHelp() {
+            const ventanaHelp = document.createElement("div");
+            ventanaHelp.id = "ventanaHelp";
+            ventanaHelp.innerHTML = `
+                <div class="popup-content">
+                    <h2>Comandos Disponibles</h2>
+                    <ul>
+                        <li><strong>/help</strong> - Muestra esta lista de comandos.</li>
+                        <li><strong>/hola</strong> - Saluda al jugador. ¡Úsalo para interactuar conmigo!</li>
+                    </ul>
+                    <button onclick="cerrarVentanaHelp()">Cerrar</button>
+                </div>
+            `;
+            document.body.appendChild(ventanaHelp);
+        }
+
+        // Función para cerrar la ventana emergente
+        function cerrarVentanaHelp() {
+            const ventanaHelp = document.getElementById("ventanaHelp");
+            if (ventanaHelp) {
+                document.body.removeChild(ventanaHelp);
+            }
+        }
+
         // Comandos del bot
         onChildAdded(chatRef, (snapshot) => {
             const data = snapshot.val();
@@ -99,17 +124,7 @@
                     timestamp: Date.now()
                 });
             } else if (data.texto.toLowerCase() === "/help") {
-                push(chatRef, {
-                    usuario: "Narrador",
-                    texto: 
-                    "¡Hola! Soy el Narrador del juego. Aquí están los comandos disponibles:\n\n" +
-                    "1. /help\n" +
-                    "   Muestra esta lista de comandos.\n\n" +
-                    "2. /hola\n" +
-                    "   Saluda al jugador. ¡Úsalo para interactuar conmigo!\n\n" +
-                    "¡Que comience la aventura!",
-                    timestamp: Date.now()
-                });
+                mostrarVentanaHelp();
             }
         });
     </script>
@@ -123,9 +138,9 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            height: 100dvh; /* Usa altura real del dispositivo */
+            height: 100dvh;
             margin: 0;
-            padding: 10px; /* Margen para que el contenido no toque los bordes */
+            padding: 10px;
             background: linear-gradient(to bottom, #ff7f00, #008f39);
             color: white;
         }
@@ -144,8 +159,8 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            max-height: calc(100dvh - 120px); /* Ajuste dinámico según el tamaño del dispositivo */
-            margin-top: 5px; /* Reducción del margen superior */
+            max-height: calc(100dvh - 120px);
+            margin-top: 5px;
         }
 
         .mensaje {
@@ -181,7 +196,6 @@
             font-size: 16px;
         }
 
-        /* Ajuste responsivo */
         @media (max-width: 600px) {
             #titulo {
                 font-size: 20px;
@@ -202,7 +216,7 @@
             padding: 10px;
             border-radius: 10px;
             overflow-y: auto;
-            max-height: 400px; /* Limita la altura */
+            max-height: 400px;
         }
 
         .recuadro {
@@ -222,6 +236,53 @@
         .cantidad {
             color: #4CAF50;
         }
+
+        /* Estilos para la ventana emergente */
+        #ventanaHelp {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .popup-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+            color: #333;
+        }
+
+        .popup-content h2 {
+            margin-bottom: 10px;
+        }
+
+        .popup-content ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .popup-content li {
+            margin: 5px 0;
+        }
+
+        .popup-content button {
+            margin-top: 20px;
+            padding: 8px 15px;
+            background-color: #ff7f00;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -234,9 +295,6 @@
 
     <!-- Contenedor para mostrar el inventario -->
     <div id="inventario"></div>
-
-    <!-- Enlace al bot -->
-    <script src="https://zanahorio326.github.io/Mal-comienzo/bot.js" defer></script>
 
 </body>
 </html>
