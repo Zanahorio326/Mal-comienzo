@@ -74,7 +74,7 @@
                 { nombre: "Oro", cantidad: 0 }
             ];
 
-            const contenedorInventario = document.getElementById('inventario');
+            const contenedorInventario = document.getElementById('contenedorInventario');
             contenedorInventario.innerHTML = '';  // Limpiar contenido previo
 
             // Mostrar todos los materiales en el inventario con cantidad 0
@@ -89,9 +89,49 @@
             });
         }
 
+        // Función para mostrar los comandos
+        function mostrarComandos() {
+            const contenedorInventario = document.getElementById('contenedorInventario');
+            contenedorInventario.innerHTML = '';  // Limpiar contenido previo
+
+            const comandos = [
+                { nombre: "Agregar Carbón", accion: "agregarCarbon" },
+                { nombre: "Eliminar Carbón", accion: "eliminarCarbon" },
+                { nombre: "Ver Inventario", accion: "verInventario" }
+            ];
+
+            // Mostrar los comandos
+            comandos.forEach((comando) => {
+                const comandoElemento = document.createElement("button");
+                comandoElemento.classList.add("comando");
+                comandoElemento.textContent = comando.nombre;
+                comandoElemento.onclick = () => ejecutarComando(comando.accion);
+                contenedorInventario.appendChild(comandoElemento);
+            });
+        }
+
+        // Función para ejecutar los comandos
+        function ejecutarComando(accion) {
+            if (accion === "agregarCarbon") {
+                alert("Se ha agregado Carbón al inventario");
+            } else if (accion === "eliminarCarbon") {
+                alert("Se ha eliminado Carbón del inventario");
+            } else if (accion === "verInventario") {
+                cargarInventario();
+            }
+        }
+
         // Llamar a la función para cargar el inventario al cargar la página
         document.addEventListener("DOMContentLoaded", cargarInventario);
 
+        // Cambiar entre Inventario y Comandos
+        function cambiarVista(vista) {
+            if (vista === "inventario") {
+                cargarInventario();
+            } else if (vista === "comandos") {
+                mostrarComandos();
+            }
+        }
     </script>
     <style>
         * {
@@ -176,7 +216,7 @@
             }
         }
 
-        #inventario {
+        #contenedorInventario {
             margin-top: 20px;
             background: rgba(0, 0, 0, 0.2);
             padding: 10px;
@@ -202,6 +242,20 @@
         .cantidad {
             color: #4CAF50;
         }
+
+        .comando {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .comando:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -212,8 +266,11 @@
         <button id="btnEnviar">Enviar</button>
     </div>
 
-    <!-- Contenedor para mostrar el inventario -->
-    <div id="inventario"></div>
+    <!-- Contenedor para mostrar el inventario y comandos -->
+    <div id="contenedorInventario">
+        <button onclick="cambiarVista('inventario')">Inventario</button>
+        <button onclick="cambiarVista('comandos')">Comandos</button>
+    </div>
 
 </body>
 </html>
