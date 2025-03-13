@@ -1,85 +1,43 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teorico - Inventario</title>
-    <style>
-        /* Asegura que los estilos se apliquen aunque se cargue dinámicamente */
-        #teorico-contenido {
-            font-family: Arial, sans-serif !important;
-            background-color: #f4f4f4 !important;
-            padding: 20px !important;
-            width: 100% !important;
-        }
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, push, onChildAdded } from "firebase/database";
 
-        .recuadro {
-            display: flex !important;
-            justify-content: space-between !important;
-            background-color: #fff !important;
-            border: 1px solid #ccc !important;
-            padding: 8px !important;
-            margin-bottom: 5px !important;
-            border-radius: 5px !important;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-        }
+// Configuración de Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+    authDomain: "thegame-5afaa.firebaseapp.com",
+    databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+    projectId: "thegame-5afaa",
+    storageBucket: "thegame-5afaa.firebasestorage.app",
+    messagingSenderId: "588556182984",
+    appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+    measurementId: "G-9M3CBJ3LV9"
+};
 
-        .recuadro p {
-            margin: 0 !important;
-            font-size: 16px !important;
-            color: black !important;
-        }
+// Inicializar Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const chatRef = ref(db, 'chat');
 
-        .nombre {
-            font-weight: bold !important;
-        }
+// Función para que el bot envíe un mensaje
+function enviarMensajeBot(texto) {
+    push(chatRef, {
+        usuario: "Narrador",
+        texto: texto,
+        timestamp: Date.now()
+    });
+}
 
-        .cantidad {
-            color: #4CAF50 !important;
-        }
+// Escuchar mensajes en tiempo real
+onChildAdded(chatRef, (snapshot) => {
+    const data = snapshot.val();
+    if (!data || !data.texto) return;
 
-        @media (max-width: 600px) {
-            #teorico-contenido {
-                padding: 10px !important;
-            }
+    const mensaje = data.texto.trim().toLowerCase();
 
-            .recuadro {
-                padding: 6px !important;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div id="teorico-contenido">
-        <!-- Mineral 1: Carbón -->
-        <div class="recuadro">
-            <p class="nombre">Carbón</p>
-            <p class="cantidad">0</p>
-        </div>
+    if (mensaje === "/hola") {
+        enviarMensajeBot("Bienvenido");
+    }
+});
 
-        <!-- Mineral 2: Cobre -->
-        <div class="recuadro">
-            <p class="nombre">Cobre</p>
-            <p class="cantidad">0</p>
-        </div>
-
-        <!-- Mineral 3: Hierro -->
-        <div class="recuadro">
-            <p class="nombre">Hierro</p>
-            <p class="cantidad">0</p>
-        </div>
-
-        <!-- Mineral 4: Plata -->
-        <div class="recuadro">
-            <p class="nombre">Plata</p>
-            <p class="cantidad">0</p>
-        </div>
-
-        <!-- Mineral 5: Oro -->
-        <div class="recuadro">
-            <p class="nombre">Oro</p>
-            <p class="cantidad">0</p>
-        </div>
-    </div>
-</body>
-</html>
+// Mantener el proceso activo
+console.log("Bot Narrador ejecutándose...");
