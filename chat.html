@@ -89,8 +89,16 @@
         // Llamar a la función para cargar el inventario al cargar la página
         document.addEventListener("DOMContentLoaded", cargarInventario);
 
+        // Variable global para verificar si la ventana help ya está abierta
+        let ventanaHelpAbierta = false;
+
         // Función para mostrar la ventana emergente con los comandos
         function mostrarVentanaHelp() {
+            if (ventanaHelpAbierta) {
+                return;  // Si la ventana ya está abierta, no hacer nada
+            }
+            ventanaHelpAbierta = true;  // Marcar que la ventana está abierta
+
             const ventanaHelp = document.createElement("div");
             ventanaHelp.id = "ventanaHelp";
             ventanaHelp.innerHTML = `
@@ -111,6 +119,7 @@
             const ventanaHelp = document.getElementById("ventanaHelp");
             if (ventanaHelp) {
                 document.body.removeChild(ventanaHelp);
+                ventanaHelpAbierta = false;  // Restablecer la variable para permitir abrirla de nuevo
             }
         }
 
@@ -259,42 +268,3 @@
             text-align: center;
             color: #333;
         }
-
-        .popup-content h2 {
-            margin-bottom: 10px;
-        }
-
-        .popup-content ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 10px 0;
-        }
-
-        .popup-content li {
-            margin: 5px 0;
-        }
-
-        .popup-content button {
-            margin-top: 20px;
-            padding: 8px 15px;
-            background-color: #ff7f00;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <div id="titulo">Zanahorio Codderbone</div>
-    <div id="mensajes"></div>
-    <div id="entrada">
-        <input type="text" id="inputMensaje" placeholder="Escribe un mensaje...">
-        <button id="btnEnviar">Enviar</button>
-    </div>
-
-    <!-- Contenedor para mostrar el inventario -->
-    <div id="inventario"></div>
-
-</body>
-</html>
