@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat - Zanahorio Codderbone</title>
+    <title>Inventario - Zanahorio Codderbone</title>
     <script type="module">
         // Importar Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
@@ -62,29 +62,27 @@
 
         // Función para cargar el inventario
         function cargarInventario() {
-            get(inventarioRef).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const inventario = snapshot.val();
-                    const contenedorInventario = document.getElementById('inventario');
-                    contenedorInventario.innerHTML = '';  // Limpiar contenido previo
+            // Definir los materiales con cantidad 0
+            const materiales = [
+                { nombre: "Carbón", cantidad: 0 },
+                { nombre: "Cobre", cantidad: 0 },
+                { nombre: "Hierro", cantidad: 0 },
+                { nombre: "Plata", cantidad: 0 },
+                { nombre: "Oro", cantidad: 0 }
+            ];
 
-                    // Recorrer los artículos en el inventario y agregarlos al contenedor
-                    for (const item in inventario) {
-                        const articulo = inventario[item];
-                        const articuloElemento = document.createElement("div");
-                        articuloElemento.classList.add("articulo");
-                        articuloElemento.innerHTML = `
-                            <h3>${articulo.nombre}</h3>
-                            <p>Cantidad: ${articulo.cantidad}</p>
-                            <p>Descripción: ${articulo.descripcion}</p>
-                        `;
-                        contenedorInventario.appendChild(articuloElemento);
-                    }
-                } else {
-                    console.log("No hay datos en el inventario.");
-                }
-            }).catch((error) => {
-                console.error("Error al cargar el inventario:", error);
+            const contenedorInventario = document.getElementById('inventario');
+            contenedorInventario.innerHTML = '';  // Limpiar contenido previo
+
+            // Mostrar todos los materiales en el inventario con cantidad 0
+            materiales.forEach((material) => {
+                const articuloElemento = document.createElement("div");
+                articuloElemento.classList.add("recuadro");
+                articuloElemento.innerHTML = `
+                    <p class="nombre">${material.nombre}</p>
+                    <p class="cantidad">${material.cantidad}</p>
+                `;
+                contenedorInventario.appendChild(articuloElemento);
             });
         }
 
@@ -184,20 +182,22 @@
             max-height: 400px; /* Limita la altura */
         }
 
-        .articulo {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 10px;
-            margin: 5px;
+        .recuadro {
+            display: flex;
+            justify-content: space-between;
+            background-color: rgba(255, 255, 255, 0.2);
             border-radius: 5px;
+            padding: 8px;
+            margin-bottom: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        .articulo h3 {
-            font-size: 18px;
-            margin: 0;
+        .nombre {
+            font-weight: bold;
         }
 
-        .articulo p {
-            margin: 5px 0;
+        .cantidad {
+            color: #4CAF50;
         }
     </style>
 </head>
