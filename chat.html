@@ -58,21 +58,6 @@
             if (mensajes.length > 6) {
                 document.getElementById("mensajes").removeChild(mensajes[0]);
             }
-
-            // Respuestas automáticas del bot (Narrador)
-            if (data.texto.toLowerCase() === "/help") {
-                push(chatRef, {
-                    usuario: "Narrador",
-                    texto: "¡Hola! Soy el Narrador del juego. Aquí están los comandos disponibles:\n1. /help - Muestra esta lista de comandos.\n2. /hola - Saluda al jugador. ¡Úsalo para interactuar conmigo!",
-                    timestamp: Date.now()
-                });
-            } else if (data.texto.toLowerCase() === "/hola") {
-                push(chatRef, {
-                    usuario: "Narrador",
-                    texto: "¡Hola, valiente jugador! ¿Listo para explorar el mundo de Zanahorio Codderbone?",
-                    timestamp: Date.now()
-                });
-            }
         });
 
         // Función para cargar el inventario
@@ -104,6 +89,27 @@
         // Llamar a la función para cargar el inventario al cargar la página
         document.addEventListener("DOMContentLoaded", cargarInventario);
 
+        // Comandos del bot
+        onChildAdded(chatRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data.texto.toLowerCase() === "/hola") {
+                push(chatRef, {
+                    usuario: "Narrador",
+                    texto: "¡Hola, " + data.usuario + "! Bienvenido a la aventura.",
+                    timestamp: Date.now()
+                });
+            } else if (data.texto.toLowerCase() === "/help") {
+                push(chatRef, {
+                    usuario: "Narrador",
+                    texto: 
+                    "¡Hola! Soy el Narrador del juego. Aquí están los comandos disponibles:\n\n" +
+                    "1. /help - Muestra esta lista de comandos.\n" +
+                    "2. /hola - Saluda al jugador. ¡Úsalo para interactuar conmigo!\n\n" +
+                    "¡Que comience la aventura!",
+                    timestamp: Date.now()
+                });
+            }
+        });
     </script>
     <style>
         * {
