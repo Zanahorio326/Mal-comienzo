@@ -1,33 +1,58 @@
-// Bot básico para responder al comando /hola
-
-// Referencia a la base de datos de Firebase
+// Inicialización de Firebase (ya debe estar configurado en tu HTML)
 const chatRef = firebase.database().ref('chat');
 
-// Escuchar los eventos de mensaje en el chat
-document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("btnEnviar").addEventListener("click", function() {
-        const mensaje = document.getElementById("inputMensaje").value.trim();
-        
-        // Verificar si el mensaje contiene el comando /hola
+// Función que maneja el envío del mensaje
+function enviarMensaje() {
+    const mensaje = document.getElementById("inputMensaje").value.trim();
+    
+    if (mensaje !== "") {
+        // Si el mensaje es "/hola", respondemos con "Bienvenido"
         if (mensaje === "/hola") {
-            // Responder con "Bienvenido"
             const respuesta = "Narrador: Bienvenido";
-            // Enviar la respuesta al chat
-            push(chatRef, {
+            
+            // Enviar la respuesta del bot al chat
+            chatRef.push({
                 usuario: "Bot",
                 texto: respuesta,
                 timestamp: Date.now()
             });
-        } else if (mensaje !== "") {
-            // Enviar el mensaje original del usuario al chat
-            push(chatRef, {
+        } else {
+            // Enviar el mensaje normal del usuario al chat
+            chatRef.push({
                 usuario: "Usuario",
                 texto: mensaje,
                 timestamp: Date.now()
             });
         }
-
-        // Limpiar el input de texto después de enviar
+        // Limpiar el campo de entrada después de enviar el mensaje
         document.getElementById("inputMensaje").value = "";
+    }
+}
+
+// Detectar cuando se haga clic en el botón "Enviar"
+document.addEventListener("DOMContentLoaded", function() {
+    // Evento de clic en el botón
+    document.getElementById("btnEnviar").addEventListener("click", enviarMensaje);
+
+    // Detectar cuando se presione "Enter" en el campo de mensaje
+    document.getElementById("inputMensaje").addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            enviarMensaje();
+        }
     });
+});
+
+// Escuchar los mensajes en el chat y mostrarlos en la interfaz
+chatRef.on('child_added', function(snapshot) {
+    const data = snapshot.val();
+    const mensajeElemento = document.createElement("div");
+    mensajeElemento.textContent = `${data.usuario}: ${data.texto}`;
+    mensajeElemento.classList.add("mensaje");
+    document.getElementById("mensajes").appendChild(mensajeElemento);
+    
+    // Mantener solo los últimos 6 mensajes visibles
+    const mensajes = document.getElementById("mensajes").children;
+    if (mensajes.length > 6) {
+        document.getElementById("mensajes").removeChild(mensajes[0]);
+    }
 });
