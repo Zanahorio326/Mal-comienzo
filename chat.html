@@ -4,112 +4,117 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventario - Zanahorio Codderbone</title>
-    <link rel="stylesheet" href="chat.css"> <!-- Enlace al archivo CSS -->
-    <script type="module">
-        // Importar Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, set, get, remove, onChildRemoved } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    
+    <!-- Importar script modularizado -->
+    <script type="module" src="chat.js"></script>
 
-        // Configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
-            authDomain: "thegame-5afaa.firebaseapp.com",
-            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
-            projectId: "thegame-5afaa",
-            storageBucket: "thegame-5afaa.firebasestorage.app",
-            messagingSenderId: "588556182984",
-            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
-            measurementId: "G-9M3CBJ3LV9"
-        };
-
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const chatRef = ref(db, 'chat');
-
-        // Obtener el nombre del usuario desde el almacenamiento local
-        const username = localStorage.getItem("username") || "Desconocido";
-
-        // Función para enviar mensajes
-        document.addEventListener("DOMContentLoaded", function() {
-            document.getElementById("btnEnviar").addEventListener("click", function() {
-                const mensaje = document.getElementById("inputMensaje").value.trim();
-                if (mensaje !== "") {
-                    const newMessageRef = push(chatRef);
-                    set(newMessageRef, {
-                        usuario: username,
-                        texto: mensaje,
-                        timestamp: Date.now()
-                    });
-                    document.getElementById("inputMensaje").value = "";
-                }
-            });
-        });
-
-        // Mostrar mensajes en tiempo real
-        onChildAdded(chatRef, (snapshot) => {
-            const data = snapshot.val();
-            const mensajeElemento = document.createElement("div");
-            mensajeElemento.textContent = `${data.usuario}: ${data.texto}`;
-            mensajeElemento.classList.add("mensaje");
-            mensajeElemento.setAttribute('data-id', snapshot.key); // Guardar el ID del mensaje
-            document.getElementById("mensajes").appendChild(mensajeElemento);
-
-            // Mantener solo los últimos 8 mensajes
-            const mensajes = document.getElementById("mensajes").children;
-            if (mensajes.length > 8) {
-                // Eliminar el mensaje de la pantalla
-                document.getElementById("mensajes").removeChild(mensajes[0]);
-
-                // Eliminar el mensaje más antiguo de la base de datos
-                const mensajeAEliminar = mensajes[0];
-                const mensajeId = mensajeAEliminar.getAttribute('data-id');
-                remove(ref(db, 'chat/' + mensajeId));
-            }
-        });
-
-        // Eliminar mensajes de la base de datos cuando se eliminen de la pantalla
-        onChildRemoved(chatRef, (snapshot) => {
-            const mensajeId = snapshot.key;
-            const mensajes = document.getElementById("mensajes").children;
-            for (let i = 0; i < mensajes.length; i++) {
-                const mensajeElemento = mensajes[i];
-                if (mensajeElemento.getAttribute('data-id') === mensajeId) {
-                    mensajeElemento.remove();
-                }
-            }
-        });
-
-        // Función para cargar el inventario
-        function cargarInventario() {
-            // Definir los materiales con cantidad 0
-            const materiales = [
-                { nombre: "Carbón", cantidad: 0 },
-                { nombre: "Cobre", cantidad: 0 },
-                { nombre: "Hierro", cantidad: 0 },
-                { nombre: "Plata", cantidad: 0 },
-                { nombre: "Oro", cantidad: 0 }
-            ];
-
-            const contenedorInventario = document.getElementById('inventario');
-            contenedorInventario.innerHTML = '';  // Limpiar contenido previo
-
-            // Mostrar todos los materiales en el inventario con cantidad 0
-            materiales.forEach((material) => {
-                const articuloElemento = document.createElement("div");
-                articuloElemento.classList.add("recuadro");
-                articuloElemento.innerHTML = `
-                    <p class="nombre">${material.nombre}</p>
-                    <p class="cantidad">${material.cantidad}</p>
-                `;
-                contenedorInventario.appendChild(articuloElemento);
-            });
+    <style>
+        * {
+            box-sizing: border-box;
         }
 
-        // Llamar a la función para cargar el inventario al cargar la página
-        document.addEventListener("DOMContentLoaded", cargarInventario);
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100dvh;
+            margin: 0;
+            padding: 10px;
+            background: linear-gradient(to bottom, #ff7f00, #008f39);
+            color: white;
+        }
 
-    </script>
+        #titulo {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        #mensajes {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            max-height: calc(100dvh - 120px);
+            margin-top: 5px;
+        }
+
+        .mensaje {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px;
+            margin: 5px;
+            border-radius: 5px;
+            width: fit-content;
+        }
+
+        #entrada {
+            display: flex;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        #inputMensaje {
+            flex-grow: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        #btnEnviar {
+            padding: 8px 15px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #ffcc00;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        @media (max-width: 600px) {
+            #titulo {
+                font-size: 20px;
+            }
+            #inputMensaje {
+                font-size: 14px;
+            }
+            #btnEnviar {
+                font-size: 14px;
+            }
+        }
+
+        #inventario {
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+            overflow-y: auto;
+            max-height: 400px;
+        }
+
+        .recuadro {
+            display: flex;
+            justify-content: space-between;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            padding: 8px;
+            margin-bottom: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .nombre {
+            font-weight: bold;
+        }
+
+        .cantidad {
+            color: #4CAF50;
+        }
+    </style>
 </head>
 <body>
     <div id="titulo">Zanahorio Codderbone</div>
@@ -124,6 +129,5 @@
 
     <!-- Enlace al bot -->
     <script src="https://zanahorio326.github.io/Mal-comienzo/bot.js" defer></script>
-
 </body>
 </html>
