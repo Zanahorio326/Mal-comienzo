@@ -35,7 +35,8 @@
             document.getElementById("btnEnviar").addEventListener("click", function() {
                 const mensaje = document.getElementById("inputMensaje").value.trim();
                 if (mensaje !== "") {
-                    push(chatRef, {
+                    const newMessageRef = push(chatRef);
+                    set(newMessageRef, {
                         usuario: username,
                         texto: mensaje,
                         timestamp: Date.now()
@@ -51,6 +52,7 @@
             const mensajeElemento = document.createElement("div");
             mensajeElemento.textContent = `${data.usuario}: ${data.texto}`;
             mensajeElemento.classList.add("mensaje");
+            mensajeElemento.setAttribute('data-id', snapshot.key); // Guardar el ID del mensaje
             document.getElementById("mensajes").appendChild(mensajeElemento);
 
             // Mantener solo los últimos 8 mensajes
