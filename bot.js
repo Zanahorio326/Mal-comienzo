@@ -56,12 +56,10 @@ chatRef.on('child_added', function(snapshot) {
     const lastMessage = data.texto;
     if (lastMessage === "/hola") {
         // Si el último mensaje es "/hola", el bot responde con "Narrador: Bienvenido"
-        setTimeout(() => {
-            chatRef.push({
-                usuario: "Bot",
-                texto: "Narrador: Bienvenido",
-                timestamp: Date.now()
-            });
-        }, 200); // Este retraso es solo para asegurar que el mensaje de usuario sea visible antes del de bot
+        chatRef.push({
+            usuario: "Bot",
+            texto: "Narrador: Bienvenido",
+            timestamp: Date.now()
+        });
     }
 });
