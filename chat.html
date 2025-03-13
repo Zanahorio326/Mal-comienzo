@@ -89,8 +89,26 @@
             });
         }
 
+        // Función para alternar entre chat e inventario
+        function alternarVista() {
+            const chatView = document.getElementById("chatVista");
+            const inventarioView = document.getElementById("inventarioVista");
+            const boton = document.getElementById("btnAlternar");
+
+            if (chatView.style.display === "none") {
+                chatView.style.display = "block";
+                inventarioView.style.display = "none";
+                boton.innerText = "Ver Inventario";
+            } else {
+                chatView.style.display = "none";
+                inventarioView.style.display = "block";
+                boton.innerText = "Ver Chat";
+            }
+        }
+
         // Llamar a la función para cargar el inventario al cargar la página
         document.addEventListener("DOMContentLoaded", cargarInventario);
+
     </script>
     <style>
         * {
@@ -160,6 +178,16 @@
             font-size: 16px;
         }
 
+        #btnAlternar {
+            margin-top: 10px;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            background: #ffcc00;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
         /* Ajuste responsivo */
         @media (max-width: 600px) {
             #titulo {
@@ -173,9 +201,14 @@
             #btnEnviar {
                 font-size: 14px;
             }
+
+            #btnAlternar {
+                font-size: 14px;
+            }
         }
 
-        #inventario {
+        #inventarioVista {
+            display: none;
             margin-top: 20px;
             background: rgba(0, 0, 0, 0.2);
             padding: 10px;
@@ -201,18 +234,28 @@
         .cantidad {
             color: #4CAF50;
         }
+
+        #chatVista {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div id="titulo">Zanahorio Codderbone</div>
-    <div id="mensajes"></div>
-    <div id="entrada">
-        <input type="text" id="inputMensaje" placeholder="Escribe un mensaje...">
-        <button id="btnEnviar">Enviar</button>
+
+    <!-- Vista del chat -->
+    <div id="chatVista">
+        <div id="mensajes"></div>
+        <div id="entrada">
+            <input type="text" id="inputMensaje" placeholder="Escribe un mensaje...">
+            <button id="btnEnviar">Enviar</button>
+        </div>
     </div>
 
-    <!-- Contenedor para mostrar el inventario -->
-    <div id="inventario"></div>
+    <!-- Vista del inventario -->
+    <div id="inventarioVista"></div>
 
+    <!-- Botón para alternar entre chat e inventario -->
+    <button id="btnAlternar" onclick="alternarVista()">Ver Inventario</button>
 </body>
 </html>
