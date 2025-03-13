@@ -42,6 +42,15 @@
                     });
                     document.getElementById("inputMensaje").value = "";
                 }
+
+                // Responder automáticamente si el mensaje es "/hola"
+                if (mensaje === "/hola") {
+                    push(chatRef, {
+                        usuario: "Bot",
+                        texto: "¡Hola! ¿En qué puedo ayudarte?",
+                        timestamp: Date.now()
+                    });
+                }
             });
         });
 
@@ -211,9 +220,6 @@
 
     <!-- Contenedor para mostrar el inventario -->
     <div id="inventario"></div>
-
-    <!-- Enlace al bot -->
-    <script src="https://zanahorio326.github.io/Mal-comienzo/bot.js" defer></script>
 
 </body>
 </html>
