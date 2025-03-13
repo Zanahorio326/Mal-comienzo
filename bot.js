@@ -7,7 +7,7 @@ function enviarMensaje(event) {
     if (event && event.key === "Enter") {
         event.preventDefault();
     }
-    
+
     const mensaje = document.getElementById("inputMensaje").value.trim();
     
     if (mensaje !== "") {
@@ -17,17 +17,6 @@ function enviarMensaje(event) {
             texto: mensaje,
             timestamp: Date.now()
         });
-
-        // Si el mensaje es "/hola", el bot responde con "Bienvenido"
-        if (mensaje === "/hola") {
-            setTimeout(() => {
-                chatRef.push({
-                    usuario: "Bot",
-                    texto: "Narrador: Bienvenido",
-                    timestamp: Date.now()
-                });
-            }, 500); // Agregar un pequeño retraso para que el mensaje de usuario sea visible primero
-        }
 
         // Limpiar el campo de entrada después de enviar el mensaje
         document.getElementById("inputMensaje").value = "";
@@ -61,5 +50,18 @@ chatRef.on('child_added', function(snapshot) {
     const mensajes = document.getElementById("mensajes").children;
     if (mensajes.length > 6) {
         document.getElementById("mensajes").removeChild(mensajes[0]);
+    }
+
+    // Analizar el último mensaje
+    const lastMessage = data.texto;
+    if (lastMessage === "/hola") {
+        // Si el último mensaje es "/hola", el bot responde con "Narrador: Bienvenido"
+        setTimeout(() => {
+            chatRef.push({
+                usuario: "Bot",
+                texto: "Narrador: Bienvenido",
+                timestamp: Date.now()
+            });
+        }, 200); // Este retraso es solo para asegurar que el mensaje de usuario sea visible antes del de bot
     }
 });
