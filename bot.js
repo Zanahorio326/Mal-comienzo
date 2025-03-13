@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Llamar a la función enviarMensaje para mandar un "hola"
     enviarMensaje("hola");
 
-    // Observar el campo de entrada de mensajes para responder al comando /hola
+    // Observar el campo de entrada de mensajes para responder a los comandos
     const inputMensaje = document.getElementById("inputMensaje");
 
     // Escuchar cuando el usuario presione la tecla "Enter"
@@ -26,9 +26,14 @@ document.addEventListener("DOMContentLoaded", function () {
         if (event.key === "Enter") {
             const mensaje = inputMensaje.value.trim();
 
+            // Comando /hola
             if (mensaje === "/hola") {
-                // Responder al comando /hola
                 enviarMensaje("¡Hola! ¿En qué puedo ayudarte?");
+                inputMensaje.value = ""; // Limpiar el campo de entrada
+            }
+            // Comando /help
+            else if (mensaje === "/help") {
+                enviarMensaje("Te ayudaré aventurero, lista de comandos:\n/help\n/hola");
                 inputMensaje.value = ""; // Limpiar el campo de entrada
             }
         }
