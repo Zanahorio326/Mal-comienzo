@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bot de Chat - Zanahorio Codderbone</title>
+    <title>Bot - Narrador</title>
     <script type="module">
         // Importar Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
@@ -26,130 +26,28 @@
         const db = getDatabase(app);
         const chatRef = ref(db, 'chat');
 
-        // Obtener el nombre del usuario desde el almacenamiento local
-        const username = localStorage.getItem("username") || "Desconocido";
-
-        // Función para enviar mensajes
-        document.addEventListener("DOMContentLoaded", function() {
-            document.getElementById("btnEnviar").addEventListener("click", function() {
-                const mensaje = document.getElementById("inputMensaje").value.trim();
-                if (mensaje !== "") {
+        // Función para escuchar los mensajes y responder cuando se envíe un mensaje /hola
+        function escucharMensajes() {
+            onChildAdded(chatRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data.texto && data.texto.toLowerCase() === "/hola") {
+                    // El bot responde con un mensaje cuando detecta "/hola"
                     push(chatRef, {
-                        usuario: username,
-                        texto: mensaje,
+                        usuario: "Narrador",
+                        texto: "¡Bienvenido al chat! ¿En qué puedo ayudarte hoy?",
                         timestamp: Date.now()
                     });
-                    document.getElementById("inputMensaje").value = "";
                 }
             });
-        });
+        }
 
-        // Mostrar mensajes en tiempo real
-        onChildAdded(chatRef, (snapshot) => {
-            const data = snapshot.val();
-            const mensajeElemento = document.createElement("div");
-            mensajeElemento.textContent = `${data.usuario}: ${data.texto}`;
-            mensajeElemento.classList.add("mensaje");
-            document.getElementById("mensajes").appendChild(mensajeElemento);
-
-            // Mantener solo los últimos 6 mensajes
-            const mensajes = document.getElementById("mensajes").children;
-            if (mensajes.length > 6) {
-                document.getElementById("mensajes").removeChild(mensajes[0]);
-            }
-        });
+        // Iniciar la función para escuchar los mensajes
+        document.addEventListener("DOMContentLoaded", escucharMensajes);
 
     </script>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100dvh; /* Usa altura real del dispositivo */
-            margin: 0;
-            padding: 10px; /* Margen para que el contenido no toque los bordes */
-            background: linear-gradient(to bottom, #ff7f00, #008f39);
-            color: white;
-        }
-
-        #titulo {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-
-        #mensajes {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            max-height: calc(100dvh - 120px); /* Ajuste dinámico según el tamaño del dispositivo */
-            margin-top: 5px; /* Reducción del margen superior */
-        }
-
-        .mensaje {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 8px;
-            margin: 5px;
-            border-radius: 5px;
-            width: fit-content;
-        }
-
-        #entrada {
-            display: flex;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-        }
-
-        #inputMensaje {
-            flex-grow: 1;
-            padding: 8px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        #btnEnviar {
-            padding: 8px 15px;
-            margin-left: 10px;
-            border: none;
-            border-radius: 5px;
-            background: #ffcc00;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        /* Ajuste responsivo */
-        @media (max-width: 600px) {
-            #titulo {
-                font-size: 20px;
-            }
-
-            #inputMensaje {
-                font-size: 14px;
-            }
-
-            #btnEnviar {
-                font-size: 14px;
-            }
-        }
-    </style>
 </head>
 <body>
-    <div id="titulo">Bot de Chat - Zanahorio Codderbone</div>
-    <div id="mensajes"></div>
-    <div id="entrada">
-        <input type="text" id="inputMensaje" placeholder="Escribe un mensaje...">
-        <button id="btnEnviar">Enviar</button>
-    </div>
+    <h1>Bot - Narrador</h1>
+    <p>El bot está ahora activo y responderá a los mensajes que empiecen con "/hola" en el chat.</p>
 </body>
 </html>
