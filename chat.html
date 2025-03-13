@@ -42,42 +42,80 @@
                     document.getElementById("inputMensaje").value = "";
                 }
             });
-
-            // Función para cargar el inventario
-            function cargarInventario() {
-                // Definir los materiales con cantidad 0
-                const materiales = [
-                    { nombre: "Carbón", cantidad: 0 },
-                    { nombre: "Cobre", cantidad: 0 },
-                    { nombre: "Hierro", cantidad: 0 },
-                    { nombre: "Plata", cantidad: 0 },
-                    { nombre: "Oro", cantidad: 0 }
-                ];
-
-                const contenedorInventario = document.getElementById('inventario');
-                contenedorInventario.innerHTML = '';  // Limpiar contenido previo
-
-                // Mostrar todos los materiales en el inventario con cantidad 0
-                materiales.forEach((material) => {
-                    const articuloElemento = document.createElement("div");
-                    articuloElemento.classList.add("recuadro");
-                    articuloElemento.innerHTML = `
-                        <p class="nombre">${material.nombre}</p>
-                        <p class="cantidad">${material.cantidad}</p>
-                    `;
-                    contenedorInventario.appendChild(articuloElemento);
-                });
-            }
-
-            // Llamar a la función para cargar el inventario al cargar la página
-            cargarInventario();
-
-            // Función para mostrar comandos
-            document.getElementById("btnComandos").addEventListener("click", function() {
-                alert("Comandos disponibles: \n1. Enviar mensaje\n2. Ver inventario\n3. Más comandos próximamente...");
-            });
-
         });
+
+        // Mostrar mensajes en tiempo real
+        onChildAdded(chatRef, (snapshot) => {
+            const data = snapshot.val();
+            const mensajeElemento = document.createElement("div");
+            mensajeElemento.textContent = `${data.usuario}: ${data.texto}`;
+            mensajeElemento.classList.add("mensaje");
+            document.getElementById("mensajes").appendChild(mensajeElemento);
+
+            // Mantener solo los últimos 8 mensajes
+            const mensajes = document.getElementById("mensajes").children;
+            if (mensajes.length > 8) {
+                // Eliminar el mensaje de la pantalla
+                document.getElementById("mensajes").removeChild(mensajes[0]);
+
+                // Eliminar el mensaje más antiguo de la base de datos
+                remove(ref(db, 'chat/' + snapshot.key));
+            }
+        });
+
+        // Función para cargar el inventario
+        function cargarInventario() {
+            // Definir los materiales con cantidad 0
+            const materiales = [
+                { nombre: "Carbón", cantidad: 0 },
+                { nombre: "Cobre", cantidad: 0 },
+                { nombre: "Hierro", cantidad: 0 },
+                { nombre: "Plata", cantidad: 0 },
+                { nombre: "Oro", cantidad: 0 }
+            ];
+
+            const contenedorInventario = document.getElementById('inventario');
+            contenedorInventario.innerHTML = '';  // Limpiar contenido previo
+
+            // Mostrar todos los materiales en el inventario con cantidad 0
+            materiales.forEach((material) => {
+                const articuloElemento = document.createElement("div");
+                articuloElemento.classList.add("recuadro");
+                articuloElemento.innerHTML = `
+                    <p class="nombre">${material.nombre}</p>
+                    <p class="cantidad">${material.cantidad}</p>
+                `;
+                contenedorInventario.appendChild(articuloElemento);
+            });
+        }
+
+        // Función para cargar comandos
+        function cargarComandos() {
+            const comandos = [
+                { comando: "/ayuda", descripcion: "Muestra los comandos disponibles" },
+                { comando: "/inventario", descripcion: "Muestra el inventario" }
+            ];
+
+            const contenedorComandos = document.getElementById('comandos');
+            contenedorComandos.innerHTML = '';  // Limpiar contenido previo
+
+            // Mostrar todos los comandos
+            comandos.forEach((comando) => {
+                const comandoElemento = document.createElement("div");
+                comandoElemento.classList.add("recuadro");
+                comandoElemento.innerHTML = `
+                    <p class="comando">${comando.comando}</p>
+                    <p class="descripcion">${comando.descripcion}</p>
+                `;
+                contenedorComandos.appendChild(comandoElemento);
+            });
+        }
+
+        // Llamar a la función para cargar el inventario al cargar la página
+        document.addEventListener("DOMContentLoaded", cargarInventario);
+
+        // Llamar a la función para cargar los comandos al cargar la página
+        document.addEventListener("DOMContentLoaded", cargarComandos);
 
     </script>
     <style>
@@ -163,7 +201,7 @@
             }
         }
 
-        #inventario {
+        #inventario, #comandos {
             margin-top: 20px;
             background: rgba(0, 0, 0, 0.2);
             padding: 10px;
@@ -182,25 +220,13 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        .nombre {
+        .nombre, .comando {
             font-weight: bold;
         }
 
-        .cantidad {
+        .cantidad, .descripcion {
             color: #4CAF50;
         }
-
-        /* Botones adicionales */
-        #btnComandos {
-            padding: 8px 15px;
-            margin-top: 20px;
-            border: none;
-            border-radius: 5px;
-            background: #ffcc00;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
     </style>
 </head>
 <body>
@@ -211,11 +237,14 @@
         <button id="btnEnviar">Enviar</button>
     </div>
 
+    <!-- Botones de acción -->
+    <button id="btnInventario" onclick="cargarInventario()">Inventario</button>
+    <button id="btnComandos" onclick="cargarComandos()">Comandos</button>
+
     <!-- Contenedor para mostrar el inventario -->
     <div id="inventario"></div>
-
-    <!-- Botón para mostrar comandos -->
-    <button id="btnComandos">Ver Comandos</button>
-
+    
+    <!-- Contenedor para mostrar los comandos -->
+    <div id="comandos"></div>
 </body>
 </html>
