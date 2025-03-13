@@ -89,24 +89,29 @@
             });
         }
 
-        // Llamar a la función para cargar el inventario al cargar la página
-        document.addEventListener("DOMContentLoaded", cargarInventario);
-
-        // Función para alternar la vista entre inventario y botones de comandos
+        // Alternar entre mostrar inventario y la tarjeta con botones de comandos
         function alternarVista() {
-            const inventario = document.getElementById('inventario');
-            const botonesComandos = document.getElementById('botonesComandos');
+            const inventario = document.getElementById("inventario");
+            const tarjetaComandos = document.getElementById("tarjetaComandos");
+            const mostrarInventario = inventario.style.display !== "none";
 
-            if (inventario.style.display === 'none') {
-                // Mostrar inventario
-                inventario.style.display = 'block';
-                botonesComandos.style.display = 'none';
+            // Alternar entre el inventario y la tarjeta de comandos
+            if (mostrarInventario) {
+                inventario.style.display = "none";
+                tarjetaComandos.style.display = "block";
             } else {
-                // Mostrar botones de comandos
-                inventario.style.display = 'none';
-                botonesComandos.style.display = 'block';
+                inventario.style.display = "block";
+                tarjetaComandos.style.display = "none";
             }
         }
+
+        // Llamar a la función para cargar el inventario al cargar la página
+        document.addEventListener("DOMContentLoaded", () => {
+            cargarInventario();
+            document.getElementById("inventario").style.display = "block";  // Mostrar inventario por defecto
+            document.getElementById("tarjetaComandos").style.display = "none";  // Esconder tarjeta de comandos por defecto
+        });
+
     </script>
     <style>
         * {
@@ -218,27 +223,20 @@
             color: #4CAF50;
         }
 
-        /* Botones de comandos */
-        #botonesComandos {
-            display: none;
-            margin-top: 20px;
+        #tarjetaComandos {
             background: rgba(0, 0, 0, 0.2);
-            padding: 10px;
+            padding: 20px;
             border-radius: 10px;
         }
 
         .botonComando {
-            background: #ffcc00;
-            padding: 10px;
+            background-color: #ffcc00;
             border: none;
-            border-radius: 5px;
-            margin-bottom: 10px;
+            padding: 10px;
+            margin: 5px;
             cursor: pointer;
             font-size: 16px;
-        }
-
-        .botonComando:hover {
-            background: #e6b800;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -253,15 +251,15 @@
     <!-- Contenedor para mostrar el inventario -->
     <div id="inventario"></div>
 
-    <!-- Botón Mochila -->
-    <button onclick="alternarVista()" class="botonComando">Mochila</button>
-
-    <!-- Contenedor para los botones de comandos -->
-    <div id="botonesComandos">
+    <!-- Tarjeta de comandos -->
+    <div id="tarjetaComandos">
         <button class="botonComando">Comando 1</button>
         <button class="botonComando">Comando 2</button>
         <button class="botonComando">Comando 3</button>
     </div>
+
+    <!-- Botón Mochila -->
+    <button id="btnMochila" onclick="alternarVista()">Mochila</button>
 
 </body>
 </html>
