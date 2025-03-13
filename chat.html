@@ -58,6 +58,25 @@
             if (mensajes.length > 6) {
                 document.getElementById("mensajes").removeChild(mensajes[0]);
             }
+
+            // Esperar medio segundo y hacer que el bot lea el último mensaje
+            setTimeout(() => {
+                const ultimoMensaje = mensajes[mensajes.length - 1]; // Obtener el último mensaje
+                if (ultimoMensaje) {
+                    // Aquí el bot lee el último mensaje
+                    const textoUltimoMensaje = ultimoMensaje.textContent.trim().toLowerCase();
+                    if (textoUltimoMensaje === "/hola") {
+                        push(chatRef, {
+                            usuario: "Narrador",
+                            texto: "¡Hola, " + data.usuario + "! Bienvenido a la aventura.",
+                            timestamp: Date.now()
+                        });
+                    } else if (textoUltimoMensaje === "/help") {
+                        // Redirigir al usuario a la página de comandos
+                        window.location.href = "https://zanahorio326.github.io/Mal-comienzo/teorico.html";
+                    }
+                }
+            }, 500); // 500ms = 0.5 segundos
         });
 
         // Función para cargar el inventario
@@ -89,20 +108,6 @@
         // Llamar a la función para cargar el inventario al cargar la página
         document.addEventListener("DOMContentLoaded", cargarInventario);
 
-        // Comandos del bot
-        onChildAdded(chatRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data.texto.toLowerCase() === "/hola") {
-                push(chatRef, {
-                    usuario: "Narrador",
-                    texto: "¡Hola, " + data.usuario + "! Bienvenido a la aventura.",
-                    timestamp: Date.now()
-                });
-            } else if (data.texto.toLowerCase() === "/help") {
-                // Redirigir al usuario a la página de ayuda
-                window.location.href = "https://zanahorio326.github.io/Mal-comienzo/teorico.html";
-            }
-        });
     </script>
     <style>
         * {
@@ -215,10 +220,10 @@
     </style>
 </head>
 <body>
-    <div id="titulo">Inventario</div>
+    <div id="titulo">Inventario - Zanahorio Codderbone</div>
     <div id="mensajes"></div>
     <div id="entrada">
-        <input type="text" id="inputMensaje" placeholder="Escribe un mensaje..." />
+        <input type="text" id="inputMensaje" placeholder="Escribe un mensaje...">
         <button id="btnEnviar">Enviar</button>
     </div>
     <div id="inventario"></div>
