@@ -6,7 +6,7 @@
     <title>Botón Minar</title>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, push, get, update, child } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getDatabase, ref, push, get, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
@@ -121,18 +121,20 @@
                             oro: 0
                         };
 
-                        // Actualizar el HTML con el inventario
+                        // Crear el contenido HTML para mostrar el inventario
                         let inventarioHTML = "<h2>Inventario</h2>";
                         inventarioHTML += `
-                            <p>Carbón: ${inventory.carbon}</p>
-                            <p>Cobre: ${inventory.cobre}</p>
-                            <p>Hierro: ${inventory.hierro}</p>
-                            <p>Plata: ${inventory.plata}</p>
-                            <p>Oro: ${inventory.oro}</p>
+                            <p>Carbón: ${inventory.carbon || 0}</p>
+                            <p>Cobre: ${inventory.cobre || 0}</p>
+                            <p>Hierro: ${inventory.hierro || 0}</p>
+                            <p>Plata: ${inventory.plata || 0}</p>
+                            <p>Oro: ${inventory.oro || 0}</p>
                         `;
 
                         // Insertar el inventario en el contenedor de mochila
                         document.getElementById("mochila").innerHTML = inventarioHTML;
+                    } else {
+                        console.log("No se encontró el inventario del usuario.");
                     }
                 }).catch((error) => {
                     console.error("Error al obtener el inventario: ", error);
