@@ -26,6 +26,9 @@
         const userRef = ref(db, 'users/' + username);
 
         document.addEventListener("DOMContentLoaded", function() {
+            // Mostrar el inventario al cargar la página
+            mostrarInventario();
+
             document.getElementById("btnMinar").addEventListener("click", function() {
                 const btn = this;
                 btn.disabled = true;
@@ -99,7 +102,8 @@
                             inventory: inventory
                         }).then(() => {
                             console.log(`Inventario actualizado con ${mineral}`);
-                            mostrarInventario(inventory); // Llamada a la función para mostrar el inventario
+                            // Después de actualizar el inventario, mostrarlo en el contenedor "mochila"
+                            mostrarInventario();
                         }).catch((error) => {
                             console.error("Error al actualizar el inventario: ", error);
                         });
@@ -109,43 +113,40 @@
                 });
             }
 
-            // Función para mostrar el inventario en la interfaz
-            function mostrarInventario(inventory) {
-                const mochilaDiv = document.getElementById("mochila");
-                mochilaDiv.innerHTML = `
-                    <h3>Inventario de ${username}</h3>
-                    <ul>
-                        <li>Carbón: ${inventory.carbon}</li>
-                        <li>Cobre: ${inventory.cobre}</li>
-                        <li>Hierro: ${inventory.hierro}</li>
-                        <li>Plata: ${inventory.plata}</li>
-                        <li>Oro: ${inventory.oro}</li>
-                    </ul>
-                `;
+            // Función para mostrar el inventario en el contenedor "mochila"
+            function mostrarInventario() {
+                get(userRef).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const inventory = snapshot.val().inventory || {
+                            carbon: 0,
+                            cobre: 0,
+                            hierro: 0,
+                            plata: 0,
+                            oro: 0
+                        };
+                        
+                        // Mostrar el inventario en el contenedor de mochila
+                        const mochilaContainer = document.getElementById("mochila");
+                        mochilaContainer.innerHTML = `
+                            <h3>Inventario</h3>
+                            <p>Carbón: ${inventory.carbon}</p>
+                            <p>Cobre: ${inventory.cobre}</p>
+                            <p>Hierro: ${inventory.hierro}</p>
+                            <p>Plata: ${inventory.plata}</p>
+                            <p>Oro: ${inventory.oro}</p>
+                        `;
+                    }
+                }).catch((error) => {
+                    console.error("Error al obtener el inventario para mostrar: ", error);
+                });
             }
-
-            // Mostrar el inventario al cargar la página
-            get(userRef).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const inventory = snapshot.val().inventory || {
-                        carbon: 0,
-                        cobre: 0,
-                        hierro: 0,
-                        plata: 0,
-                        oro: 0
-                    };
-                    mostrarInventario(inventory); // Mostrar inventario al inicio
-                }
-            }).catch((error) => {
-                console.error("Error al obtener el inventario inicial: ", error);
-            });
         });
     </script>
 </head>
 <body>
     <button id="btnMinar">⛏️ Minar</button>
 
-    <!-- Contenedor donde se mostrará el inventario -->
+    <!-- Contenedor de mochilas para mostrar el inventario -->
     <div id="mochila"></div>
 </body>
 </html>
