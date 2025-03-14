@@ -54,6 +54,12 @@
             font-size: 1.5em;
             color: #2980b9;
         }
+
+        /* Estilo para el icono de candado */
+        .candado {
+            font-size: 1.5em;
+            color: #f39c12;
+        }
     </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
@@ -85,19 +91,19 @@
             get(userRef).then((snapshot) => {
                 if (snapshot.exists()) {
                     const inventory = snapshot.val().inventory || {
-                        Carbón: 0,
-                        Cobre: 0,
-                        Hierro: 0,
-                        Plata: 0,
-                        Oro: 0
+                        Carbón: undefined,
+                        Cobre: undefined,
+                        Hierro: undefined,
+                        Plata: undefined,
+                        Oro: undefined
                     };
 
-                    // Mostrar el inventario de minerales en el contenedor
-                    document.getElementById("carbón").textContent = "Carbón: " + inventory.Carbón;
-                    document.getElementById("cobre").textContent = "Cobre: " + inventory.Cobre;
-                    document.getElementById("hierro").textContent = "Hierro: " + inventory.Hierro;
-                    document.getElementById("plata").textContent = "Plata: " + inventory.Plata;
-                    document.getElementById("oro").textContent = "Oro: " + inventory.Oro;
+                    // Comprobar si el valor es undefined y mostrar un candado
+                    document.getElementById("carbón").textContent = inventory.Carbón !== undefined ? "Carbón: " + inventory.Carbón : "Carbón: 🔒";
+                    document.getElementById("cobre").textContent = inventory.Cobre !== undefined ? "Cobre: " + inventory.Cobre : "Cobre: 🔒";
+                    document.getElementById("hierro").textContent = inventory.Hierro !== undefined ? "Hierro: " + inventory.Hierro : "Hierro: 🔒";
+                    document.getElementById("plata").textContent = inventory.Plata !== undefined ? "Plata: " + inventory.Plata : "Plata: 🔒";
+                    document.getElementById("oro").textContent = inventory.Oro !== undefined ? "Oro: " + inventory.Oro : "Oro: 🔒";
                 } else {
                     console.log("No se encontraron datos para el usuario.");
                 }
@@ -116,11 +122,11 @@
     <h1>Mochila</h1>
     <div id="mochila">
         <h3>Inventario</h3>
-        <p id="carbón">Carbón: 0</p>
-        <p id="cobre">Cobre: 0</p>
-        <p id="hierro">Hierro: 0</p>
-        <p id="plata">Plata: 0</p>
-        <p id="oro">Oro: 0</p>
+        <p id="carbón">Carbón: 🔒</p>
+        <p id="cobre">Cobre: 🔒</p>
+        <p id="hierro">Hierro: 🔒</p>
+        <p id="plata">Plata: 🔒</p>
+        <p id="oro">Oro: 🔒</p>
     </div>
 </body>
 </html>
