@@ -26,8 +26,7 @@
         const userRef = ref(db, 'users/' + username);
 
         document.addEventListener("DOMContentLoaded", function() {
-            // Cargar y mostrar el inventario del usuario
-            cargarInventario();
+            cargarInventario(); // Cargar inventario cuando la página se carga
         });
 
         // Función para cargar el inventario y mostrarlo en la interfaz
@@ -42,7 +41,7 @@
                         oro: 0
                     };
 
-                    // Mostrar el inventario en el contenedor
+                    // Mostrar el inventario en el contenedor de mochila
                     document.getElementById("carbon").textContent = `Carbón: ${inventory.carbon}`;
                     document.getElementById("cobre").textContent = `Cobre: ${inventory.cobre}`;
                     document.getElementById("hierro").textContent = `Hierro: ${inventory.hierro}`;
@@ -58,7 +57,8 @@
     </script>
 </head>
 <body>
-    <div id="mochila">
+    <!-- Contenedor del inventario, visible cuando se haga clic en "Mochila" -->
+    <div id="mochila" style="display: block;">
         <h3>Inventario</h3>
         <p id="carbon">Carbón: 0</p>
         <p id="cobre">Cobre: 0</p>
