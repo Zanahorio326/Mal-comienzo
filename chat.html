@@ -1,207 +1,175 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario - Zanahorio Codderbone</title>
-    <script type="module">
-        // Importar Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+<body>  
+    <div id="titulo">Zanahorio Codderbone</div>  
+    <div id="mensajes"></div>  
+    <div id="entrada">  
+        <input type="text" id="inputMensaje" placeholder="Escribe un mensaje...">  
+        <button id="btnEnviar">Enviar</button>  
+    </div>  
 
-        // Configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
-            authDomain: "thegame-5afaa.firebaseapp.com",
-            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
-            projectId: "thegame-5afaa",
-            storageBucket: "thegame-5afaa.firebasestorage.app",
-            messagingSenderId: "588556182984",
-            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
-            measurementId: "G-9M3CBJ3LV9"
-        };
+    <!-- Botón para alternar entre Inventario y Comandos -->
+    <button id="btnMochila">Mochila</button>
 
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const chatRef = ref(db, 'chat');
-        const inventarioRef = ref(db, 'inventario');
+    <!-- Contenedor donde se alternará Inventario y Comandos -->
+    <div id="contenedorMochila"></div>  
 
-        // Obtener el nombre del usuario desde el almacenamiento local
-        const username = localStorage.getItem("username") || "Desconocido";
+    <script type="module">  
+        // Importar Firebase  
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";  
+        import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";  
 
-        // Función para enviar mensajes
-        document.addEventListener("DOMContentLoaded", function() {
-            document.getElementById("btnEnviar").addEventListener("click", function() {
-                const mensaje = document.getElementById("inputMensaje").value.trim();
-                if (mensaje !== "") {
-                    push(chatRef, {
-                        usuario: username,
-                        texto: mensaje,
-                        timestamp: Date.now()
-                    });
-                    document.getElementById("inputMensaje").value = "";
-                }
+        // Configuración de Firebase  
+        const firebaseConfig = {  
+            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",  
+            authDomain: "thegame-5afaa.firebaseapp.com",  
+            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",  
+            projectId: "thegame-5afaa",  
+            storageBucket: "thegame-5afaa.firebasestorage.app",  
+            messagingSenderId: "588556182984",  
+            appId: "1:588556182984:web:a0557067d35c18e3944cfd",  
+            measurementId: "G-9M3CBJ3LV9"  
+        };  
+
+        // Inicializar Firebase  
+        const app = initializeApp(firebaseConfig);  
+        const db = getDatabase(app);  
+        const chatRef = ref(db, 'chat');  
+
+        const username = localStorage.getItem("username") || "Desconocido";  
+
+        document.addEventListener("DOMContentLoaded", function() {  
+            document.getElementById("btnEnviar").addEventListener("click", function() {  
+                const mensaje = document.getElementById("inputMensaje").value.trim();  
+                if (mensaje !== "") {  
+                    push(chatRef, { usuario: username, texto: mensaje, timestamp: Date.now() });  
+                    document.getElementById("inputMensaje").value = "";  
+                }  
+            });  
+        });  
+
+        onChildAdded(chatRef, (snapshot) => {  
+            const data = snapshot.val();  
+            const mensajeElemento = document.createElement("div");  
+            mensajeElemento.textContent = `${data.usuario}: ${data.texto}`;  
+            mensajeElemento.classList.add("mensaje");  
+            document.getElementById("mensajes").appendChild(mensajeElemento);  
+
+            const mensajes = document.getElementById("mensajes").children;  
+            if (mensajes.length > 8) {  
+                document.getElementById("mensajes").removeChild(mensajes[0]);  
+                remove(ref(db, 'chat/' + snapshot.key));  
+            }  
+        });  
+
+        function cargarInventario() {  
+            const materiales = [
+                { nombre: "Carbón", cantidad: 0 },  
+                { nombre: "Cobre", cantidad: 0 },  
+                { nombre: "Hierro", cantidad: 0 },  
+                { nombre: "Plata", cantidad: 0 },  
+                { nombre: "Oro", cantidad: 0 }  
+            ];  
+
+            const contenedorMochila = document.getElementById('contenedorMochila');  
+            contenedorMochila.innerHTML = '';  
+
+            materiales.forEach((material) => {  
+                const articuloElemento = document.createElement("div");  
+                articuloElemento.classList.add("recuadro");  
+                articuloElemento.innerHTML = `  
+                    <p class="nombre">${material.nombre}</p>  
+                    <p class="cantidad">${material.cantidad}</p>  
+                `;  
+                contenedorMochila.appendChild(articuloElemento);  
+            });  
+        }  
+
+        function cargarComandos() {
+            const comandos = ["Usar", "Descartar", "Inspeccionar"];
+            const contenedorMochila = document.getElementById('contenedorMochila');  
+            contenedorMochila.innerHTML = '';
+
+            comandos.forEach((comando) => {
+                const boton = document.createElement("button");
+                boton.textContent = comando;
+                boton.classList.add("boton-comando");
+                boton.addEventListener("click", () => {
+                    alert(`Comando seleccionado: ${comando}`);
+                });
+                contenedorMochila.appendChild(boton);
             });
-
-            // Agregar material al inventario
-            document.getElementById("btnAgregarMaterial").addEventListener("click", function() {
-                const materialNombre = document.getElementById("inputMaterial").value.trim();
-                const materialCantidad = parseInt(document.getElementById("inputCantidad").value);
-
-                if (materialNombre !== "" && !isNaN(materialCantidad) && materialCantidad > 0) {
-                    push(inventarioRef, {
-                        nombre: materialNombre,
-                        cantidad: materialCantidad
-                    });
-                    document.getElementById("inputMaterial").value = "";
-                    document.getElementById("inputCantidad").value = "";
-                }
-            });
-        });
-
-        // Mostrar mensajes en tiempo real
-        onChildAdded(chatRef, (snapshot) => {
-            const data = snapshot.val();
-            const mensajeElemento = document.createElement("div");
-            mensajeElemento.textContent = `${data.usuario}: ${data.texto}`;
-            mensajeElemento.classList.add("mensaje");
-            document.getElementById("mensajes").appendChild(mensajeElemento);
-
-            // Mantener solo los últimos 8 mensajes
-            const mensajes = document.getElementById("mensajes").children;
-            if (mensajes.length > 8) {
-                document.getElementById("mensajes").removeChild(mensajes[0]);
-                remove(ref(db, 'chat/' + snapshot.key));
-            }
-        });
-
-        // Mostrar inventario en tiempo real
-        onChildAdded(inventarioRef, (snapshot) => {
-            const data = snapshot.val();
-            const articuloElemento = document.createElement("div");
-            articuloElemento.classList.add("recuadro");
-            articuloElemento.innerHTML = `
-                <p class="nombre">${data.nombre}</p>
-                <p class="cantidad">${data.cantidad}</p>
-            `;
-            document.getElementById("inventario").appendChild(articuloElemento);
-        });
-
-    </script>
-    <style>
-        * {
-            box-sizing: border-box;
         }
 
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100dvh;
-            margin: 0;
-            padding: 10px;
-            background: linear-gradient(to bottom, #ff7f00, #008f39);
-            color: white;
-        }
+        let mostrandoInventario = true;  
 
-        #titulo {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
+        function alternarMochila() {
+            mostrandoInventario = !mostrandoInventario;  
+            if (mostrandoInventario) {  
+                cargarInventario();  
+            } else {  
+                cargarComandos();  
+            }  
+        }  
 
-        #mensajes {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            max-height: calc(100dvh - 120px);
-            margin-top: 5px;
-        }
+        document.getElementById("btnMochila").addEventListener("click", alternarMochila);  
 
-        .mensaje {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 8px;
-            margin: 5px;
-            border-radius: 5px;
-            width: fit-content;
-        }
+        document.addEventListener("DOMContentLoaded", cargarInventario);  
 
-        #entrada {
-            display: flex;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-        }
+    </script>  
 
-        #inputMensaje {
-            flex-grow: 1;
-            padding: 8px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-        }
+    <style>  
+        * { box-sizing: border-box; }  
 
-        #btnEnviar {
-            padding: 8px 15px;
-            margin-left: 10px;
-            border: none;
-            border-radius: 5px;
-            background: #ffcc00;
-            cursor: pointer;
-            font-size: 16px;
-        }
+        body {  
+            font-family: Arial, sans-serif;  
+            display: flex;  
+            flex-direction: column;  
+            justify-content: space-between;  
+            height: 100dvh;  
+            margin: 0;  
+            padding: 10px;  
+            background: linear-gradient(to bottom, #ff7f00, #008f39);  
+            color: white;  
+        }  
 
-        #inventario {
-            margin-top: 20px;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 10px;
-            border-radius: 10px;
-            overflow-y: auto;
-            max-height: 400px;
-        }
+        #btnMochila {  
+            margin-top: 10px;  
+            padding: 10px;  
+            border: none;  
+            border-radius: 5px;  
+            background: #ffcc00;  
+            cursor: pointer;  
+            font-size: 16px;  
+            width: 100%;  
+        }  
 
-        .recuadro {
-            display: flex;
-            justify-content: space-between;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            padding: 8px;
-            margin-bottom: 5px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
+        #contenedorMochila {  
+            margin-top: 10px;  
+            background: rgba(0, 0, 0, 0.2);  
+            padding: 10px;  
+            border-radius: 10px;  
+            overflow-y: auto;  
+            max-height: 400px;  
+        }  
 
-        .nombre {
-            font-weight: bold;
-        }
+        .recuadro {  
+            display: flex;  
+            justify-content: space-between;  
+            background-color: rgba(255, 255, 255, 0.2);  
+            border-radius: 5px;  
+            padding: 8px;  
+            margin-bottom: 5px;  
+        }  
 
-        .cantidad {
-            color: #4CAF50;
-        }
-    </style>
-</head>
-<body>
-    <div id="titulo">Zanahorio Codderbone</div>
-    <div id="mensajes"></div>
-    <div id="entrada">
-        <input type="text" id="inputMensaje" placeholder="Escribe un mensaje...">
-        <button id="btnEnviar">Enviar</button>
-    </div>
-
-    <!-- Contenedor para mostrar el inventario -->
-    <div id="inventario"></div>
-
-    <!-- Formularios para agregar materiales -->
-    <div>
-        <input type="text" id="inputMaterial" placeholder="Nombre del material">
-        <input type="number" id="inputCantidad" placeholder="Cantidad" min="1">
-        <button id="btnAgregarMaterial">Agregar Material</button>
-    </div>
-
+        .boton-comando {  
+            display: block;  
+            width: 100%;  
+            margin: 5px 0;  
+            padding: 10px;  
+            border: none;  
+            border-radius: 5px;  
+            background: #ffcc00;  
+            cursor: pointer;  
+            font-size: 16px;  
+        }  
+    </style>  
 </body>
-</html>
