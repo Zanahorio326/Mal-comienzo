@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario del Usuario</title>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+            authDomain: "thegame-5afaa.firebaseapp.com",
+            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+            projectId: "thegame-5afaa",
+            storageBucket: "thegame-5afaa.firebasestorage.app",
+            messagingSenderId: "588556182984",
+            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+            measurementId: "G-9M3CBJ3LV9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const username = localStorage.getItem("username") || "Desconocido";
+        const userRef = ref(db, 'users/' + username);
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Cargar y mostrar el inventario del usuario
+            cargarInventario();
+        });
+
+        // Función para cargar el inventario y mostrarlo en la interfaz
+        function cargarInventario() {
+            get(userRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const inventory = snapshot.val().inventory || {
+                        carbon: 0,
+                        cobre: 0,
+                        hierro: 0,
+                        plata: 0,
+                        oro: 0
+                    };
+
+                    // Mostrar el inventario en el contenedor
+                    document.getElementById("carbon").textContent = `Carbón: ${inventory.carbon}`;
+                    document.getElementById("cobre").textContent = `Cobre: ${inventory.cobre}`;
+                    document.getElementById("hierro").textContent = `Hierro: ${inventory.hierro}`;
+                    document.getElementById("plata").textContent = `Plata: ${inventory.plata}`;
+                    document.getElementById("oro").textContent = `Oro: ${inventory.oro}`;
+                } else {
+                    console.log("El usuario no tiene inventario.");
+                }
+            }).catch((error) => {
+                console.error("Error al obtener el inventario: ", error);
+            });
+        }
+    </script>
+</head>
+<body>
+    <div id="mochila">
+        <h3>Inventario</h3>
+        <p id="carbon">Carbón: 0</p>
+        <p id="cobre">Cobre: 0</p>
+        <p id="hierro">Hierro: 0</p>
+        <p id="plata">Plata: 0</p>
+        <p id="oro">Oro: 0</p>
+    </div>
+</body>
+</html>
