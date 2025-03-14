@@ -1,133 +1,116 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mochila</title>
-    <style>
-        /* Estilos generales */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-
-        h1, h3 {
-            text-align: center;
-            color: #444;
-        }
-
-        /* Estilos para el contenedor principal de la mochila */
-        #mochila {
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Estilos para los elementos del inventario */
-        p {
-            font-size: 1.2em;
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        p:nth-child(odd) {
-            background-color: #e7e7e7;
-        }
-
-        /* Estilos para el título principal */
-        h1 {
-            font-size: 2em;
-            color: #2c3e50;
-            margin-top: 20px;
-        }
-
-        /* Estilos para el título de la mochila */
-        h3 {
-            font-size: 1.5em;
-            color: #2980b9;
-        }
-    </style>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-
-        // Configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
-            authDomain: "thegame-5afaa.firebaseapp.com",
-            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
-            projectId: "thegame-5afaa",
-            storageBucket: "thegame-5afaa.firebasestorage.app",
-            messagingSenderId: "588556182984",
-            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
-            measurementId: "G-9M3CBJ3LV9"
-        };
-
-        // Inicialización de Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        // Obtener el nombre de usuario
-        const username = localStorage.getItem("username") || "Desconocido";
-        const userRef = ref(db, 'users/' + username);
-
-        // Función para mostrar el inventario del jugador
-        function mostrarInventario() {
-            // Acceder al inventario del jugador en Firebase
-            get(userRef).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const inventory = snapshot.val().inventory || {};
-
-                    // Función para actualizar la visualización del inventario
-                    const updateItem = (item, id) => {
-                        const value = inventory[item];
-                        document.getElementById(id).textContent = (value !== undefined && value !== null) ? `${item}: ${value}` : `${item}: 🔒`;
-                    };
-
-                    // Actualizar cada mineral en el inventario
-                    updateItem('Carbón', 'carbón');
-                    updateItem('Cobre', 'cobre');
-                    updateItem('Hierro', 'hierro');
-                    updateItem('Plata', 'plata');
-                    updateItem('Oro', 'oro');
-
-                } else {
-                    console.log("No se encontraron datos para el usuario.");
-                    // Si no hay datos, se muestra el candado para todos los elementos
-                    document.getElementById("carbón").textContent = "Carbón: 🔒";
-                    document.getElementById("cobre").textContent = "Cobre: 🔒";
-                    document.getElementById("hierro").textContent = "Hierro: 🔒";
-                    document.getElementById("plata").textContent = "Plata: 🔒";
-                    document.getElementById("oro").textContent = "Oro: 🔒";
-                }
-            }).catch((error) => {
-                console.error("Error al obtener el inventario: ", error);
-            });
-        }
-
-        // Llamar a la función de mostrar inventario al cargar la página
-        document.addEventListener("DOMContentLoaded", function() {
-            mostrarInventario();
-        });
-    </script>
-</head>
-<body>
-    <h1>Mochila</h1>
-    <div id="mochila">
-        <h3>Inventario</h3>
-        <p id="carbón">Carbón: 🔒</p>
-        <p id="cobre">Cobre: 🔒</p>
-        <p id="hierro">Hierro: 🔒</p>
-        <p id="plata">Plata: 🔒</p>
-        <p id="oro">Oro: 🔒</p>
-    </div>
-</body>
-</html>
+<html lang="es">    
+<head>    
+    <meta charset="UTF-8">    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <title>Botón Minar</title>    
+    <script type="module">    
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";    
+        import { getDatabase, ref, push, get, update, child } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";    
+    
+        const firebaseConfig = {    
+            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",    
+            authDomain: "thegame-5afaa.firebaseapp.com",    
+            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",    
+            projectId: "thegame-5afaa",    
+            storageBucket: "thegame-5afaa.firebasestorage.app",    
+            messagingSenderId: "588556182984",    
+            appId: "1:588556182984:web:a0557067d35c18e3944cfd",    
+            measurementId: "G-9M3CBJ3LV9"    
+        };    
+    
+        const app = initializeApp(firebaseConfig);    
+        const db = getDatabase(app);    
+    
+        const username = localStorage.getItem("username") || "Desconocido";    
+        const userRef = ref(db, 'users/' + username);    
+    
+        document.addEventListener("DOMContentLoaded", function() {    
+            document.getElementById("btnMinar").addEventListener("click", function() {    
+                const btn = this;    
+                btn.disabled = true;    
+                btn.textContent = "⛏️ Picando...";    
+    
+                // Enviar mensaje al chat de que está minando    
+                push(ref(db, 'chat'), {    
+                    usuario: username,    
+                    texto: "Minando...",    
+                    timestamp: Date.now()    
+                });    
+    
+                setTimeout(function() {    
+                    const resultado = obtenerMineral();    
+                    let mensaje = "";    
+    
+                    if (resultado === "Nada") {    
+                        mensaje = "No encontré nada...";    
+                    } else {    
+                        mensaje = `Encontré ${resultado}`;    
+                        // Actualizar el inventario del jugador    
+                        actualizarInventario(resultado);    
+                    }    
+    
+                    // Enviar el mensaje de resultado al chat    
+                    push(ref(db, 'chat'), {    
+                        usuario: username,    
+                        texto: mensaje,    
+                        timestamp: Date.now()    
+                    });    
+    
+                    btn.disabled = false;    
+                    btn.textContent = "⛏️ Minar";    
+                }, 5000);    
+            });    
+    
+            // Función para obtener el mineral    
+            function obtenerMineral() {    
+                const probabilidad = Math.random() * 100;    
+    
+                if (probabilidad < 40) return "Nada";    
+                if (probabilidad < 65) return "Carbón";    
+                if (probabilidad < 83) return "Cobre";    
+                if (probabilidad < 93) return "Hierro";    
+                if (probabilidad < 98) return "Plata";    
+                return "Oro";    
+            }    
+    
+            // Función para actualizar el inventario del jugador    
+            function actualizarInventario(mineral) {    
+                // Obtener el inventario actual del jugador    
+                get(userRef).then((snapshot) => {    
+                    if (snapshot.exists()) {    
+                        const inventory = snapshot.val().inventory || {    
+                            carbon: 0,    
+                            cobre: 0,    
+                            hierro: 0,    
+                            plata: 0,    
+                            oro: 0    
+                        };    
+                            
+                        // Si el mineral ya está en el inventario, incrementamos la cantidad    
+                        if (inventory[mineral]) {    
+                            inventory[mineral] += 1;    
+                        } else {    
+                            inventory[mineral] = 1; // Si no está, lo añadimos con cantidad 1    
+                        }    
+    
+                        // Actualizamos el inventario en Firebase    
+                        update(userRef, {    
+                            inventory: inventory    
+                        }).then(() => {    
+                            console.log(`Inventario actualizado con ${mineral}`);    
+                        }).catch((error) => {    
+                            console.error("Error al actualizar el inventario: ", error);    
+                        });    
+                    }    
+                }).catch((error) => {    
+                    console.error("Error al obtener el inventario: ", error);    
+                });    
+            }    
+        });    
+    </script>    
+</head>    
+<body>    
+    <button id="btnMinar">⛏️ Minar</button>    
+</body>    
+</html>```    
+Incluso si tiene 0 unidades, que se muestre igual. Así que lo que vamos a hacer es lo mismo que hace este código, este código es un HTML completo que se muestra linkeado en ese código que acabas de limpiar, vamos a hacer otro HTML de inventario completo que se linkee en el contenedor de mochila, entendido?
