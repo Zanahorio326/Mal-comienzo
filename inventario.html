@@ -93,13 +93,19 @@
                     };
 
                     // Mostrar el inventario de minerales en el contenedor
-                    document.getElementById("carbón").textContent = "Carbón: " + inventory.Carbón;
-                    document.getElementById("cobre").textContent = "Cobre: " + inventory.Cobre;
-                    document.getElementById("hierro").textContent = "Hierro: " + inventory.Hierro;
-                    document.getElementById("plata").textContent = "Plata: " + inventory.Plata;
-                    document.getElementById("oro").textContent = "Oro: " + inventory.Oro;
+                    document.getElementById("carbón").textContent = inventory.Carbón !== undefined ? "Carbón: " + inventory.Carbón : "Carbón: 🔒";
+                    document.getElementById("cobre").textContent = inventory.Cobre !== undefined ? "Cobre: " + inventory.Cobre : "Cobre: 🔒";
+                    document.getElementById("hierro").textContent = inventory.Hierro !== undefined ? "Hierro: " + inventory.Hierro : "Hierro: 🔒";
+                    document.getElementById("plata").textContent = inventory.Plata !== undefined ? "Plata: " + inventory.Plata : "Plata: 🔒";
+                    document.getElementById("oro").textContent = inventory.Oro !== undefined ? "Oro: " + inventory.Oro : "Oro: 🔒";
                 } else {
                     console.log("No se encontraron datos para el usuario.");
+                    // Si no hay datos, se muestra el candado para todos los elementos
+                    document.getElementById("carbón").textContent = "Carbón: 🔒";
+                    document.getElementById("cobre").textContent = "Cobre: 🔒";
+                    document.getElementById("hierro").textContent = "Hierro: 🔒";
+                    document.getElementById("plata").textContent = "Plata: 🔒";
+                    document.getElementById("oro").textContent = "Oro: 🔒";
                 }
             }).catch((error) => {
                 console.error("Error al obtener el inventario: ", error);
@@ -116,11 +122,11 @@
     <h1>Mochila</h1>
     <div id="mochila">
         <h3>Inventario</h3>
-        <p id="carbón">Carbón: 0</p>
-        <p id="cobre">Cobre: 0</p>
-        <p id="hierro">Hierro: 0</p>
-        <p id="plata">Plata: 0</p>
-        <p id="oro">Oro: 0</p>
+        <p id="carbón">Carbón: 🔒</p>
+        <p id="cobre">Cobre: 🔒</p>
+        <p id="hierro">Hierro: 🔒</p>
+        <p id="plata">Plata: 🔒</p>
+        <p id="oro">Oro: 🔒</p>
     </div>
 </body>
 </html>
