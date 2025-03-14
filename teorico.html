@@ -6,7 +6,7 @@
     <title>Botón Minar</title>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, push, get, update, child } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getDatabase, ref, push, get, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
@@ -31,7 +31,6 @@
                 btn.disabled = true;
                 btn.textContent = "⛏️ Picando...";
 
-                // Enviar mensaje al chat de que está minando
                 push(ref(db, 'chat'), {
                     usuario: username,
                     texto: "Minando...",
@@ -46,11 +45,9 @@
                         mensaje = "No encontré nada...";
                     } else {
                         mensaje = `Encontré ${resultado}`;
-                        // Actualizar el inventario del jugador
                         actualizarInventario(resultado);
                     }
 
-                    // Enviar el mensaje de resultado al chat
                     push(ref(db, 'chat'), {
                         usuario: username,
                         texto: mensaje,
@@ -62,7 +59,6 @@
                 }, 5000);
             });
 
-            // Función para obtener el mineral
             function obtenerMineral() {
                 const probabilidad = Math.random() * 100;
 
@@ -74,9 +70,7 @@
                 return "Oro";
             }
 
-            // Función para actualizar el inventario del jugador
             function actualizarInventario(mineral) {
-                // Obtener el inventario actual del jugador
                 get(userRef).then((snapshot) => {
                     if (snapshot.exists()) {
                         const inventory = snapshot.val().inventory || {
@@ -87,14 +81,8 @@
                             oro: 0
                         };
 
-                        // Si el mineral ya está en el inventario, incrementamos la cantidad
-                        if (inventory[mineral]) {
-                            inventory[mineral] += 1;
-                        } else {
-                            inventory[mineral] = 1; // Si no está, lo añadimos con cantidad 1
-                        }
+                        inventory[mineral] = (inventory[mineral] || 0) + 1;
 
-                        // Actualizamos el inventario en Firebase
                         update(userRef, {
                             inventory: inventory
                         }).then(() => {
@@ -108,23 +96,24 @@
                 });
             }
 
-            // Función para manejar el botón de poder
             document.getElementById("btnPoder").addEventListener("click", function(event) {
-                event.preventDefault(); // Evita cualquier acción predeterminada
-                if (window.self !== window.top) {
-                    // Si está dentro de un iframe, abrir en pantalla completa
-                    window.top.location.href = "https://zanahorio326.github.io/Mal-comienzo/prestigio.html";
-                } else {
-                    // Si no está en un iframe, abrir normalmente
-                    window.location.href = "https://zanahorio326.github.io/Mal-comienzo/prestigio.html";
-                }
+                event.preventDefault();
+
+                // Asegurar que el botón fue realmente pulsado antes de redirigir
+                setTimeout(() => {
+                    if (window.self !== window.top) {
+                        window.top.location.href = "https://zanahorio326.github.io/Mal-comienzo/prestigio.html";
+                    } else {
+                        window.location.href = "https://zanahorio326.github.io/Mal-comienzo/prestigio.html";
+                    }
+                }, 100); // Pequeño retraso para evitar ejecuciones prematuras
             });
         });
     </script>
 </head>
 <body>
     <button id="btnMinar">⛏️ Minar</button>
-    <br><br> <!-- Espaciado extra entre los botones -->
+    <br><br>
     <button id="btnPoder">🏆 Poder</button>
 </body>
 </html>
