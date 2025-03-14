@@ -84,20 +84,21 @@
             // Acceder al inventario del jugador en Firebase
             get(userRef).then((snapshot) => {
                 if (snapshot.exists()) {
-                    const inventory = snapshot.val().inventory || {
-                        Carbón: 0,
-                        Cobre: 0,
-                        Hierro: 0,
-                        Plata: 0,
-                        Oro: 0
+                    const inventory = snapshot.val().inventory || {};
+
+                    // Función para actualizar la visualización del inventario
+                    const updateItem = (item, id) => {
+                        const value = inventory[item];
+                        document.getElementById(id).textContent = (value !== undefined && value !== null) ? `${item}: ${value}` : `${item}: 🔒`;
                     };
 
-                    // Mostrar el inventario de minerales en el contenedor
-                    document.getElementById("carbón").textContent = inventory.Carbón !== undefined ? "Carbón: " + inventory.Carbón : "Carbón: 🔒";
-                    document.getElementById("cobre").textContent = inventory.Cobre !== undefined ? "Cobre: " + inventory.Cobre : "Cobre: 🔒";
-                    document.getElementById("hierro").textContent = inventory.Hierro !== undefined ? "Hierro: " + inventory.Hierro : "Hierro: 🔒";
-                    document.getElementById("plata").textContent = inventory.Plata !== undefined ? "Plata: " + inventory.Plata : "Plata: 🔒";
-                    document.getElementById("oro").textContent = inventory.Oro !== undefined ? "Oro: " + inventory.Oro : "Oro: 🔒";
+                    // Actualizar cada mineral en el inventario
+                    updateItem('Carbón', 'carbón');
+                    updateItem('Cobre', 'cobre');
+                    updateItem('Hierro', 'hierro');
+                    updateItem('Plata', 'plata');
+                    updateItem('Oro', 'oro');
+
                 } else {
                     console.log("No se encontraron datos para el usuario.");
                     // Si no hay datos, se muestra el candado para todos los elementos
