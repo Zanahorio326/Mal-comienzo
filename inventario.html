@@ -1,123 +1,157 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario del Usuario</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            width: 80%;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-            font-size: 24px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 10px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-        td {
-            background-color: #f9f9f9;
-        }
-        .small-text {
-            font-size: 12px;
-            color: #888;
-            text-align: center;
-            margin-top: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventario - Zanahorio Codderbone</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(to bottom, #ff7f00, #008f39);
+      color: white;
+      padding: 20px;
+    }
+
+    #titulo {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .inventario-tabla {
+      width: 100%;
+      max-width: 600px;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .inventario-tabla th,
+    .inventario-tabla td {
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #ddd;
+      font-size: 18px;
+    }
+
+    .inventario-tabla th {
+      background-color: #008f39;
+      color: white;
+    }
+
+    .inventario-tabla td {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .recuadro {
+      display: flex;
+      justify-content: space-between;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 5px;
+      padding: 8px;
+      margin-bottom: 5px;
+    }
+
+    .nombre {
+      font-weight: bold;
+    }
+
+    .cantidad {
+      color: #4CAF50;
+    }
+
+    @media (max-width: 600px) {
+      #titulo {
+        font-size: 20px;
+      }
+
+      .inventario-tabla th, .inventario-tabla td {
+        font-size: 14px;
+        padding: 8px;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div id="titulo">Inventario de Zanahorio Codderbone</div>
+  <table class="inventario-tabla">
+    <thead>
+      <tr>
+        <th>Material</th>
+        <th>Cantidad</th>
+      </tr>
+    </thead>
+    <tbody id="inventario">
+      <!-- Aquí se cargarán los datos del inventario -->
+    </tbody>
+  </table>
 
-    <div class="container">
-        <h1>Inventario de Minerales</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Mineral</th>
-                    <th>Cantidad</th>
-                </tr>
-            </thead>
-            <tbody id="inventoryTable">
-                <!-- Aquí se llenarán los datos -->
-            </tbody>
-        </table>
-        <p class="small-text">Actualizado automáticamente</p>
-    </div>
+  <script>
+    // Cargar el inventario desde Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+      authDomain: "thegame-5afaa.firebaseapp.com",
+      databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+      projectId: "thegame-5afaa",
+      storageBucket: "thegame-5afaa.firebasestorage.app",
+      messagingSenderId: "588556182984",
+      appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+      measurementId: "G-9M3CBJ3LV9"
+    };
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const inventarioRef = ref(db, 'inventarios');  // Ruta del inventario en Firebase
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
-            authDomain: "thegame-5afaa.firebaseapp.com",
-            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
-            projectId: "thegame-5afaa",
-            storageBucket: "thegame-5afaa.firebasestorage.app",
-            messagingSenderId: "588556182984",
-            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
-            measurementId: "G-9M3CBJ3LV9"
-        };
+    const username = localStorage.getItem("username") || "Desconocido";
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        
-        const username = localStorage.getItem("username") || "Desconocido";
-        const userRef = ref(db, 'users/' + username);
+    document.addEventListener("DOMContentLoaded", function() {
+      cargarInventario();
+    });
 
-        document.addEventListener("DOMContentLoaded", function() {
-            get(userRef).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const inventory = snapshot.val().inventory || {
-                        "Carbón": 0,
-                        "Cobre": 0,
-                        "Hierro": 0,
-                        "Plata": 0,
-                        "Oro": 0
-                    };
+    // Cargar inventario desde Firebase
+    function cargarInventario() {
+      const usuarioID = localStorage.getItem("username") || "Desconocido"; // Obtener el username del usuario
 
-                    const inventoryTable = document.getElementById("inventoryTable");
-                    for (const mineral in inventory) {
-                        const row = document.createElement("tr");
-                        const cell1 = document.createElement("td");
-                        const cell2 = document.createElement("td");
-                        
-                        cell1.textContent = mineral;
-                        cell2.textContent = inventory[mineral] || 0;
-                        
-                        row.appendChild(cell1);
-                        row.appendChild(cell2);
-                        inventoryTable.appendChild(row);
-                    }
-                }
-            }).catch((error) => {
-                console.error("Error al obtener el inventario: ", error);
-            });
-        });
-    </script>
+      get(child(inventarioRef, usuarioID)).then((snapshot) => {
+        if (snapshot.exists()) {
+          const inventarioData = snapshot.val();
+          const materiales = [
+            { nombre: "Carbón", cantidad: inventarioData.carbon || 0 },
+            { nombre: "Cobre", cantidad: inventarioData.cobre || 0 },
+            { nombre: "Hierro", cantidad: inventarioData.hierro || 0 },
+            { nombre: "Plata", cantidad: inventarioData.plata || 0 },
+            { nombre: "Oro", cantidad: inventarioData.oro || 0 }
+          ];
 
+          const contenedorInventario = document.getElementById('inventario');
+          contenedorInventario.innerHTML = '';
+
+          materiales.forEach((material) => {
+            const fila = document.createElement("tr");
+            fila.innerHTML = `
+              <td>${material.nombre}</td>
+              <td>${material.cantidad}</td>
+            `;
+            contenedorInventario.appendChild(fila);
+          });
+        } else {
+          console.log("No hay datos de inventario para este usuario.");
+        }
+      }).catch((error) => {
+        console.error("Error al cargar el inventario:", error);
+      });
+    }
+  </script>
 </body>
 </html>
