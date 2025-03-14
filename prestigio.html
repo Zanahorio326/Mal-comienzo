@@ -44,34 +44,37 @@
             background-color: #555;
         }
 
-        /* Animación de despliegue de fila */
-        .fila {
-            opacity: 0;
-            animation: desplegarFila 0.5s ease-out forwards;
+        /* Estilo para el botón animado */
+        .boton {
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 18px;
+            color: white;
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            background-size: 200% 200%;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            text-decoration: none;
+            animation: gradiente 2s ease infinite;
+            margin-top: 30px;
         }
 
-        @keyframes desplegarFila {
+        .boton:hover {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes gradiente {
             0% {
-                transform: translateY(-20px);
-                opacity: 0;
+                background-position: 200% 0;
+            }
+            50% {
+                background-position: 0 100%;
             }
             100% {
-                transform: translateY(0);
-                opacity: 1;
+                background-position: 200% 0;
             }
-        }
-
-        /* Animación de aumento de prestigio */
-        .prestigio {
-            font-weight: bold;
-            color: #4CAF50;
-            font-size: 1.2em;
-            animation: aumentoPrestigio 2s ease-in-out forwards;
-        }
-
-        @keyframes aumentoPrestigio {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
         }
     </style>
 </head>
@@ -88,6 +91,8 @@
             <!-- Aquí se cargarán los datos de los usuarios -->
         </tbody>
     </table>
+
+    <a href="https://zanahorio326.github.io/Mal-comienzo/chat.html" class="boton">Ir al chat</a>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
@@ -126,19 +131,6 @@
             return prestigio;
         }
 
-        // Función para animar el prestigio
-        function animarPrestigio(id, valorFinal) {
-            let valorActual = 0;
-            let incremento = valorFinal / 100; // Ajusta la velocidad de la animación
-            let intervalo = setInterval(function() {
-                valorActual += incremento;
-                document.getElementById(id).textContent = Math.floor(valorActual);
-                if (valorActual >= valorFinal) {
-                    clearInterval(intervalo);
-                }
-            }, 20);
-        }
-
         // Función para mostrar la tabla de prestigio
         function mostrarPrestigio() {
             const tablaPrestigio = document.getElementById("tablaPrestigio");
@@ -168,27 +160,19 @@
                     // Limpiar la tabla actual
                     tablaPrestigio.innerHTML = '';
 
-                    // Agregar las filas ordenadas con animación de despliegue
-                    usuariosArray.forEach((usuario, index) => {
+                    // Agregar las filas ordenadas
+                    usuariosArray.forEach(usuario => {
                         const fila = document.createElement("tr");
-                        fila.classList.add("fila");
 
                         const celdaNombre = document.createElement("td");
                         celdaNombre.textContent = usuario.username;
                         fila.appendChild(celdaNombre);
 
                         const celdaPrestigio = document.createElement("td");
-                        const prestigioSpan = document.createElement("span");
-                        prestigioSpan.classList.add("prestigio");
-                        prestigioSpan.id = `prestigio${index}`;
-                        prestigioSpan.textContent = "0"; // Inicializa el prestigio en 0
-                        celdaPrestigio.appendChild(prestigioSpan);
+                        celdaPrestigio.textContent = usuario.prestigio;
                         fila.appendChild(celdaPrestigio);
 
                         tablaPrestigio.appendChild(fila);
-
-                        // Animar el prestigio
-                        animarPrestigio(`prestigio${index}`, usuario.prestigio);
                     });
                 } else {
                     console.log("No se encontraron datos para los usuarios.");
