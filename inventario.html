@@ -10,13 +10,13 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background: linear-gradient(to bottom right, #28a745, #f39c12); /* Degradado verde a naranja */
             color: #333;
         }
 
         h1, h3 {
             text-align: center;
-            color: #444;
+            color: #fff;
         }
 
         /* Estilos para el contenedor principal de la mochila */
@@ -84,29 +84,22 @@
             // Acceder al inventario del jugador en Firebase
             get(userRef).then((snapshot) => {
                 if (snapshot.exists()) {
-                    const inventory = snapshot.val().inventory || {};
-
-                    // Función para actualizar la visualización del inventario
-                    const updateItem = (item, id) => {
-                        const value = inventory[item];
-                        document.getElementById(id).textContent = (value !== undefined && value !== null) ? `${item}: ${value}` : `${item}: 🔒`;
+                    const inventory = snapshot.val().inventory || {
+                        Carbón: 0,
+                        Cobre: 0,
+                        Hierro: 0,
+                        Plata: 0,
+                        Oro: 0
                     };
 
-                    // Actualizar cada mineral en el inventario
-                    updateItem('Carbón', 'carbón');
-                    updateItem('Cobre', 'cobre');
-                    updateItem('Hierro', 'hierro');
-                    updateItem('Plata', 'plata');
-                    updateItem('Oro', 'oro');
-
+                    // Mostrar el inventario de minerales en el contenedor
+                    document.getElementById("carbón").textContent = "Carbón: " + inventory.Carbón;
+                    document.getElementById("cobre").textContent = "Cobre: " + inventory.Cobre;
+                    document.getElementById("hierro").textContent = "Hierro: " + inventory.Hierro;
+                    document.getElementById("plata").textContent = "Plata: " + inventory.Plata;
+                    document.getElementById("oro").textContent = "Oro: " + inventory.Oro;
                 } else {
                     console.log("No se encontraron datos para el usuario.");
-                    // Si no hay datos, se muestra el candado para todos los elementos
-                    document.getElementById("carbón").textContent = "Carbón: 🔒";
-                    document.getElementById("cobre").textContent = "Cobre: 🔒";
-                    document.getElementById("hierro").textContent = "Hierro: 🔒";
-                    document.getElementById("plata").textContent = "Plata: 🔒";
-                    document.getElementById("oro").textContent = "Oro: 🔒";
                 }
             }).catch((error) => {
                 console.error("Error al obtener el inventario: ", error);
@@ -123,11 +116,11 @@
     <h1>Mochila</h1>
     <div id="mochila">
         <h3>Inventario</h3>
-        <p id="carbón">Carbón: 🔒</p>
-        <p id="cobre">Cobre: 🔒</p>
-        <p id="hierro">Hierro: 🔒</p>
-        <p id="plata">Plata: 🔒</p>
-        <p id="oro">Oro: 🔒</p>
+        <p id="carbón">Carbón: 0</p>
+        <p id="cobre">Cobre: 0</p>
+        <p id="hierro">Hierro: 0</p>
+        <p id="plata">Plata: 0</p>
+        <p id="oro">Oro: 0</p>
     </div>
 </body>
 </html>
