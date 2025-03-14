@@ -1,183 +1,178 @@
-<!DOCTYPE html>  
-<html lang="es">  
-<head>  
-    <meta charset="UTF-8">  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>Botón Minar</title>  
-    <script type="module">  
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";  
-        import { getDatabase, ref, push, get, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";  
-  
-        const firebaseConfig = {  
-            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",  
-            authDomain: "thegame-5afaa.firebaseapp.com",  
-            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",  
-            projectId: "thegame-5afaa",  
-            storageBucket: "thegame-5afaa.firebasestorage.app",  
-            messagingSenderId: "588556182984",  
-            appId: "1:588556182984:web:a0557067d35c18e3944cfd",  
-            measurementId: "G-9M3CBJ3LV9"  
-        };  
-  
-        const app = initializeApp(firebaseConfig);  
-        const db = getDatabase(app);  
-  
-        const username = localStorage.getItem("username") || "Desconocido";  
-        const userRef = ref(db, 'users/' + username);  
-  
-        let talandoOminando = false;  // Variable para evitar talar y minar al mismo tiempo
-  
-        document.addEventListener("DOMContentLoaded", function() {  
-            document.getElementById("btnMinar").addEventListener("click", function() {  
-                if (talandoOminando) return;  // Si ya está talando o minando, no hacer nada  
-                talandoOminando = true;  
-                const btn = this;  
-                btn.disabled = true;  
-                btn.textContent = "⛏️ Picando...";  
-  
-                push(ref(db, 'chat'), {  
-                    usuario: username,  
-                    texto: "Minando...",  
-                    timestamp: Date.now()  
-                });  
-  
-                setTimeout(function() {  
-                    const resultado = obtenerMineral();  
-                    let mensaje = "";  
-  
-                    if (resultado === "Nada") {  
-                        mensaje = "No encontré nada...";  
-                    } else {  
-                        mensaje = `Encontré ${resultado}`;  
-                        actualizarInventario(resultado);  
-                    }  
-  
-                    push(ref(db, 'chat'), {  
-                        usuario: username,  
-                        texto: mensaje,  
-                        timestamp: Date.now()  
-                    });  
-  
-                    btn.disabled = false;  
-                    btn.textContent = "⛏️ Minar";  
-                    talandoOminando = false;  
-                }, 15000);  
-            });  
-  
-            document.getElementById("btnTalar").addEventListener("click", function() {  
-                if (talandoOminando) return;  // Si ya está talando o minando, no hacer nada  
-                talandoOminando = true;  
-                const btn = this;  
-                btn.disabled = true;  
-                btn.textContent = "🪓 Talando...";  
-  
-                push(ref(db, 'chat'), {  
-                    usuario: username,  
-                    texto: "Talando...",  
-                    timestamp: Date.now()  
-                });  
-  
-                setTimeout(function() {  
-                    const resultado = obtenerMadera();  
-                    let mensaje = "";  
-  
-                    if (resultado === "Nada") {  
-                        mensaje = "Parece que no tuve suerte hoy.";  
-                    } else if (resultado === "Tropezón") {  
-                        get(userRef).then((snapshot) => {  
-                            if (snapshot.exists()) {  
-                                const inventory = snapshot.val().inventory || {};  
-                                const items = Object.keys(inventory);  
-                                if (items.length > 0) {  
-                                    const itemPerdido = items[Math.floor(Math.random() * items.length)];  
-                                    mensaje = `¡Oh, me tropecé y he perdido ${itemPerdido}!`;  
-                                    inventory[itemPerdido] -= 1;  
-                                    if (inventory[itemPerdido] <= 0) {  
-                                        delete inventory[itemPerdido];  
-                                    }  
-                                    update(userRef, {  
-                                        inventory: inventory  
-                                    });  
-                                } else {  
-                                    mensaje = "Me caí, pero al menos no perdí nada.";  
-                                }  
-                            }  
-                        }).catch((error) => {  
-                            console.error("Error al obtener el inventario: ", error);  
-                        });  
-                    } else if (resultado === "Madera") {  
-                        mensaje = "Logré conseguir un tronco.";  
-                        actualizarInventario("madera");  
-                    }  
-  
-                    push(ref(db, 'chat'), {  
-                        usuario: username,  
-                        texto: mensaje,  
-                        timestamp: Date.now()  
-                    });  
-  
-                    btn.disabled = false;  
-                    btn.textContent = "🪓 Talar";  
-                    talandoOminando = false;  
-                }, 15000);  
-            });  
-  
-            function obtenerMineral() {  
-                const probabilidad = Math.random() * 100;  
-  
-                if (probabilidad < 40) return "Nada";  
-                if (probabilidad < 65) return "Carbón";  
-                if (probabilidad < 83) return "Cobre";  
-                if (probabilidad < 93) return "Hierro";  
-                if (probabilidad < 98) return "Plata";  
-                return "Oro";  
-            }  
-  
-            function obtenerMadera() {  
-                const probabilidad = Math.random() * 100;  
-                if (probabilidad < 60) return "Nada";  
-                if (probabilidad < 90) return "Tropezón";  
-                return "Madera";  
-            }  
-  
-            function actualizarInventario(item) {  
-                get(userRef).then((snapshot) => {  
-                    if (snapshot.exists()) {  
-                        const inventory = snapshot.val().inventory || {};  
-                        inventory[item] = (inventory[item] || 0) + 1;  
-  
-                        update(userRef, {  
-                            inventory: inventory  
-                        }).then(() => {  
-                            console.log(`Inventario actualizado con ${item}`);  
-                        }).catch((error) => {  
-                            console.error("Error al actualizar el inventario: ", error);  
-                        });  
-                    }  
-                }).catch((error) => {  
-                    console.error("Error al obtener el inventario: ", error);  
-                });  
-            }  
-  
-            document.getElementById("btnPoder").addEventListener("click", function(event) {  
-                event.preventDefault();  
-  
-                setTimeout(() => {  
-                    if (window.self !== window.top) {  
-                        window.top.location.href = "https://zanahorio326.github.io/Mal-comienzo/prestigio.html";  
-                    } else {  
-                        window.location.href = "https://zanahorio326.github.io/Mal-comienzo/prestigio.html";  
-                    }  
-                }, 100);  
-            });  
-        });  
-    </script>  
-</head>  
-<body>  
-    <button id="btnMinar">⛏️ Minar</button>  
-    <br><br>  
-    <button id="btnTalar">🪓 Talar</button>  
-    <br><br>  
-    <button id="btnPoder">🏆 Poder</button>  
-</body>  
+<!DOCTYPE html>    
+<html lang="es">    
+<head>    
+    <meta charset="UTF-8">    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <title>Botón Minar</title>    
+    <script type="module">    
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";    
+        import { getDatabase, ref, push, get, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";    
+    
+        const firebaseConfig = {    
+            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",    
+            authDomain: "thegame-5afaa.firebaseapp.com",    
+            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",    
+            projectId: "thegame-5afaa",    
+            storageBucket: "thegame-5afaa.firebasestorage.app",    
+            messagingSenderId: "588556182984",    
+            appId: "1:588556182984:web:a0557067d35c18e3944cfd",    
+            measurementId: "G-9M3CBJ3LV9"    
+        };    
+    
+        const app = initializeApp(firebaseConfig);    
+        const db = getDatabase(app);    
+    
+        const username = localStorage.getItem("username") || "Desconocido";    
+        const userRef = ref(db, 'users/' + username);    
+    
+        let isMining = false; // Variable para evitar realizar dos acciones a la vez (minar y talar)  
+
+        document.addEventListener("DOMContentLoaded", function() {    
+            document.getElementById("btnMinar").addEventListener("click", function() {    
+                if (isMining) return; // Evitar minar si ya está talando o minando    
+                
+                isMining = true; // Desactivar otras acciones mientras se está minando    
+                
+                const btn = this;    
+                btn.disabled = true;    
+                btn.textContent = "⛏️ Picando...";    
+    
+                push(ref(db, 'chat'), {    
+                    usuario: username,    
+                    texto: "Minando...",    
+                    timestamp: Date.now()    
+                });    
+    
+                setTimeout(function() {    
+                    const resultado = obtenerMineral();    
+                    let mensaje = "";    
+    
+                    if (resultado === "Nada") {    
+                        mensaje = "No encontré nada...";    
+                    } else {    
+                        mensaje = `Encontré ${resultado}`;    
+                        actualizarInventario(resultado);    
+                    }    
+    
+                    push(ref(db, 'chat'), {    
+                        usuario: username,    
+                        texto: mensaje,    
+                        timestamp: Date.now()    
+                    });    
+    
+                    btn.disabled = false;    
+                    btn.textContent = "⛏️ Minar";    
+                    isMining = false; // Rehabilitar la acción después de terminar de minar    
+                }, 15000);    
+            });    
+    
+            // Función para obtener mineral
+            function obtenerMineral() {    
+                const probabilidad = Math.random() * 100;    
+                if (probabilidad < 40) return "Nada";    
+                if (probabilidad < 65) return "Carbón";    
+                if (probabilidad < 83) return "Cobre";    
+                if (probabilidad < 93) return "Hierro";    
+                if (probabilidad < 98) return "Plata";    
+                return "Oro";    
+            }    
+    
+            // Función para actualizar inventario
+            function actualizarInventario(mineral) {    
+                get(userRef).then((snapshot) => {    
+                    if (snapshot.exists()) {    
+                        const inventory = snapshot.val().inventory || {    
+                            carbon: 0,    
+                            cobre: 0,    
+                            hierro: 0,    
+                            plata: 0,    
+                            oro: 0    
+                        };    
+    
+                        inventory[mineral] = (inventory[mineral] || 0) + 1;    
+    
+                        update(userRef, {    
+                            inventory: inventory    
+                        }).then(() => {    
+                            console.log(`Inventario actualizado con ${mineral}`);    
+                        }).catch((error) => {    
+                            console.error("Error al actualizar el inventario: ", error);    
+                        });    
+                    }    
+                }).catch((error) => {    
+                    console.error("Error al obtener el inventario: ", error);    
+                });    
+            }
+
+            // Implementación para el botón de Talar
+            document.getElementById("btnTalar").addEventListener("click", function() {    
+                if (isMining) return; // Evitar talar si ya se está minando o talando    
+    
+                isMining = true; // Desactivar otras acciones mientras se está talando    
+                
+                const btn = this;    
+                btn.disabled = true;    
+                btn.textContent = "🪓 Talando...";    
+    
+                push(ref(db, 'chat'), {    
+                    usuario: username,    
+                    texto: "Talando...",    
+                    timestamp: Date.now()    
+                });    
+    
+                setTimeout(function() {    
+                    const resultado = obtenerMadera();    
+                    let mensaje = "";    
+    
+                    if (resultado === "Nada") {    
+                        mensaje = "Parece que no tuve suerte hoy.";    
+                    } else if (resultado === "Tropezón") {    
+                        get(userRef).then((snapshot) => {    
+                            if (snapshot.exists()) {    
+                                const inventory = snapshot.val().inventory || {};    
+                                const items = Object.keys(inventory);    
+                                if (items.length > 0) {    
+                                    const itemPerdido = items[Math.floor(Math.random() * items.length)];    
+                                    inventory[itemPerdido] -= 1;    
+                                    mensaje = `¡Oh, me tropecé y he perdido ${itemPerdido}!`;    
+                                    update(userRef, { inventory });    
+                                } else {    
+                                    mensaje = "Me caí, pero al menos no perdí nada.";    
+                                }    
+                            }    
+                        });    
+                    } else if (resultado === "Madera") {    
+                        mensaje = "Logré conseguir un tronco.";    
+                        actualizarInventario("Madera");    
+                    }    
+    
+                    push(ref(db, 'chat'), {    
+                        usuario: username,    
+                        texto: mensaje,    
+                        timestamp: Date.now()    
+                    });    
+    
+                    btn.disabled = false;    
+                    btn.textContent = "🪓 Talando";    
+                    isMining = false; // Rehabilitar la acción después de talar    
+                }, 15000);    
+            });    
+    
+            // Función para obtener madera
+            function obtenerMadera() {    
+                const probabilidad = Math.random() * 100;    
+                if (probabilidad < 60) return "Nada";    
+                if (probabilidad < 90) return "Tropezón";    
+                return "Madera";    
+            }    
+        });    
+    </script>    
+</head>    
+<body>    
+    <button id="btnMinar">⛏️ Minar</button>    
+    <br><br>    
+    <button id="btnTalar">🪓 Talando</button>    
+    <br><br>    
+    <button id="btnPoder">🏆 Poder</button>    
+</body>    
 </html>
