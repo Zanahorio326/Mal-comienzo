@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bot - Narrador</title>
+    <title>Botón Minar</title>
     <script type="module">
-        // Importar Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
             authDomain: "thegame-5afaa.firebaseapp.com",
@@ -21,33 +19,25 @@
             measurementId: "G-9M3CBJ3LV9"
         };
 
-        // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const chatRef = ref(db, 'chat');
 
-        // Función para escuchar los mensajes y responder cuando se envíe un mensaje /hola
-        function escucharMensajes() {
-            onChildAdded(chatRef, (snapshot) => {
-                const data = snapshot.val();
-                if (data.texto && data.texto.toLowerCase() === "/hola") {
-                    // El bot responde con un mensaje cuando detecta "/hola"
-                    push(chatRef, {
-                        usuario: "Narrador",
-                        texto: "¡Bienvenido al chat! ¿En qué puedo ayudarte hoy?",
-                        timestamp: Date.now()
-                    });
-                }
+        const username = localStorage.getItem("username") || "Desconocido";
+
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("btnMinar").addEventListener("click", function() {
+                const mensaje = "Minando..."; // El mensaje que se enviará al chat
+                push(chatRef, {
+                    usuario: username,
+                    texto: mensaje,
+                    timestamp: Date.now()
+                });
             });
-        }
-
-        // Iniciar la función para escuchar los mensajes
-        document.addEventListener("DOMContentLoaded", escucharMensajes);
-
+        });
     </script>
 </head>
 <body>
-    <h1>Bot - Narrador</h1>
-    <p>El bot está ahora activo y responderá a los mensajes que empiecen con "/hola" en el chat.</p>
+    <button id="btnMinar">⛏️ Minar</button>
 </body>
 </html>
