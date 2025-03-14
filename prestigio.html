@@ -12,26 +12,26 @@
             text-align: center;
             padding: 20px;
         }
-        
+
         h1 {
             margin-bottom: 20px;
         }
-        
+
         table {
             width: 60%;
             margin: 0 auto;
             border-collapse: collapse;
         }
-        
+
         table, th, td {
             border: 1px solid #fff;
         }
-        
+
         th, td {
             padding: 10px;
             text-align: center;
         }
-        
+
         th {
             background-color: #333;
         }
@@ -42,6 +42,18 @@
 
         tr:nth-child(odd) {
             background-color: #555;
+        }
+
+        /* Animación de aparición de filas */
+        @keyframes aparecer {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Estilo para el botón animado */
@@ -131,7 +143,7 @@
             return prestigio;
         }
 
-        // Función para mostrar la tabla de prestigio
+        // Función para mostrar la tabla de prestigio con animaciones
         function mostrarPrestigio() {
             const tablaPrestigio = document.getElementById("tablaPrestigio");
             const usersRef = ref(db, 'users/');
@@ -160,8 +172,8 @@
                     // Limpiar la tabla actual
                     tablaPrestigio.innerHTML = '';
 
-                    // Agregar las filas ordenadas
-                    usuariosArray.forEach(usuario => {
+                    // Agregar las filas ordenadas con animación
+                    usuariosArray.forEach((usuario, index) => {
                         const fila = document.createElement("tr");
 
                         const celdaNombre = document.createElement("td");
@@ -169,10 +181,21 @@
                         fila.appendChild(celdaNombre);
 
                         const celdaPrestigio = document.createElement("td");
-                        celdaPrestigio.textContent = usuario.prestigio;
+                        celdaPrestigio.textContent = "0"; // Inicia en 0 para animar después
                         fila.appendChild(celdaPrestigio);
 
+                        // Animación de aparición
+                        fila.style.opacity = "0";
+                        setTimeout(() => {
+                            fila.style.animation = `aparecer 0.5s ease forwards`;
+                        }, index * 200); // Retraso escalonado
+
                         tablaPrestigio.appendChild(fila);
+
+                        // Animación de conteo después de la animación de aparición
+                        setTimeout(() => {
+                            animarNumero(celdaPrestigio, usuario.prestigio);
+                        }, (index + 1) * 200); // Comienza después de la aparición
                     });
                 } else {
                     console.log("No se encontraron datos para los usuarios.");
@@ -180,6 +203,25 @@
             }).catch((error) => {
                 console.error("Error al obtener los datos de los usuarios: ", error);
             });
+        }
+
+        // Función para animar el conteo de prestigio
+        function animarNumero(elemento, valorFinal) {
+            let valorActual = 0;
+            const duracion = 1000; // 1 segundo
+            const incremento = Math.ceil(valorFinal / (duracion / 16)); // Ajuste a 60 FPS
+
+            function actualizarNumero() {
+                valorActual += incremento;
+                if (valorActual >= valorFinal) {
+                    elemento.textContent = valorFinal; // Asegura que no pase el valor final
+                } else {
+                    elemento.textContent = valorActual;
+                    requestAnimationFrame(actualizarNumero);
+                }
+            }
+
+            requestAnimationFrame(actualizarNumero);
         }
 
         // Cargar la tabla de prestigio al cargar la página
