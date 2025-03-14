@@ -3,12 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario - Mochila</title>
+    <title>Inventario del Usuario</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        td {
+            background-color: #f9f9f9;
+        }
+        .small-text {
+            font-size: 12px;
+            color: #888;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Inventario de Minerales</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Mineral</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+            <tbody id="inventoryTable">
+                <!-- Aquí se llenarán los datos -->
+            </tbody>
+        </table>
+        <p class="small-text">Actualizado automáticamente</p>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
             authDomain: "thegame-5afaa.firebaseapp.com",
@@ -20,56 +82,42 @@
             measurementId: "G-9M3CBJ3LV9"
         };
 
-        // Inicialización de Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-
-        // Obtener el nombre de usuario
+        
         const username = localStorage.getItem("username") || "Desconocido";
         const userRef = ref(db, 'users/' + username);
 
-        // Función para mostrar el inventario del jugador
-        function mostrarInventario() {
-            // Acceder al inventario del jugador en Firebase
+        document.addEventListener("DOMContentLoaded", function() {
             get(userRef).then((snapshot) => {
                 if (snapshot.exists()) {
                     const inventory = snapshot.val().inventory || {
-                        Carbón: 0,
-                        Cobre: 0,
-                        Hierro: 0,
-                        Plata: 0,
-                        Oro: 0
+                        "Carbón": 0,
+                        "Cobre": 0,
+                        "Hierro": 0,
+                        "Plata": 0,
+                        "Oro": 0
                     };
 
-                    // Mostrar el inventario de minerales en el contenedor
-                    document.getElementById("carbón").textContent = "Carbón: " + inventory.Carbón;
-                    document.getElementById("cobre").textContent = "Cobre: " + inventory.Cobre;
-                    document.getElementById("hierro").textContent = "Hierro: " + inventory.Hierro;
-                    document.getElementById("plata").textContent = "Plata: " + inventory.Plata;
-                    document.getElementById("oro").textContent = "Oro: " + inventory.Oro;
-                } else {
-                    console.log("No se encontraron datos para el usuario.");
+                    const inventoryTable = document.getElementById("inventoryTable");
+                    for (const mineral in inventory) {
+                        const row = document.createElement("tr");
+                        const cell1 = document.createElement("td");
+                        const cell2 = document.createElement("td");
+                        
+                        cell1.textContent = mineral;
+                        cell2.textContent = inventory[mineral] || 0;
+                        
+                        row.appendChild(cell1);
+                        row.appendChild(cell2);
+                        inventoryTable.appendChild(row);
+                    }
                 }
             }).catch((error) => {
                 console.error("Error al obtener el inventario: ", error);
             });
-        }
-
-        // Llamar a la función de mostrar inventario al cargar la página
-        document.addEventListener("DOMContentLoaded", function() {
-            mostrarInventario();
         });
     </script>
-</head>
-<body>
-    <h1>Inventario del Jugador</h1>
-    <div id="mochila">
-        <h3>Inventario</h3>
-        <p id="carbón">Carbón: 0</p>
-        <p id="cobre">Cobre: 0</p>
-        <p id="hierro">Hierro: 0</p>
-        <p id="plata">Plata: 0</p>
-        <p id="oro">Oro: 0</p>
-    </div>
+
 </body>
 </html>
