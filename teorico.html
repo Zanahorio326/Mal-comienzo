@@ -4,6 +4,54 @@
     <meta charset="UTF-8">    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">    
     <title>Botón Minar</title>    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(45deg, #4caf50, #ff9800);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        /* Estilo para el botón "Poder" */
+        .boton-poder {
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            color: white;
+            font-size: 18px;
+            text-transform: uppercase;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            margin-top: 30px;
+            animation: gradiente 2s ease infinite;
+        }
+
+        .boton-poder:hover {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes gradiente {
+            0% {
+                background-position: 200% 0;
+            }
+            50% {
+                background-position: 0 100%;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+    </style>    
     <script type="module">    
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";    
         import { getDatabase, ref, push, get, update, child } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";    
@@ -112,5 +160,7 @@
 </head>    
 <body>    
     <button id="btnMinar">⛏️ Minar</button>    
+    <!-- Botón "Poder" para redirigir -->
+    <a href="https://zanahorio326.github.io/Mal-comienzo/prestigio.html" class="boton-poder">Poder</a>
 </body>    
 </html>
