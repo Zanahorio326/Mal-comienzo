@@ -1,9 +1,9 @@
-<!DOCTYPE html>    
-<html lang="es">    
-<head>    
-    <meta charset="UTF-8">    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
-    <title>Botón Minar</title>    
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla de Prestigio</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,31 +12,56 @@
             text-align: center;
             padding: 20px;
         }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 20px;
+        
+        h1 {
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 60%;
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+        
+        table, th, td {
+            border: 1px solid #fff;
+        }
+        
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: #333;
         }
 
-        /* Estilo para el botón "Poder" */
-        .boton-poder {
-            background: linear-gradient(45deg, #ff00ff, #00ffff);
-            color: white;
-            font-size: 18px;
-            text-transform: uppercase;
+        tr:nth-child(even) {
+            background-color: #444;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #555;
+        }
+
+        /* Estilo para el botón animado */
+        .boton {
+            display: inline-block;
             padding: 15px 30px;
+            font-size: 18px;
+            color: white;
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            background-size: 200% 200%;
             border: none;
             border-radius: 50px;
             cursor: pointer;
+            text-transform: uppercase;
             text-decoration: none;
-            margin-top: 30px;
             animation: gradiente 2s ease infinite;
+            margin-top: 30px;
         }
 
-        .boton-poder:hover {
+        .boton:hover {
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         }
 
@@ -51,116 +76,119 @@
                 background-position: 200% 0;
             }
         }
-    </style>    
-    <script type="module">    
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";    
-        import { getDatabase, ref, push, get, update, child } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";    
-    
-        const firebaseConfig = {    
-            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",    
-            authDomain: "thegame-5afaa.firebaseapp.com",    
-            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",    
-            projectId: "thegame-5afaa",    
-            storageBucket: "thegame-5afaa.firebasestorage.app",    
-            messagingSenderId: "588556182984",    
-            appId: "1:588556182984:web:a0557067d35c18e3944cfd",    
-            measurementId: "G-9M3CBJ3LV9"    
-        };    
-    
-        const app = initializeApp(firebaseConfig);    
-        const db = getDatabase(app);    
-    
-        const username = localStorage.getItem("username") || "Desconocido";    
-        const userRef = ref(db, 'users/' + username);    
-    
-        document.addEventListener("DOMContentLoaded", function() {    
-            document.getElementById("btnMinar").addEventListener("click", function() {    
-                const btn = this;    
-                btn.disabled = true;    
-                btn.textContent = "⛏️ Picando...";    
-    
-                // Enviar mensaje al chat de que está minando    
-                push(ref(db, 'chat'), {    
-                    usuario: username,    
-                    texto: "Minando...",    
-                    timestamp: Date.now()    
-                });    
-    
-                setTimeout(function() {    
-                    const resultado = obtenerMineral();    
-                    let mensaje = "";    
-    
-                    if (resultado === "Nada") {    
-                        mensaje = "No encontré nada...";    
-                    } else {    
-                        mensaje = `Encontré ${resultado}`;    
-                        // Actualizar el inventario del jugador    
-                        actualizarInventario(resultado);    
-                    }    
-    
-                    // Enviar el mensaje de resultado al chat    
-                    push(ref(db, 'chat'), {    
-                        usuario: username,    
-                        texto: mensaje,    
-                        timestamp: Date.now()    
-                    });    
-    
-                    btn.disabled = false;    
-                    btn.textContent = "⛏️ Minar";    
-                }, 5000);    
-            });    
-    
-            // Función para obtener el mineral    
-            function obtenerMineral() {    
-                const probabilidad = Math.random() * 100;    
-    
-                if (probabilidad < 40) return "Nada";    
-                if (probabilidad < 65) return "Carbón";    
-                if (probabilidad < 83) return "Cobre";    
-                if (probabilidad < 93) return "Hierro";    
-                if (probabilidad < 98) return "Plata";    
-                return "Oro";    
-            }    
-    
-            // Función para actualizar el inventario del jugador    
-            function actualizarInventario(mineral) {    
-                // Obtener el inventario actual del jugador    
-                get(userRef).then((snapshot) => {    
-                    if (snapshot.exists()) {    
-                        const inventory = snapshot.val().inventory || {    
-                            carbon: 0,    
-                            cobre: 0,    
-                            hierro: 0,    
-                            plata: 0,    
-                            oro: 0    
-                        };    
-                            
-                        // Si el mineral ya está en el inventario, incrementamos la cantidad    
-                        if (inventory[mineral]) {    
-                            inventory[mineral] += 1;    
-                        } else {    
-                            inventory[mineral] = 1; // Si no está, lo añadimos con cantidad 1    
-                        }    
-    
-                        // Actualizamos el inventario en Firebase    
-                        update(userRef, {    
-                            inventory: inventory    
-                        }).then(() => {    
-                            console.log(`Inventario actualizado con ${mineral}`);    
-                        }).catch((error) => {    
-                            console.error("Error al actualizar el inventario: ", error);    
-                        });    
-                    }    
-                }).catch((error) => {    
-                    console.error("Error al obtener el inventario: ", error);    
-                });    
-            }    
-        });    
-    </script>    
-</head>    
-<body>    
-    <button id="btnMinar">⛏️ Minar</button>    
-    <!-- Botón "Poder" para redirigir -->
-    <a href="https://zanahorio326.github.io/Mal-comienzo/prestigio.html" class="boton-poder">Poder</a>
-</body>    
+    </style>
+</head>
+<body>
+    <h1>Tabla de Prestigio</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre de Usuario</th>
+                <th>Prestigio</th>
+            </tr>
+        </thead>
+        <tbody id="tablaPrestigio">
+            <!-- Aquí se cargarán los datos de los usuarios -->
+        </tbody>
+    </table>
+
+    <a href="https://zanahorio326.github.io/Mal-comienzo/chat.html" class="boton">Ir al chat</a>
+
+    <!-- Botón "Poder" sin decoración -->
+    <a href="https://zanahorio326.github.io/Mal-comienzo/prestigio.html">
+        <button id="btnPoder">Poder</button>
+    </a>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+            authDomain: "thegame-5afaa.firebaseapp.com",
+            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+            projectId: "thegame-5afaa",
+            storageBucket: "thegame-5afaa.firebasestorage.app",
+            messagingSenderId: "588556182984",
+            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+            measurementId: "G-9M3CBJ3LV9"
+        };
+
+        // Inicialización de Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Función para calcular el prestigio
+        function calcularPrestigio(inventory) {
+            const puntosPorMineral = {
+                "Carbón": 1,
+                "Cobre": 2,
+                "Hierro": 5,
+                "Plata": 10,
+                "Oro": 20
+            };
+
+            let prestigio = 0;
+            for (const mineral in inventory) {
+                prestigio += inventory[mineral] * (puntosPorMineral[mineral] || 0);
+            }
+            return prestigio;
+        }
+
+        // Función para mostrar la tabla de prestigio
+        function mostrarPrestigio() {
+            const tablaPrestigio = document.getElementById("tablaPrestigio");
+            const usersRef = ref(db, 'users/');
+
+            get(usersRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const usuarios = snapshot.val();
+                    const usuariosArray = [];
+
+                    for (const username in usuarios) {
+                        const inventory = usuarios[username].inventory || {
+                            Carbón: 0,
+                            Cobre: 0,
+                            Hierro: 0,
+                            Plata: 0,
+                            Oro: 0
+                        };
+
+                        const prestigio = calcularPrestigio(inventory);
+                        usuariosArray.push({ username, prestigio });
+                    }
+
+                    // Ordenar los usuarios por prestigio (de mayor a menor)
+                    usuariosArray.sort((a, b) => b.prestigio - a.prestigio);
+
+                    // Limpiar la tabla actual
+                    tablaPrestigio.innerHTML = '';
+
+                    // Agregar las filas ordenadas
+                    usuariosArray.forEach(usuario => {
+                        const fila = document.createElement("tr");
+
+                        const celdaNombre = document.createElement("td");
+                        celdaNombre.textContent = usuario.username;
+                        fila.appendChild(celdaNombre);
+
+                        const celdaPrestigio = document.createElement("td");
+                        celdaPrestigio.textContent = usuario.prestigio;
+                        fila.appendChild(celdaPrestigio);
+
+                        tablaPrestigio.appendChild(fila);
+                    });
+                } else {
+                    console.log("No se encontraron datos para los usuarios.");
+                }
+            }).catch((error) => {
+                console.error("Error al obtener los datos de los usuarios: ", error);
+            });
+        }
+
+        // Cargar la tabla de prestigio al cargar la página
+        document.addEventListener("DOMContentLoaded", mostrarPrestigio);
+    </script>
+</body>
 </html>
