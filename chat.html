@@ -13,189 +13,124 @@
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-
-import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-
+import { getDatabase, ref, push, onChildAdded, remove, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 const firebaseConfig = {
-
-apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
-
-authDomain: "thegame-5afaa.firebaseapp.com",
-
-databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
-
-projectId: "thegame-5afaa",
-
-storageBucket: "thegame-5afaa.firebasestorage.app",
-
-messagingSenderId: "588556182984",
-
-appId: "1:588556182984:web:a0557067d35c18e3944cfd",
-
-measurementId: "G-9M3CBJ3LV9"
-
+  apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+  authDomain: "thegame-5afaa.firebaseapp.com",
+  databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+  projectId: "thegame-5afaa",
+  storageBucket: "thegame-5afaa.firebasestorage.app",
+  messagingSenderId: "588556182984",
+  appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+  measurementId: "G-9M3CBJ3LV9"
 };
 
-
 const app = initializeApp(firebaseConfig);
-
 const db = getDatabase(app);
-
 const chatRef = ref(db, 'chat');
-
-
+const inventarioRef = ref(db, 'inventario');
 const username = localStorage.getItem("username") || "Desconocido";
-
 
 document.addEventListener("DOMContentLoaded", function() {
 
-document.getElementById("btnEnviar").addEventListener("click", function() {
+  document.getElementById("btnEnviar").addEventListener("click", function() {
+    const mensaje = document.getElementById("inputMensaje").value.trim();
+    if (mensaje !== "") {
+      push(chatRef, {
+        usuario: username,
+        texto: mensaje,
+        timestamp: Date.now()
+      });
+      document.getElementById("inputMensaje").value = "";
+    }
+  });
 
-const mensaje = document.getElementById("inputMensaje").value.trim();
+  document.getElementById("btnMochila").addEventListener("click", function() {
+    const inventario = document.getElementById("inventario");
+    inventario.classList.toggle("mostrar");
+  });
 
-if (mensaje !== "") {
+  document.getElementById("btnHerramientas").addEventListener("click", function() {
+    const herramientas = document.getElementById("herramientas");
+    herramientas.classList.toggle("mostrar");
+    cargarTeorico();
+  });
 
-push(chatRef, {
-
-usuario: username,
-
-texto: mensaje,
-
-timestamp: Date.now()
-
-});
-
-document.getElementById("inputMensaje").value = "";
-
-}
-
-});
-
-
-document.getElementById("btnMochila").addEventListener("click", function() {
-
-const inventario = document.getElementById("inventario");
-
-inventario.classList.toggle("mostrar");
+  cargarInventario();
 
 });
-
-
-document.getElementById("btnHerramientas").addEventListener("click", function() {
-
-const herramientas = document.getElementById("herramientas");
-
-herramientas.classList.toggle("mostrar");
-
-cargarTeorico();
-
-});
-
-});
-
 
 // Cargar mensajes en tiempo real
-
 onChildAdded(chatRef, (snapshot) => {
+  const data = snapshot.val();
+  const mensajeElemento = document.createElement("div");
+  mensajeElemento.textContent = `${data.usuario}: ${data.texto}`;
+  mensajeElemento.classList.add("mensaje");
+  document.getElementById("mensajes").appendChild(mensajeElemento);
 
-const data = snapshot.val();
+  // Desplazar hacia el último mensaje
+  const mensajes = document.getElementById("mensajes");
+  mensajes.scrollTop = mensajes.scrollHeight;
 
-const mensajeElemento = document.createElement("div");
-
-mensajeElemento.textContent = `${data.usuario}: ${data.texto}`;
-
-mensajeElemento.classList.add("mensaje");
-
-document.getElementById("mensajes").appendChild(mensajeElemento);
-
-
-// Desplazar hacia el último mensaje
-
-const mensajes = document.getElementById("mensajes");
-
-mensajes.scrollTop = mensajes.scrollHeight;
-
-
-// Limitar la cantidad de mensajes visibles
-
-const mensajeLimite = 8;
-
-const mensajesHijos = mensajes.children;
-
-if (mensajesHijos.length > mensajeLimite) {
-
-mensajes.removeChild(mensajesHijos[0]);
-
-remove(ref(db, 'chat/' + snapshot.key));
-
-}
-
+  // Limitar la cantidad de mensajes visibles
+  const mensajeLimite = 8;
+  const mensajesHijos = mensajes.children;
+  if (mensajesHijos.length > mensajeLimite) {
+    mensajes.removeChild(mensajesHijos[0]);
+    remove(ref(db, 'chat/' + snapshot.key));
+  }
 });
 
-
+// Cargar inventario desde Firebase
 function cargarInventario() {
+  onChildAdded(inventarioRef, (snapshot) => {
+    const inventarioData = snapshot.val();
+    const materiales = [
+      { nombre: "Carbón", cantidad: inventarioData ? inventarioData.carbon : 0 },
+      { nombre: "Cobre", cantidad: inventarioData ? inventarioData.cobre : 0 },
+      { nombre: "Hierro", cantidad: inventarioData ? inventarioData.hierro : 0 },
+      { nombre: "Plata", cantidad: inventarioData ? inventarioData.plata : 0 },
+      { nombre: "Oro", cantidad: inventarioData ? inventarioData.oro : 0 }
+    ];
 
-const materiales = [
+    const contenedorInventario = document.getElementById('inventario');
+    contenedorInventario.innerHTML = '';
 
-{ nombre: "Carbón", cantidad: 0 },
-
-{ nombre: "Cobre", cantidad: 0 },
-
-{ nombre: "Hierro", cantidad: 0 },
-
-{ nombre: "Plata", cantidad: 0 },
-
-{ nombre: "Oro", cantidad: 0 }
-
-];
-
-
-const contenedorInventario = document.getElementById('inventario');
-
-contenedorInventario.innerHTML = '';
-
-
-materiales.forEach((material) => {
-
-const articuloElemento = document.createElement("div");
-
-articuloElemento.classList.add("recuadro");
-
-articuloElemento.innerHTML = `
-
-<p class="nombre">${material.nombre}</p>
-
-<p class="cantidad">${material.cantidad}</p>
-
-`;
-
-contenedorInventario.appendChild(articuloElemento);
-
-});
-
+    materiales.forEach((material) => {
+      const articuloElemento = document.createElement("div");
+      articuloElemento.classList.add("recuadro");
+      articuloElemento.innerHTML = `
+        <p class="nombre">${material.nombre}</p>
+        <p class="cantidad">${material.cantidad}</p>
+      `;
+      contenedorInventario.appendChild(articuloElemento);
+    });
+  });
 }
-
-
-document.addEventListener("DOMContentLoaded", cargarInventario);
-
 
 // Función para cargar la página teorico.html dentro del contenedor
-
 function cargarTeorico() {
+  const herramientasContenedor = document.getElementById("herramientas");
+  herramientasContenedor.innerHTML = `
+    <iframe src="https://zanahorio326.github.io/Mal-comienzo/teorico.html" width="100%" height="400" frameborder="0"></iframe>
+  `;
+}
 
-const herramientasContenedor = document.getElementById("herramientas");
+// Función para actualizar inventario en Firebase
+function actualizarInventario() {
+  const inventario = {
+    carbon: 10,
+    cobre: 5,
+    hierro: 8,
+    plata: 2,
+    oro: 3
+  };
 
-herramientasContenedor.innerHTML = `
-
-<iframe src="https://zanahorio326.github.io/Mal-comienzo/teorico.html" width="100%" height="400" frameborder="0"></iframe>
-
-`;
-
+  update(inventarioRef, inventario);
 }
 
 </script>
-
 
 <style>
 
@@ -571,4 +506,3 @@ top: 55px;
 </body>
 
 </html>
-
