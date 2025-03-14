@@ -107,14 +107,24 @@
                     console.error("Error al obtener el inventario: ", error);
                 });
             }
+
+            // Función para manejar el botón de poder
+            document.getElementById("btnPoder").addEventListener("click", function(event) {
+                event.preventDefault(); // Evita cualquier acción predeterminada
+                if (window.self !== window.top) {
+                    // Si está dentro de un iframe, abrir en pantalla completa
+                    window.top.location.href = "https://zanahorio326.github.io/Mal-comienzo/prestigio.html";
+                } else {
+                    // Si no está en un iframe, abrir normalmente
+                    window.location.href = "https://zanahorio326.github.io/Mal-comienzo/prestigio.html";
+                }
+            });
         });
     </script>
 </head>
 <body>
     <button id="btnMinar">⛏️ Minar</button>
-    <br><br> <!-- Se añadió un espacio extra entre los botones -->
-    <a href="https://zanahorio326.github.io/Mal-comienzo/prestigio.html">
-        <button>🏆 Poder</button>
-    </a>
+    <br><br> <!-- Espaciado extra entre los botones -->
+    <button id="btnPoder">🏆 Poder</button>
 </body>
 </html>
