@@ -27,12 +27,34 @@
 
         document.addEventListener("DOMContentLoaded", function() {
             document.getElementById("btnMinar").addEventListener("click", function() {
-                const mensaje = "Minando..."; // El mensaje que se enviará al chat
+                const btn = this;
+                const mensajeInicio = "Minando..."; // Mensaje al iniciar
+                const mensajeFin = "Minado!"; // Mensaje al terminar
+
+                // Desactivar el botón y cambiar el texto a "Picando..."
+                btn.disabled = true;
+                btn.textContent = "⛏️ Picando...";
+
+                // Enviar mensaje de inicio al chat
                 push(chatRef, {
                     usuario: username,
-                    texto: mensaje,
+                    texto: mensajeInicio,
                     timestamp: Date.now()
                 });
+
+                // Esperar 5 segundos antes de finalizar el proceso
+                setTimeout(function() {
+                    // Rehabilitar el botón y cambiar el texto a "Minar"
+                    btn.disabled = false;
+                    btn.textContent = "⛏️ Minar";
+
+                    // Enviar mensaje de fin al chat
+                    push(chatRef, {
+                        usuario: username,
+                        texto: mensajeFin,
+                        timestamp: Date.now()
+                    });
+                }, 5000); // 5 segundos de espera
             });
         });
     </script>
