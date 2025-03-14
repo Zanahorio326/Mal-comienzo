@@ -49,6 +49,7 @@
             });
         });
 
+        // Cargar mensajes en tiempo real
         onChildAdded(chatRef, (snapshot) => {
             const data = snapshot.val();
             const mensajeElemento = document.createElement("div");
@@ -56,9 +57,15 @@
             mensajeElemento.classList.add("mensaje");
             document.getElementById("mensajes").appendChild(mensajeElemento);
 
-            const mensajes = document.getElementById("mensajes").children;
-            if (mensajes.length > 8) {
-                document.getElementById("mensajes").removeChild(mensajes[0]);
+            // Desplazar hacia el último mensaje
+            const mensajes = document.getElementById("mensajes");
+            mensajes.scrollTop = mensajes.scrollHeight;
+
+            // Limitar la cantidad de mensajes visibles
+            const mensajeLimite = 8;
+            const mensajesHijos = mensajes.children;
+            if (mensajesHijos.length > mensajeLimite) {
+                mensajes.removeChild(mensajesHijos[0]);
                 remove(ref(db, 'chat/' + snapshot.key));
             }
         });
