@@ -79,7 +79,13 @@
                 // Obtener el inventario actual del jugador
                 get(userRef).then((snapshot) => {
                     if (snapshot.exists()) {
-                        const inventory = snapshot.val().inventory || {};
+                        const inventory = snapshot.val().inventory || {
+                            carbon: 0,
+                            cobre: 0,
+                            hierro: 0,
+                            plata: 0,
+                            oro: 0
+                        };
                         
                         // Si el mineral ya está en el inventario, incrementamos la cantidad
                         if (inventory[mineral]) {
