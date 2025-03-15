@@ -1,180 +1,202 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unidades de Prestigio</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(45deg, #4caf50, #ff9800);
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-        h1 { margin-bottom: 20px; }
-        table {
-            width: 80%;
-            margin: 0 auto;
-            border-collapse: collapse;
-        }
-        table, th, td { border: 1px solid #fff; }
-        th, td { padding: 10px; text-align: center; }
-        th { background-color: #333; }
-        tr:nth-child(even) { background-color: #444; }
-        tr:nth-child(odd) { background-color: #555; }
-        .mochila-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .mochila-btn:hover { transform: scale(1.2); }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            background: white;
-            color: black;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-            text-align: left;
-        }
-        .modal h2 { margin-top: 0; }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-        .modal button {
-            display: block;
-            margin: 10px auto 0;
-            padding: 5px 10px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .boton {
-            display: inline-block;
-            padding: 15px 30px;
-            font-size: 18px;
-            color: white;
-            background: linear-gradient(45deg, #ff00ff, #00ffff);
-            background-size: 200% 200%;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            text-transform: uppercase;
-            text-decoration: none;
-            animation: gradiente 2s ease infinite;
-            margin-top: 30px;
-        }
-        .boton:hover { 
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5); 
+<!DOCTYPE html>  
+<html lang="es">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Unidades de Prestigio</title>  
+    <style>  
+        body {  
+            font-family: Arial, sans-serif;  
+            background: linear-gradient(45deg, #4caf50, #ff9800);  
+            color: white;  
+            text-align: center;  
+            padding: 20px;  
+        }  
+        h1 { margin-bottom: 20px; }  
+        table {  
+            width: 80%;  
+            margin: 0 auto;  
+            border-collapse: collapse;  
+        }  
+        table, th, td { border: 1px solid #fff; }  
+        th, td { padding: 10px; text-align: center; }  
+        th { background-color: #333; }  
+        tr:nth-child(even) { background-color: #444; }  
+        tr:nth-child(odd) { background-color: #555; }  
+        .mochila-btn {  
+            background: none;  
+            border: none;  
+            font-size: 24px;  
+            cursor: pointer;  
+            transition: transform 0.2s;  
+        }  
+        .mochila-btn:hover { transform: scale(1.2); }  
+        .modal {  
+            display: none;  
+            position: fixed;  
+            top: 50%;  
+            left: 50%;  
+            transform: translate(-50%, -50%);  
+            width: 300px;  
+            background: white;  
+            color: black;  
+            padding: 20px;  
+            border-radius: 10px;  
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);  
+            text-align: left;  
+        }  
+        .modal h2 { margin-top: 0; }  
+        .grid {  
+            display: grid;  
+            grid-template-columns: repeat(2, 1fr);  
+            gap: 10px;  
+        }  
+        .modal button {  
+            display: block;  
+            margin: 10px auto 0;  
+            padding: 5px 10px;  
+            font-size: 16px;  
+            cursor: pointer;  
+        }  
+        .boton {  
+            display: inline-block;  
+            padding: 15px 30px;  
+            font-size: 18px;  
+            color: white;  
+            background: linear-gradient(45deg, #ff00ff, #00ffff);  
+            background-size: 200% 200%;  
+            border: none;  
+            border-radius: 50px;  
+            cursor: pointer;  
+            text-transform: uppercase;  
+            text-decoration: none;  
+            animation: gradiente 2s ease infinite;  
+            margin-top: 30px;  
+        }  
+        .boton:hover {   
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);   
+        }  
+  
+        @keyframes gradiente {  
+            0% {  
+                background-position: 200% 0;  
+            }  
+            100% {  
+                background-position: 0 0;  
+            }  
+        }  
+
+        /* Animación para la aparición de las filas */
+        @keyframes fadeInRow {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        @keyframes gradiente {
-            0% {
-                background-position: 200% 0;
-            }
-            100% {
-                background-position: 0 0;
-            }
+        .fila-aparicion {
+            animation: fadeInRow 0.5s ease-out forwards;
         }
-    </style>
-</head>
-<body>
-    <h1>Unidades de Prestigio</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Jugador</th>
-                <th>Prestigio</th>
-                <th>Mochila</th>
-            </tr>
-        </thead>
-        <tbody id="tablaPrestigio"></tbody>
-    </table>
-    <a href="https://zanahorio326.github.io/Mal-comienzo/chat.html" class="boton">Ir al chat</a>
-    <div id="modal" class="modal">
-        <h2 id="modal-title"></h2>
-        <div id="modal-content" class="grid"></div>
-        <button id="cerrar-modal">Cerrar</button>
-    </div>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-        const firebaseConfig = {
-            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
-            authDomain: "thegame-5afaa.firebaseapp.com",
-            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
-            projectId: "thegame-5afaa",
-            storageBucket: "thegame-5afaa.firebasestorage.app",
-            messagingSenderId: "588556182984",
-            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
-            measurementId: "G-9M3CBJ3LV9"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        function calcularPrestigio(inventory) {
-            const puntosPorMineral = { "Carbón": 1, "Cobre": 2, "Hierro": 5, "Plata": 10, "Oro": 20, "Madera": 15 };
-            return Object.entries(inventory).reduce((acc, [mineral, cantidad]) => acc + (cantidad * (puntosPorMineral[mineral] || 0)), 0);
-        }
-        function mostrarInventario(event) {
-            const nombre = event.target.getAttribute("data-nombre");
-            let inventory = JSON.parse(event.target.getAttribute("data-inventory"));
-            inventory = Object.fromEntries(Object.entries(inventory).filter(([_, cantidad]) => cantidad > 0));
-            const modal = document.getElementById("modal");
-            const modalTitle = document.getElementById("modal-title");
-            const modalContent = document.getElementById("modal-content");
-            modalTitle.textContent = `Mochila de ${nombre}`;
-            modalContent.innerHTML = Object.entries(inventory).map(([item, cantidad]) => `<div><strong>${item}</strong>: x${cantidad}</div>`).join("") || "<p>Vacío</p>";
-            modal.style.display = "block";
-        }
-        function cerrarModal() {
-            document.getElementById("modal").style.display = "none";
-        }
-        document.getElementById("cerrar-modal").addEventListener("click", cerrarModal);
-        function mostrarPrestigio() {
-            const tablaPrestigio = document.getElementById("tablaPrestigio");
-            get(ref(db, 'users/')).then(snapshot => {
-                if (!snapshot.exists()) return console.log("No se encontraron datos para los usuarios.");
-                const usuariosArray = Object.entries(snapshot.val()).map(([username, { inventory = {} }]) => ({
-                    username,
-                    prestigio: calcularPrestigio(inventory),
-                    inventory
-                })).sort((a, b) => b.prestigio - a.prestigio);
-                tablaPrestigio.innerHTML = '';
-                usuariosArray.forEach((usuario, index) => {
-                    const fila = document.createElement("tr");
-                    fila.innerHTML = `
-                        <td>${usuario.username}</td>
-                        <td class="prestigio">0</td>
-                        <td><button class="mochila-btn" data-nombre="${usuario.username}" data-inventory='${JSON.stringify(usuario.inventory)}'>🎒</button></td>
-                    `;
-                    fila.style.opacity = "0";
-                    setTimeout(() => { fila.style.opacity = "1"; }, index * 200);
-                    tablaPrestigio.appendChild(fila);
-                    setTimeout(() => animarNumero(fila.querySelector(".prestigio"), usuario.prestigio), (index + 1) * 200);
-                });
-                document.querySelectorAll(".mochila-btn").forEach(btn => btn.addEventListener("click", mostrarInventario));
-            }).catch(error => console.error("Error al obtener los datos de los usuarios:", error));
-        }
-        function animarNumero(elemento, valorFinal) {
-            let valorActual = 0;
-            const incremento = Math.ceil(valorFinal / (1000 / 16));
-            function actualizarNumero() {
-                valorActual += incremento;
-                elemento.textContent = valorActual >= valorFinal ? valorFinal : valorActual;
-                if (valorActual < valorFinal) requestAnimationFrame(actualizarNumero);
-            }
-            requestAnimationFrame(actualizarNumero);
-        }
-        document.addEventListener("DOMContentLoaded", mostrarPrestigio);
-    </script>
-</body>
+    </style>  
+</head>  
+<body>  
+    <h1>Unidades de Prestigio</h1>  
+    <table>  
+        <thead>  
+            <tr>  
+                <th>Jugador</th>  
+                <th>Prestigio</th>  
+                <th>Mochila</th>  
+            </tr>  
+        </thead>  
+        <tbody id="tablaPrestigio"></tbody>  
+    </table>  
+    <a href="https://zanahorio326.github.io/Mal-comienzo/chat.html" class="boton">Ir al chat</a>  
+    <div id="modal" class="modal">  
+        <h2 id="modal-title"></h2>  
+        <div id="modal-content" class="grid"></div>  
+        <button id="cerrar-modal">Cerrar</button>  
+    </div>  
+    <script type="module">  
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";  
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";  
+        const firebaseConfig = {  
+            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",  
+            authDomain: "thegame-5afaa.firebaseapp.com",  
+            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",  
+            projectId: "thegame-5afaa",  
+            storageBucket: "thegame-5afaa.firebasestorage.app",  
+            messagingSenderId: "588556182984",  
+            appId: "1:588556182984:web:a0557067d35c18e3944cfd",  
+            measurementId: "G-9M3CBJ3LV9"  
+        };  
+        const app = initializeApp(firebaseConfig);  
+        const db = getDatabase(app);  
+        function calcularPrestigio(inventory) {  
+            const puntosPorMineral = { "Carbón": 1, "Cobre": 2, "Hierro": 5, "Plata": 10, "Oro": 20, "Madera": 15 };  
+            return Object.entries(inventory).reduce((acc, [mineral, cantidad]) => acc + (cantidad * (puntosPorMineral[mineral] || 0)), 0);  
+        }  
+        function mostrarInventario(event) {  
+            const nombre = event.target.getAttribute("data-nombre");  
+            let inventory = JSON.parse(event.target.getAttribute("data-inventory"));  
+            inventory = Object.fromEntries(Object.entries(inventory).filter(([_, cantidad]) => cantidad > 0));  
+            const modal = document.getElementById("modal");  
+            const modalTitle = document.getElementById("modal-title");  
+            const modalContent = document.getElementById("modal-content");  
+            modalTitle.textContent = `Mochila de ${nombre}`;  
+            modalContent.innerHTML = Object.entries(inventory).map(([item, cantidad]) => `<div><strong>${item}</strong>: x${cantidad}</div>`).join("") || "<p>Vacío</p>";  
+            modal.style.display = "block";  
+        }  
+        function cerrarModal() {  
+            document.getElementById("modal").style.display = "none";  
+        }  
+        document.getElementById("cerrar-modal").addEventListener("click", cerrarModal);  
+        
+        function mostrarPrestigio() {  
+            const tablaPrestigio = document.getElementById("tablaPrestigio");  
+            get(ref(db, 'users/')).then(snapshot => {  
+                if (!snapshot.exists()) return console.log("No se encontraron datos para los usuarios.");  
+                const usuariosArray = Object.entries(snapshot.val()).map(([username, { inventory = {} }]) => ({  
+                    username,  
+                    prestigio: calcularPrestigio(inventory),  
+                    inventory  
+                })).sort((a, b) => b.prestigio - a.prestigio);  
+                tablaPrestigio.innerHTML = '';  
+                usuariosArray.forEach((usuario, index) => {  
+                    const fila = document.createElement("tr");  
+                    fila.classList.add("fila-aparicion");  // Agrega la clase de animación  
+                    fila.innerHTML = `  
+                        <td>${usuario.username}</td>  
+                        <td class="prestigio">0</td>  
+                        <td><button class="mochila-btn" data-nombre="${usuario.username}" data-inventory='${JSON.stringify(usuario.inventory)}'>🎒</button></td>  
+                    `;  
+                    tablaPrestigio.appendChild(fila);  
+                    setTimeout(() => animarNumero(fila.querySelector(".prestigio"), usuario.prestigio), (index + 1) * 500);  // Retraso incremental  
+                });  
+                document.querySelectorAll(".mochila-btn").forEach(btn => btn.addEventListener("click", mostrarInventario));  
+            }).catch(error => console.error("Error al obtener los datos de los usuarios:", error));  
+        }  
+
+        function animarNumero(elemento, valorFinal) {  
+            let valorActual = 0;  
+            const incremento = Math.ceil(valorFinal / (1000 / 16));  
+            function actualizarNumero() {  
+                valorActual += incremento;  
+                elemento.textContent = valorActual >= valorFinal ? valorFinal : valorActual;  
+                if (valorActual < valorFinal) requestAnimationFrame(actualizarNumero);  
+            }  
+            requestAnimationFrame(actualizarNumero);  
+        }  
+
+        // Llamar a la función para cargar los datos cuando se cargue la página  
+        document.addEventListener("DOMContentLoaded", () => {  
+            mostrarPrestigio();  
+            setInterval(mostrarPrestigio, 10000);  // Recargar datos cada 10 segundos  
+        });  
+    </script>  
+</body>  
 </html>
