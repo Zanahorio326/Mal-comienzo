@@ -79,11 +79,11 @@
                 get(userRef).then((snapshot) => {      
                     if (snapshot.exists()) {      
                         const inventory = snapshot.val().inventory || {      
-                            carbon: 0,      
-                            cobre: 0,      
-                            hierro: 0,      
-                            plata: 0,      
-                            oro: 0      
+                            Carbón: 0,      
+                            Cobre: 0,      
+                            Hierro: 0,      
+                            Plata: 0,      
+                            Oro: 0      
                         };      
       
                         inventory[mineral] = (inventory[mineral] || 0) + 1;      
@@ -132,7 +132,7 @@
                         });      
                     } else if (resultado === "Madera") {      
                         mensaje = "Logré conseguir un tronco.";      
-                        actualizarInventario("madera");      
+                        actualizarInventario("Madera");      
                     }      
       
                     push(ref(db, 'chat'), {      
