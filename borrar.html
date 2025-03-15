@@ -109,7 +109,7 @@
                         if (users[username].inventory) {
                             let inventory = users[username].inventory;
                             let inventoryUpdated = false;
-                            let nuevoInventario = {};
+                            let nuevoInventario = { ...inventory }; // Hacer una copia para actualizar
 
                             for (const item in inventory) {
                                 let cantidad = inventory[item]; // Cantidad del ítem
@@ -118,12 +118,21 @@
                                 let itemLimpio = item.trim().toLowerCase();
                                 if (itemsIncorrectos[itemLimpio]) {
                                     const nuevoNombre = itemsIncorrectos[itemLimpio];
+
                                     agregarAlerta(`Corrigiendo "${item}" por "${nuevoNombre}" en el usuario ${username}`);
-                                    nuevoInventario[nuevoNombre] = cantidad; // Guardar con el nombre corregido
+
+                                    // Si ya existe el ítem corregido, sumar las cantidades
+                                    if (nuevoInventario[nuevoNombre]) {
+                                        nuevoInventario[nuevoNombre] += cantidad;
+                                    } else {
+                                        nuevoInventario[nuevoNombre] = cantidad;
+                                    }
+
+                                    // Eliminar el ítem incorrecto
+                                    delete nuevoInventario[item];
+
                                     inventoryUpdated = true;
                                     cambiosRealizados++;
-                                } else {
-                                    nuevoInventario[item] = cantidad; // Mantener el ítem original si no necesita cambio
                                 }
                             }
 
