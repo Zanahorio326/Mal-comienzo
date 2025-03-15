@@ -3,83 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cambiar Inventario</title>
+    <title>Corregir Inventarios</title>
     <style>
+        /* Estilos generales */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom right, #28a745, #f39c12); /* Degradado verde a naranja */
+            color: #333;
+        }
+
+        h1, h3 {
             text-align: center;
+            color: #fff;
+        }
+
+        /* Estilos para el contenedor principal */
+        #mochila {
+            max-width: 600px;
+            margin: 20px auto;
             padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
+        /* Estilos para los elementos del inventario */
         p {
-            font-size: 1.5em;
+            font-size: 1.2em;
             margin: 10px 0;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 4px;
         }
+
+        p:nth-child(odd) {
+            background-color: #e7e7e7;
+        }
+
+        /* Estilos para el título principal */
+        h1 {
+            font-size: 2em;
+            color: #2c3e50;
+            margin-top: 20px;
+        }
+
+        /* Estilos para el título de la mochila */
+        h3 {
+            font-size: 1.5em;
+            color: #2980b9;
+        }
+
+        /* Estilo para el botón */
         button {
+            display: block;
+            margin: 20px auto;
             padding: 10px 20px;
-            font-size: 1em;
+            background-color: #f39c12;
+            color: white;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 4px;
             cursor: pointer;
         }
+
+        button:hover {
+            background-color: #e67e22;
+        }
     </style>
-</head>
-<body>
-    <h1>Inventario</h1>
-    <p id="carbón">carbon: 10</p>
-    <p id="cobre">cobre: 5</p>
-    <p id="hierro">hierra: 3</p>
-    <p id="plata">plata: 8</p>
-    <p id="oro">oro: 2</p>
-    <p id="madera">madera: 15</p>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-    <button onclick="corregirInventario()">Corregir Inventario</button>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+            authDomain: "thegame-5afaa.firebaseapp.com",
+            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+            projectId: "thegame-5afaa",
+            storageBucket: "thegame-5afaa.firebasestorage.app",
+            messagingSenderId: "588556182984",
+            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+            measurementId: "G-9M3CBJ3LV9"
+        };
 
-    <script>
-        // Función que corrige los textos
-        function corregirInventario() {
-            // Objeto con los reemplazos
-            const cambios = {
-                "carbon": "Carbón",
-                "carbono": "Carbón",
-                "carbones": "Carbón",
-                "carbón": "Carbón",
-                "cobre": "Cobre",
-                "cobres": "Cobre",
-                "coobre": "Cobre",
-                "cobrees": "Cobre",
-                "hierro": "Hierro",
-                "hierra": "Hierro",
-                "hiero": "Hierro",
-                "plata": "Plata",
-                "plat": "Plata",
-                "platA": "Plata",
-                "oro": "Oro",
-                "Oro": "Oro",
-                "madera": "Madera",
-                "maderas": "Madera",
-                "maderaa": "Madera"
+        // Inicialización de Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Función para reemplazar los nombres incorrectos por los correctos
+        function corregirInventario(inventory) {
+            const correciones = {
+                'carbon': 'Carbón',
+                'cobre': 'Cobre',
+                'hierro': 'Hierro',
+                'plata': 'Plata',
+                'oro': 'Oro',
+                'madera': 'Madera'
             };
 
-            // Reemplazo de texto en cada elemento
-            document.getElementById("carbón").textContent = document.getElementById("carbón").textContent.replace(/carbones?/gi, cambios["carbon"]);
-            document.getElementById("carbón").textContent = document.getElementById("carbón").textContent.replace(/carbono?/gi, cambios["carbon"]);
-            document.getElementById("carbón").textContent = document.getElementById("carbón").textContent.replace(/carbón/gi, cambios["carbon"]);
+            const corregido = {};
 
-            document.getElementById("cobre").textContent = document.getElementById("cobre").textContent.replace(/cobres?/gi, cambios["cobre"]);
-            document.getElementById("cobre").textContent = document.getElementById("cobre").textContent.replace(/coobre/gi, cambios["cobre"]);
-            document.getElementById("cobre").textContent = document.getElementById("cobre").textContent.replace(/cobrees?/gi, cambios["cobre"]);
+            for (const item in inventory) {
+                if (inventory.hasOwnProperty(item)) {
+                    let itemName = item.toLowerCase();
+                    corregido[correciones[itemName] || item] = inventory[item];
+                }
+            }
 
-            document.getElementById("hierro").textContent = document.getElementById("hierro").textContent.replace(/hierra/gi, cambios["hierro"]);
-            document.getElementById("hierro").textContent = document.getElementById("hierro").textContent.replace(/hiero/gi, cambios["hierro"]);
-
-            document.getElementById("plata").textContent = document.getElementById("plata").textContent.replace(/platA/gi, cambios["plata"]);
-            document.getElementById("plata").textContent = document.getElementById("plata").textContent.replace(/plat/gi, cambios["plata"]);
-
-            document.getElementById("oro").textContent = document.getElementById("oro").textContent.replace(/Oro/gi, cambios["oro"]);
-            document.getElementById("oro").textContent = document.getElementById("oro").textContent.replace(/oro/gi, cambios["oro"]);
-
-            document.getElementById("madera").textContent = document.getElementById("madera").textContent.replace(/maderas?/gi, cambios["madera"]);
-            document.getElementById("madera").textContent = document.getElementById("madera").textContent.replace(/maderaa/gi, cambios["madera"]);
+            return corregido;
         }
+
+        // Función para actualizar el inventario con las correcciones
+        function actualizarInventario(usuario) {
+            const userRef = ref(db, 'users/' + usuario + '/inventory');
+            get(userRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const inventory = snapshot.val();
+                    const inventoryCorregido = corregirInventario(inventory);
+
+                    // Actualizar en la base de datos con los nombres corregidos
+                    set(userRef, inventoryCorregido)
+                        .then(() => {
+                            alert("¡Inventario corregido!");
+                        })
+                        .catch((error) => {
+                            console.error("Error al actualizar el inventario: ", error);
+                        });
+                } else {
+                    console.log("No se encontraron datos para el usuario.");
+                }
+            }).catch((error) => {
+                console.error("Error al obtener el inventario: ", error);
+            });
+        }
+
+        // Obtener el nombre de usuario
+        const username = localStorage.getItem("username") || "Desconocido";
+
+        // Llamar a la función cuando se presione el botón
+        document.getElementById("btnCorregir").addEventListener("click", function() {
+            actualizarInventario(username);
+        });
     </script>
+</head>
+<body>
+    <h1>Corregir Inventarios</h1>
+    <div id="mochila">
+        <h3>Haz clic para corregir los inventarios</h3>
+        <button id="btnCorregir">Corregir Inventario</button>
+    </div>
 </body>
 </html>
