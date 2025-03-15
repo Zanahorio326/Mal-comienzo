@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabla de Prestigio</title>
+    <title>Unidades de Prestigio</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,51 +12,52 @@
             text-align: center;
             padding: 20px;
         }
-
-        h1 {
-            margin-bottom: 20px;
-        }
-
+        h1 { margin-bottom: 20px; }
         table {
-            width: 60%;
+            width: 80%;
             margin: 0 auto;
             border-collapse: collapse;
         }
-
-        table, th, td {
-            border: 1px solid #fff;
+        table, th, td { border: 1px solid #fff; }
+        th, td { padding: 10px; text-align: center; }
+        th { background-color: #333; }
+        tr:nth-child(even) { background-color: #444; }
+        tr:nth-child(odd) { background-color: #555; }
+        .mochila-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            transition: transform 0.2s;
         }
-
-        th, td {
-            padding: 10px;
-            text-align: center;
+        .mochila-btn:hover { transform: scale(1.2); }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            background: white;
+            color: black;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            text-align: left;
         }
-
-        th {
-            background-color: #333;
+        .modal h2 { margin-top: 0; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
         }
-
-        tr:nth-child(even) {
-            background-color: #444;
+        .modal button {
+            display: block;
+            margin: 10px auto 0;
+            padding: 5px 10px;
+            font-size: 16px;
+            cursor: pointer;
         }
-
-        tr:nth-child(odd) {
-            background-color: #555;
-        }
-
-        /* Animación de aparición de filas */
-        @keyframes aparecer {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Estilo para el botón animado */
         .boton {
             display: inline-block;
             padding: 15px 30px;
@@ -72,45 +73,30 @@
             animation: gradiente 2s ease infinite;
             margin-top: 30px;
         }
-
-        .boton:hover {
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-        }
-
-        @keyframes gradiente {
-            0% {
-                background-position: 200% 0;
-            }
-            50% {
-                background-position: 0 100%;
-            }
-            100% {
-                background-position: 200% 0;
-            }
-        }
+        .boton:hover { box-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
     </style>
 </head>
 <body>
-    <h1>Tabla de Prestigio</h1>
+    <h1>Unidades de Prestigio</h1>
     <table>
         <thead>
             <tr>
-                <th>Nombre de Usuario</th>
+                <th>Jugador</th>
                 <th>Prestigio</th>
+                <th>Mochila</th>
             </tr>
         </thead>
-        <tbody id="tablaPrestigio">
-            <!-- Aquí se cargarán los datos de los usuarios -->
-        </tbody>
+        <tbody id="tablaPrestigio"></tbody>
     </table>
-
     <a href="https://zanahorio326.github.io/Mal-comienzo/chat.html" class="boton">Ir al chat</a>
-
+    <div id="modal" class="modal">
+        <h2 id="modal-title"></h2>
+        <div id="modal-content" class="grid"></div>
+        <button id="cerrar-modal">Cerrar</button>
+    </div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-
-        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
             authDomain: "thegame-5afaa.firebaseapp.com",
@@ -121,112 +107,62 @@
             appId: "1:588556182984:web:a0557067d35c18e3944cfd",
             measurementId: "G-9M3CBJ3LV9"
         };
-
-        // Inicialización de Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-
-        // Función para calcular el prestigio
         function calcularPrestigio(inventory) {
-            const puntosPorMineral = {
-                "Carbón": 1,
-                "Cobre": 2,
-                "Hierro": 5,
-                "Plata": 10,
-                "Oro": 20,
-                "Madera": 15
-            };
-
-            let prestigio = 0;
-            for (const mineral in inventory) {
-                prestigio += inventory[mineral] * (puntosPorMineral[mineral] || 0);
-            }
-            return prestigio;
+            const puntosPorMineral = { "Carbón": 1, "Cobre": 2, "Hierro": 5, "Plata": 10, "Oro": 20, "Madera": 15 };
+            return Object.entries(inventory).reduce((acc, [mineral, cantidad]) => acc + (cantidad * (puntosPorMineral[mineral] || 0)), 0);
         }
-
-        // Función para mostrar la tabla de prestigio con animaciones
+        function mostrarInventario(event) {
+            const nombre = event.target.getAttribute("data-nombre");
+            let inventory = JSON.parse(event.target.getAttribute("data-inventory"));
+            inventory = Object.fromEntries(Object.entries(inventory).filter(([_, cantidad]) => cantidad > 0));
+            const modal = document.getElementById("modal");
+            const modalTitle = document.getElementById("modal-title");
+            const modalContent = document.getElementById("modal-content");
+            modalTitle.textContent = `Mochila de ${nombre}`;
+            modalContent.innerHTML = Object.entries(inventory).map(([item, cantidad]) => `<div><strong>${item}</strong>: x${cantidad}</div>`).join("") || "<p>Vacío</p>";
+            modal.style.display = "block";
+        }
+        function cerrarModal() {
+            document.getElementById("modal").style.display = "none";
+        }
+        document.getElementById("cerrar-modal").addEventListener("click", cerrarModal);
         function mostrarPrestigio() {
             const tablaPrestigio = document.getElementById("tablaPrestigio");
-            const usersRef = ref(db, 'users/');
-
-            get(usersRef).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const usuarios = snapshot.val();
-                    const usuariosArray = [];
-
-                    for (const username in usuarios) {
-                        const inventory = usuarios[username].inventory || {
-                            Carbón: 0,
-                            Cobre: 0,
-                            Hierro: 0,
-                            Plata: 0,
-                            Oro: 0,
-                            Madera: 0
-                        };
-
-                        const prestigio = calcularPrestigio(inventory);
-                        usuariosArray.push({ username, prestigio });
-                    }
-
-                    // Ordenar los usuarios por prestigio (de mayor a menor)
-                    usuariosArray.sort((a, b) => b.prestigio - a.prestigio);
-
-                    // Limpiar la tabla actual
-                    tablaPrestigio.innerHTML = '';
-
-                    // Agregar las filas ordenadas con animación
-                    usuariosArray.forEach((usuario, index) => {
-                        const fila = document.createElement("tr");
-
-                        const celdaNombre = document.createElement("td");
-                        celdaNombre.textContent = usuario.username;
-                        fila.appendChild(celdaNombre);
-
-                        const celdaPrestigio = document.createElement("td");
-                        celdaPrestigio.textContent = "0"; // Inicia en 0 para animar después
-                        fila.appendChild(celdaPrestigio);
-
-                        // Animación de aparición
-                        fila.style.opacity = "0";
-                        setTimeout(() => {
-                            fila.style.animation = `aparecer 0.5s ease forwards`;
-                        }, index * 200); // Retraso escalonado
-
-                        tablaPrestigio.appendChild(fila);
-
-                        // Animación de conteo después de la animación de aparición
-                        setTimeout(() => {
-                            animarNumero(celdaPrestigio, usuario.prestigio);
-                        }, (index + 1) * 200); // Comienza después de la aparición
-                    });
-                } else {
-                    console.log("No se encontraron datos para los usuarios.");
-                }
-            }).catch((error) => {
-                console.error("Error al obtener los datos de los usuarios: ", error);
-            });
+            get(ref(db, 'users/')).then(snapshot => {
+                if (!snapshot.exists()) return console.log("No se encontraron datos para los usuarios.");
+                const usuariosArray = Object.entries(snapshot.val()).map(([username, { inventory = {} }]) => ({
+                    username,
+                    prestigio: calcularPrestigio(inventory),
+                    inventory
+                })).sort((a, b) => b.prestigio - a.prestigio);
+                tablaPrestigio.innerHTML = '';
+                usuariosArray.forEach((usuario, index) => {
+                    const fila = document.createElement("tr");
+                    fila.innerHTML = `
+                        <td>${usuario.username}</td>
+                        <td class="prestigio">0</td>
+                        <td><button class="mochila-btn" data-nombre="${usuario.username}" data-inventory='${JSON.stringify(usuario.inventory)}'>🎒</button></td>
+                    `;
+                    fila.style.opacity = "0";
+                    setTimeout(() => { fila.style.opacity = "1"; }, index * 200);
+                    tablaPrestigio.appendChild(fila);
+                    setTimeout(() => animarNumero(fila.querySelector(".prestigio"), usuario.prestigio), (index + 1) * 200);
+                });
+                document.querySelectorAll(".mochila-btn").forEach(btn => btn.addEventListener("click", mostrarInventario));
+            }).catch(error => console.error("Error al obtener los datos de los usuarios:", error));
         }
-
-        // Función para animar el conteo de prestigio
         function animarNumero(elemento, valorFinal) {
             let valorActual = 0;
-            const duracion = 1000; // 1 segundo
-            const incremento = Math.ceil(valorFinal / (duracion / 16)); // Ajuste a 60 FPS
-
+            const incremento = Math.ceil(valorFinal / (1000 / 16));
             function actualizarNumero() {
                 valorActual += incremento;
-                if (valorActual >= valorFinal) {
-                    elemento.textContent = valorFinal; // Asegura que no pase el valor final
-                } else {
-                    elemento.textContent = valorActual;
-                    requestAnimationFrame(actualizarNumero);
-                }
+                elemento.textContent = valorActual >= valorFinal ? valorFinal : valorActual;
+                if (valorActual < valorFinal) requestAnimationFrame(actualizarNumero);
             }
-
             requestAnimationFrame(actualizarNumero);
         }
-
-        // Cargar la tabla de prestigio al cargar la página
         document.addEventListener("DOMContentLoaded", mostrarPrestigio);
     </script>
 </body>
