@@ -86,11 +86,11 @@ function cargarInventario() {
     if (snapshot.exists()) {
       const inventarioData = snapshot.val();
       const materiales = [
-        { nombre: "Carbón", cantidad: inventarioData.Carbón || 0 },
-        { nombre: "Cobre", cantidad: inventarioData.Cobre || 0 },
-        { nombre: "Hierro", cantidad: inventarioData.Hierro || 0 },
-        { nombre: "Plata", cantidad: inventarioData.Plata || 0 },
-        { nombre: "Oro", cantidad: inventarioData.Oro || 0 }
+        { nombre: "carbón", cantidad: inventarioData.carbón || 0 },
+        { nombre: "cobre", cantidad: inventarioData.cobre || 0 },
+        { nombre: "hierro", cantidad: inventarioData.hierro || 0 },
+        { nombre: "plata", cantidad: inventarioData.plata || 0 },
+        { nombre: "oro", cantidad: inventarioData.oro || 0 }
       ];
 
       const contenedorInventario = document.getElementById('inventario');
