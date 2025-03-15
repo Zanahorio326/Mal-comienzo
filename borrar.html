@@ -55,28 +55,29 @@
 
                     for (const username in users) {
                         if (users[username].inventory) {
-                            let inventoryUpdated = false;
                             let inventory = users[username].inventory;
+                            let inventoryUpdated = false;
+                            let nuevoInventario = {};
 
                             for (const item in inventory) {
-                                let valorActual = inventory[item];
-                                todasLasPalabras.push(valorActual); // Agregar todas las palabras encontradas
+                                let cantidad = inventory[item]; // Cantidad del ítem
+                                todasLasPalabras.push(item); // Guardar el nombre del ítem
 
-                                if (typeof valorActual === 'string') {
-                                    let valorLimpio = valorActual.trim().toLowerCase(); // Normalizar comparación
-                                    if (itemsIncorrectos[valorLimpio]) {
-                                        const nuevoValor = itemsIncorrectos[valorLimpio];
-                                        alert(`Corrigiendo "${valorActual}" por "${nuevoValor}" en el usuario ${username}`);
-                                        inventory[item] = nuevoValor;
-                                        inventoryUpdated = true;
-                                        cambiosRealizados++;
-                                    }
+                                let itemLimpio = item.trim().toLowerCase();
+                                if (itemsIncorrectos[itemLimpio]) {
+                                    const nuevoNombre = itemsIncorrectos[itemLimpio];
+                                    alert(`Corrigiendo "${item}" por "${nuevoNombre}" en el usuario ${username}`);
+                                    nuevoInventario[nuevoNombre] = cantidad; // Guardar con el nombre corregido
+                                    inventoryUpdated = true;
+                                    cambiosRealizados++;
+                                } else {
+                                    nuevoInventario[item] = cantidad; // Mantener el ítem original si no necesita cambio
                                 }
                             }
 
                             // Si hubo cambios, subir el inventario actualizado
                             if (inventoryUpdated) {
-                                set(ref(db, `users/${username}/inventory`), inventory).then(() => {
+                                set(ref(db, `users/${username}/inventory`), nuevoInventario).then(() => {
                                     alert(`Inventario de ${username} actualizado en la base de datos.`);
                                 }).catch((error) => {
                                     alert(`Error al actualizar el inventario de ${username}: ${error}`);
