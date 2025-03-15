@@ -1,51 +1,149 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Actualizar Inventarios</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mochila</title>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom right, #28a745, #f39c12); /* Degradado verde a naranja */
+            color: #333;
+        }
+
+        h1, h3 {
+            text-align: center;
+            color: #fff;
+        }
+
+        /* Estilos para el contenedor principal de la mochila */
+        #mochila {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilos para los elementos del inventario */
+        p {
+            font-size: 1.2em;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        p:nth-child(odd) {
+            background-color: #e7e7e7;
+        }
+
+        /* Estilos para el título principal */
+        h1 {
+            font-size: 2em;
+            color: #2c3e50;
+            margin-top: 20px;
+        }
+
+        /* Estilos para el título de la mochila */
+        h3 {
+            font-size: 1.5em;
+            color: #2980b9;
+        }
+
+        /* Estilo para el icono de candado */
+        .candado {
+            font-size: 1.5em;
+            color: #f39c12;
+        }
+    </style>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+            authDomain: "thegame-5afaa.firebaseapp.com",
+            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+            projectId: "thegame-5afaa",
+            storageBucket: "thegame-5afaa.firebasestorage.app",
+            messagingSenderId: "588556182984",
+            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+            measurementId: "G-9M3CBJ3LV9"
+        };
+
+        // Inicialización de Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Obtener el nombre de usuario
+        const username = localStorage.getItem("username") || "Desconocido";
+        const userRef = ref(db, 'users/' + username);
+
+        // Mapa para normalizar los nombres de los elementos
+        const normalizarItems = {
+            "carbon": "Carbón",
+            "carbón": "Carbón",
+            "cobre": "Cobre",
+            "cobre": "Cobre",
+            "hierro": "Hierro",
+            "hierro": "Hierro",
+            "plata": "Plata",
+            "plata": "Plata",
+            "oro": "Oro",
+            "oro": "Oro",
+            "madera": "Madera",
+            "madera": "Madera"
+        };
+
+        // Función para normalizar el nombre de los items
+        function normalizarNombre(item) {
+            const itemMin = item.toLowerCase();
+            return normalizarItems[itemMin] || item;
+        }
+
+        // Función para mostrar el inventario del jugador
+        function mostrarInventario() {
+            get(userRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const inventory = snapshot.val().inventory || {};
+
+                    // Recorremos todos los items y los normalizamos
+                    const items = ["carbon", "cobre", "hierro", "plata", "oro", "madera"];
+                    items.forEach(item => {
+                        const normalizedItem = normalizarNombre(item);
+                        const quantity = inventory[item] !== undefined ? inventory[item] : "🔒";
+                        document.getElementById(normalizedItem).textContent = `${normalizedItem}: ${quantity}`;
+                    });
+                } else {
+                    console.log("No se encontraron datos para el usuario.");
+                }
+            }).catch((error) => {
+                console.error("Error al obtener el inventario: ", error);
+            });
+        }
+
+        // Llamar a la función de mostrar inventario al cargar la página
+        document.addEventListener("DOMContentLoaded", function() {
+            mostrarInventario();
+        });
+    </script>
 </head>
 <body>
-  <!-- Botón para actualizar los inventarios -->
-  <button onclick="actualizarInventarios()">Actualizar Inventarios</button>
-
-  <script>
-    // Arreglo de inventarios (cada objeto representa un inventario)
-    let inventarios = [
-      { "Carbón": 5, "Cobre": 2, "Hierro": 1, "Madera": 2, "Oro": 1, "Plata": 1 },
-      { "carbón": 5, "cobre": 1 },
-      { "Cobre": 2, "carbón": 1 },
-      { "Cobre": 3 },
-      { "Carbón": 5 },
-      { "Cobre": 3, "Hierro": 1 },
-      { "Cobre": 2 },
-      { "Carbón": 11, "Cobre": 0, "Madera": 0, "Plata": 1 }
-    ];
-
-    // Mapa de variaciones de ítems a su forma correcta
-    const itemsCorrectos = {
-      "Carbón": ["carbón", "Carbon", "CARBÓN", "carbon", "CARbon", "CArbón"],
-      "Cobre": ["cobre", "COBRE", "CObre", "cObre"],
-      "Hierro": ["hierro", "HIERRO", "HiErRo", "hiErRo"],
-      "Madera": ["madera", "MADERA", "MaDeRa", "mAdErA"],
-      "Oro": ["oro", "ORO", "OrO", "oRo"],
-      "Plata": ["plata", "PLATA", "PlAtA", "pLaTa"]
-    };
-
-    // Función para actualizar todos los inventarios
-    function actualizarInventarios() {
-      inventarios.forEach(inventario => {
-        for (let itemCorrecto in itemsCorrectos) {
-          itemsCorrectos[itemCorrecto].forEach(variacion => {
-            if (inventario.hasOwnProperty(variacion)) {
-              inventario[itemCorrecto] = inventario[variacion];
-              delete inventario[variacion];
-            }
-          });
-        }
-      });
-      console.log("Inventarios actualizados:", inventarios);
-    }
-  </script>
+    <h1>Mochila</h1>
+    <div id="mochila">
+        <h3>Inventario</h3>
+        <p id="Carbón">Carbón: 🔒</p>
+        <p id="Cobre">Cobre: 🔒</p>
+        <p id="Hierro">Hierro: 🔒</p>
+        <p id="Plata">Plata: 🔒</p>
+        <p id="Oro">Oro: 🔒</p>
+        <p id="Madera">Madera: 🔒</p>
+    </div>
 </body>
 </html>
