@@ -1,86 +1,51 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eliminar cuenta y datos</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Actualizar Inventarios</title>
 </head>
 <body>
-    <h1>Eliminar cuenta y todos los datos asociados</h1>
-    <button onclick="eliminarCuenta()">Eliminar Cuenta</button>
-    <button onclick="mostrarDatos()">Mostrar Datos Actuales</button>
-    <div id="mensaje"></div>
+  <!-- Botón para actualizar los inventarios -->
+  <button onclick="actualizarInventarios()">Actualizar Inventarios</button>
 
-    <script>
-        // Configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
-            authDomain: "thegame-5afaa.firebaseapp.com",
-            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
-            projectId: "thegame-5afaa",
-            storageBucket: "thegame-5afaa.firebasestorage.app",
-            messagingSenderId: "588556182984",
-            appId: "1:588556182984:web:a0557067d35c18e3944cfd",
-            measurementId: "G-9M3CBJ3LV9"
-        };
+  <script>
+    // Arreglo de inventarios (cada objeto representa un inventario)
+    let inventarios = [
+      { "Carbón": 5, "Cobre": 2, "Hierro": 1, "Madera": 2, "Oro": 1, "Plata": 1 },
+      { "carbón": 5, "cobre": 1 },
+      { "Cobre": 2, "carbón": 1 },
+      { "Cobre": 3 },
+      { "Carbón": 5 },
+      { "Cobre": 3, "Hierro": 1 },
+      { "Cobre": 2 },
+      { "Carbón": 11, "Cobre": 0, "Madera": 0, "Plata": 1 }
+    ];
 
-        // Inicializar Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const database = firebase.database();
+    // Mapa de variaciones de ítems a su forma correcta
+    const itemsCorrectos = {
+      "Carbón": ["carbón", "Carbon", "CARBÓN", "carbon", "CARbon", "CArbón"],
+      "Cobre": ["cobre", "COBRE", "CObre", "cObre"],
+      "Hierro": ["hierro", "HIERRO", "HiErRo", "hiErRo"],
+      "Madera": ["madera", "MADERA", "MaDeRa", "mAdErA"],
+      "Oro": ["oro", "ORO", "OrO", "oRo"],
+      "Plata": ["plata", "PLATA", "PlAtA", "pLaTa"]
+    };
 
-        // Función para eliminar la cuenta y todos los datos asociados
-        async function eliminarCuenta() {
-            const user = auth.currentUser;
-            if (user) {
-                try {
-                    // Borrar los datos asociados al usuario desde la base de datos
-                    await database.ref('usuarios/' + user.uid).remove();
-
-                    // Eliminar la cuenta del usuario de Firebase Authentication
-                    await user.delete();
-
-                    // Mostrar mensaje de éxito
-                    document.getElementById("mensaje").innerHTML = "Cuenta y todos los datos han sido eliminados correctamente.";
-                    document.getElementById("mensaje").style.color = "green";
-                } catch (error) {
-                    // Mostrar mensaje de error
-                    document.getElementById("mensaje").innerHTML = "Error al eliminar la cuenta: " + error.message;
-                    document.getElementById("mensaje").style.color = "red";
-                }
-            } else {
-                document.getElementById("mensaje").innerHTML = "No hay usuario autenticado.";
-                document.getElementById("mensaje").style.color = "red";
+    // Función para actualizar todos los inventarios
+    function actualizarInventarios() {
+      inventarios.forEach(inventario => {
+        for (let itemCorrecto in itemsCorrectos) {
+          itemsCorrectos[itemCorrecto].forEach(variacion => {
+            if (inventario.hasOwnProperty(variacion)) {
+              inventario[itemCorrecto] = inventario[variacion];
+              delete inventario[variacion];
             }
+          });
         }
-
-        // Función para mostrar los datos actuales asociados al usuario
-        function mostrarDatos() {
-            const user = auth.currentUser;
-            if (user) {
-                database.ref('usuarios/' + user.uid).get()
-                    .then((snapshot) => {
-                        if (snapshot.exists()) {
-                            const datos = snapshot.val();
-                            document.getElementById("mensaje").innerHTML = "Datos del usuario: " + JSON.stringify(datos, null, 2);
-                            document.getElementById("mensaje").style.color = "black";
-                        } else {
-                            document.getElementById("mensaje").innerHTML = "No hay datos asociados a esta cuenta.";
-                            document.getElementById("mensaje").style.color = "red";
-                        }
-                    })
-                    .catch((error) => {
-                        document.getElementById("mensaje").innerHTML = "Error al cargar los datos: " + error.message;
-                        document.getElementById("mensaje").style.color = "red";
-                    });
-            } else {
-                document.getElementById("mensaje").innerHTML = "No hay usuario autenticado.";
-                document.getElementById("mensaje").style.color = "red";
-            }
-        }
-    </script>
+      });
+      console.log("Inventarios actualizados:", inventarios);
+    }
+  </script>
 </body>
 </html>
