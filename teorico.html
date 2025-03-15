@@ -116,8 +116,20 @@
                     if (resultado === "Nada") {      
                         mensaje = "Parece que no tuve suerte hoy.";      
                     } else if (resultado === "Tropezón") {      
-                        // Enviar siempre el mismo mensaje, independientemente de si pierde algo o no
-                        mensaje = "Me tropecé con una rama... Espero no haber dejado caer nada de la mochila";      
+                        get(userRef).then((snapshot) => {      
+                            if (snapshot.exists()) {      
+                                const inventory = snapshot.val().inventory || {};      
+                                const items = Object.keys(inventory);      
+                                if (items.length > 0) {      
+                                    const itemPerdido = items[Math.floor(Math.random() * items.length)];      
+                                    inventory[itemPerdido] -= 1;      
+                                    mensaje = `¡Oh, me tropecé y he perdido ${itemPerdido}!`;      
+                                    update(userRef, { inventory });      
+                                } else {      
+                                    mensaje = "Me caí, pero al menos no perdí nada.";      
+                                }      
+                            }      
+                        });      
                     } else if (resultado === "Madera") {      
                         mensaje = "Logré conseguir un tronco.";      
                         actualizarInventario("madera");      
@@ -157,8 +169,8 @@
     <br><br>      
     <button id="btnPoder">🏆 Poder</button>      
     <br><br>      
-    <div id="recuadroTexto">      
-        Para interactuar con tus herramientas debes tener esta mano en uso, si quitas la mano se cancelará la "acción"      
+    <div style="border: 1px solid; padding: 10px; width: 200px; text-align: center; color: white; background-color: gray;">
+        Para interactuar con tus herramientas debes tener esta mano en uso, si quitas la mano se cancelará la acción.
     </div>      
 </body>      
 </html>
