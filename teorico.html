@@ -114,26 +114,10 @@
                     let mensaje = "";      
       
                     if (resultado === "Nada") {      
-                        mensaje = "Parece que no tuve suerte hoy.";      
+                        mensaje = "No podré llevar este tronco... ¡Pesa mucho!.";      
                     } else if (resultado === "Tropezón") {      
-                        get(userRef).then((snapshot) => {      
-                            if (snapshot.exists()) {      
-                                const inventory = snapshot.val().inventory || {};      
-                                const items = Object.keys(inventory);      
-                                if (items.length > 0) {      
-                                    const itemPerdido = items[Math.floor(Math.random() * items.length)];      
-                                    inventory[itemPerdido] -= 1;      
-                                    mensaje = `Demonios, me tropecé y creo que perdí algo de mi inventario`;      
-                                    update(userRef, { inventory });      
-                                } else {      
-                                    mensaje = "Ho, rayos, me tropecé con una rama";      
-                                }      
-                            } else {      
-                                mensaje = "Ho, rayos, me tropecé con una rama";      
-                            }      
-                        }).catch(() => {      
-                            mensaje = "Ho, rayos, me tropecé con una rama";      
-                        });      
+                        // Enviar siempre el mismo mensaje, independientemente de si pierde algo o no
+                        mensaje = "Me tropecé con una rama... Espero no haber dejado caer nada de la mochila";      
                     } else if (resultado === "Madera") {      
                         mensaje = "Logré conseguir un tronco.";      
                         actualizarInventario("madera");      
@@ -169,7 +153,7 @@
 <body>      
     <button id="btnMinar">⛏️ Minar</button>      
     <br><br>      
-    <button id="btnTalar">🪓 Talando</button>      
+    <button id="btnTalar">🪓 Talar</button>      
     <br><br>      
     <button id="btnPoder">🏆 Poder</button>      
 </body>      
