@@ -19,7 +19,7 @@
             measurementId: "G-9M3CBJ3LV9"
         };
 
-        // Inicialización de Firebase
+        // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
@@ -28,11 +28,19 @@
 
             const itemsIncorrectos = {
                 "carbon": "Carbón",
+                "Carbon": "Carbón",
+                "carbón": "Carbón",
                 "cobre": "Cobre",
+                "cobré": "Cobre",
                 "hierro": "Hierro",
+                "hirro": "Hierro",
                 "plata": "Plata",
+                "platta": "Plata",
                 "oro": "Oro",
-                "madera": "Madera"
+                "madera": "Madera",
+                "maderra": "Madera",
+                "piedra": "Piedra",
+                "piedrita": "Piedra"
             };
 
             const usersRef = ref(db, 'users');
@@ -44,20 +52,26 @@
                     let cambiosRealizados = 0;
 
                     for (const username in users) {
-                        const userInventory = users[username].inventory;
+                        if (users[username].inventory) {
+                            let inventoryUpdated = false;
 
-                        if (userInventory) {
-                            for (const item in userInventory) {
-                                const itemValue = userInventory[item];
-                                if (typeof itemValue === 'string' && itemsIncorrectos[itemValue.toLowerCase()]) {
-                                    alert(`Reemplazando "${itemValue}" por "${itemsIncorrectos[itemValue.toLowerCase()]}" en el usuario ${username}`);
-                                    userInventory[item] = itemsIncorrectos[itemValue.toLowerCase()];
+                            for (const item in users[username].inventory) {
+                                const valorActual = users[username].inventory[item];
+
+                                if (typeof valorActual === 'string' && itemsIncorrectos[valorActual]) {
+                                    const nuevoValor = itemsIncorrectos[valorActual];
+                                    alert(`Reemplazando "${valorActual}" por "${nuevoValor}" en el usuario ${username}`);
+                                    users[username].inventory[item] = nuevoValor;
+                                    inventoryUpdated = true;
                                     cambiosRealizados++;
                                 }
                             }
-                        }
 
-                        set(ref(db, 'users/' + username + '/inventory'), userInventory);
+                            // Si hubo cambios, subir el inventario actualizado
+                            if (inventoryUpdated) {
+                                set(ref(db, `users/${username}/inventory`), users[username].inventory);
+                            }
+                        }
                     }
 
                     if (cambiosRealizados > 0) {
