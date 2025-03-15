@@ -114,7 +114,7 @@
                     let mensaje = "";      
       
                     if (resultado === "Nada") {      
-                        mensaje = "No puedo llevarme este tronco, ¡pesa demaciado!."; // Mensaje cuando no obtiene nada      
+                        mensaje = "No puedo llevarme este tronco, ¡pesa demasiado!."; // Mensaje cuando no obtiene nada      
                     } else if (resultado === "Tropezón") {      
                         mensaje = "Demonios, caí al tropezar con una raíz, espero no haber perdido nada de la mochila"; // Mensaje cuando tropieza      
                     } else if (resultado === "madera") {      
@@ -149,15 +149,33 @@
         });      
     </script>      
 </head>      
-<body>      
+<body>
+    <div style="border: 1px solid; padding: 5px; width: 70px; text-align: center; color: white; background-color: gray; font-size: 12px;">
+        Acción
+    </div>
+    <br>
     <button id="btnMinar">⛏️ Minar</button>      
     <br><br>      
     <button id="btnTalar">🪓 Talar</button>      
     <br><br>      
     <button id="btnPoder">🏆 Poder</button>      
+
+    <hr> <!-- Línea separadora -->
+
+    <!-- Cuadro de texto "Crafteos" debajo de la línea -->
+    <div style="border: 1px solid; padding: 5px; width: 70px; text-align: center; color: white; background-color: gray; font-size: 12px;">
+        Crafteos
+    </div>
+
+    <br>      
+    <button id="btn1">Próximamente 1</button>      
     <br><br>      
-    <div style="border: 1px solid; padding: 15px 10px; width: 100px; height: 120px; text-align: center; color: white; background-color: gray; font-size: 12px; word-wrap: break-word;">
-        Para usar tus herramientas debes usar esta mano,<br> si quitas la mano se cancelará la acción
+    <button id="btn2">Próximamente 2</button>      
+
+    <hr> <!-- Línea separadora -->
+ 
+    <div style="border: 1px solid; padding: 15px 10px; width: 90px; height: 100px; text-align: center; color: white; background-color: gray; font-size: 12px; word-wrap: break-word;">
+        Para usar tus herramientas debes usar esta mano. Si quitas la mano, se cancelará la acción
     </div>      
 </body>      
 </html>
