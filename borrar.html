@@ -73,12 +73,37 @@
             });
         }
 
+        function listarJugadores() {
+            const usersRef = ref(db, 'users');
+
+            get(usersRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const users = snapshot.val();
+                    const listaJugadores = document.getElementById("listaJugadores");
+                    listaJugadores.innerHTML = ""; // Limpiar lista antes de actualizar
+
+                    for (const username in users) {
+                        const li = document.createElement("li");
+                        li.textContent = username;
+                        listaJugadores.appendChild(li);
+                    }
+                } else {
+                    alert("No se encontraron usuarios en la base de datos.");
+                }
+            }).catch((error) => {
+                alert("Error al acceder a la base de datos: " + error);
+            });
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("reemplazarBtn").addEventListener("click", reemplazarPalabras);
+            listarJugadores(); // Llamar a la función para listar jugadores al cargar la página
         });
     </script>
 </head>
 <body>
     <button id="reemplazarBtn">Reemplazar Palabras Incorrectas</button>
+    <h3>Lista de Jugadores</h3>
+    <ul id="listaJugadores"></ul>
 </body>
 </html>
