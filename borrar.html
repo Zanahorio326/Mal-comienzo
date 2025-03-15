@@ -82,6 +82,7 @@
                 } else {
                     alert("No se encontraron usuarios en la base de datos.");
                 }
+                listarJugadores(); // Actualizar la lista después del reemplazo
             }).catch((error) => {
                 alert("Error al acceder a la base de datos: " + error);
             });
@@ -98,7 +99,7 @@
 
                     for (const username in users) {
                         const li = document.createElement("li");
-                        li.textContent = username;
+                        li.textContent = `${username} → ${JSON.stringify(users[username].inventory)}`;
                         listaJugadores.appendChild(li);
                     }
                 } else {
