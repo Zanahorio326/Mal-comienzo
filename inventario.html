@@ -90,21 +90,21 @@
             get(userRef).then((snapshot) => {
                 if (snapshot.exists()) {
                     const inventory = snapshot.val().inventory || {
-                        Carbón: undefined,
-                        Cobre: undefined,
-                        Hierro: undefined,
-                        Plata: undefined,
-                        Oro: undefined,
-                        Madera: undefined // Se añade Madera al inventario
+                        carbón: undefined,
+                        cobre: undefined,
+                        hierro: undefined,
+                        plata: undefined,
+                        oro: undefined,
+                        madera: undefined // Se añade madera al inventario
                     };
 
                     // Comprobar si el valor es undefined y mostrar un candado
-                    document.getElementById("Carbón").textContent = inventory.Carbón !== undefined ? "Carbón: " + inventory.Carbón : "Carbón: 🔒";
-                    document.getElementById("Cobre").textContent = inventory.Cobre !== undefined ? "Cobre: " + inventory.Cobre : "Cobre: 🔒";
-                    document.getElementById("Hierro").textContent = inventory.Hierro !== undefined ? "Hierro: " + inventory.Hierro : "Hierro: 🔒";
-                    document.getElementById("Plata").textContent = inventory.Plata !== undefined ? "Plata: " + inventory.Plata : "Plata: 🔒";
-                    document.getElementById("Oro").textContent = inventory.Oro !== undefined ? "Oro: " + inventory.Oro : "Oro: 🔒";
-                    document.getElementById("Madera").textContent = inventory.Madera !== undefined ? "Madera: " + inventory.Madera : "Madera: 🔒"; // Se muestra la Madera
+                    document.getElementById("carbón").textContent = inventory.carbón !== undefined ? "carbón: " + inventory.carbón : "carbón: 🔒";
+                    document.getElementById("cobre").textContent = inventory.cobre !== undefined ? "cobre: " + inventory.cobre : "cobre: 🔒";
+                    document.getElementById("hierro").textContent = inventory.hierro !== undefined ? "hierro: " + inventory.hierro : "hierro: 🔒";
+                    document.getElementById("plata").textContent = inventory.plata !== undefined ? "plata: " + inventory.plata : "plata: 🔒";
+                    document.getElementById("oro").textContent = inventory.oro !== undefined ? "oro: " + inventory.oro : "oro: 🔒";
+                    document.getElementById("madera").textContent = inventory.madera !== undefined ? "madera: " + inventory.madera : "madera: 🔒"; // Se muestra la madera
                 } else {
                     console.log("No se encontraron datos para el usuario.");
                 }
@@ -123,12 +123,12 @@
     <h1>Mochila</h1>
     <div id="mochila">
         <h3>Inventario</h3>
-        <p id="Carbón">Carbón: 🔒</p>
-        <p id="Cobre">Cobre: 🔒</p>
-        <p id="Hierro">Hierro: 🔒</p>
-        <p id="Plata">Plata: 🔒</p>
-        <p id="Oro">Oro: 🔒</p>
-        <p id="Madera">Madera: 🔒</p> <!-- Se añade la Madera en el HTML -->
+        <p id="carbón">carbón: 🔒</p>
+        <p id="cobre">cobre: 🔒</p>
+        <p id="hierro">hierro: 🔒</p>
+        <p id="plata">plata: 🔒</p>
+        <p id="oro">oro: 🔒</p>
+        <p id="madera">madera: 🔒</p> <!-- Se añade la madera en el HTML -->
     </div>
 </body>
 </html>
