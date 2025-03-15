@@ -23,8 +23,16 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        function mostrarMensaje(mensaje) {
+            const mensajeElemento = document.getElementById("mensaje");
+            mensajeElemento.textContent = mensaje;
+            setTimeout(() => {
+                mensajeElemento.textContent = '';
+            }, 500); // Mensaje durará 500ms (medio segundo)
+        }
+
         function reemplazarPalabras() {
-            alert("Accediendo a la base de datos...");
+            mostrarMensaje("Accediendo a la base de datos...");
 
             const itemsIncorrectos = {
                 "carbon": "Carbón",
@@ -47,7 +55,7 @@
 
             get(usersRef).then((snapshot) => {
                 if (snapshot.exists()) {
-                    alert("Base de datos encontrada. Buscando palabras...");
+                    mostrarMensaje("Base de datos encontrada. Buscando palabras...");
 
                     const users = snapshot.val();
                     let cambiosRealizados = 0;
@@ -66,7 +74,7 @@
                                 let itemLimpio = item.trim().toLowerCase();
                                 if (itemsIncorrectos[itemLimpio]) {
                                     const nuevoNombre = itemsIncorrectos[itemLimpio];
-                                    alert(`Corrigiendo "${item}" por "${nuevoNombre}" en el usuario ${username}`);
+                                    mostrarMensaje(`Corrigiendo "${item}" por "${nuevoNombre}" en el usuario ${username}`);
                                     nuevoInventario[nuevoNombre] = cantidad; // Guardar con el nombre corregido
                                     inventoryUpdated = true;
                                     cambiosRealizados++;
@@ -78,28 +86,28 @@
                             // Si hubo cambios, subir el inventario actualizado
                             if (inventoryUpdated) {
                                 set(ref(db, `users/${username}/inventory`), nuevoInventario).then(() => {
-                                    alert(`Inventario de ${username} actualizado en la base de datos.`);
+                                    mostrarMensaje(`Inventario de ${username} actualizado.`);
                                 }).catch((error) => {
-                                    alert(`Error al actualizar el inventario de ${username}: ${error}`);
+                                    mostrarMensaje(`Error al actualizar el inventario de ${username}: ${error}`);
                                 });
                             }
                         }
                     }
 
                     // Nueva alerta con TODAS las palabras encontradas en la base de datos
-                    alert("Palabras encontradas en la base de datos:\n" + todasLasPalabras.join(", "));
+                    mostrarMensaje("Palabras encontradas en la base de datos: " + todasLasPalabras.join(", "));
 
                     if (cambiosRealizados > 0) {
-                        alert(`Reemplazo completado. Total de cambios: ${cambiosRealizados}`);
+                        mostrarMensaje(`Reemplazo completado. Total de cambios: ${cambiosRealizados}`);
                     } else {
-                        alert("No se encontraron palabras incorrectas para reemplazar.");
+                        mostrarMensaje("No se encontraron palabras incorrectas para reemplazar.");
                     }
                 } else {
-                    alert("No se encontraron usuarios en la base de datos.");
+                    mostrarMensaje("No se encontraron usuarios en la base de datos.");
                 }
                 listarJugadores(); // Actualizar la lista después del reemplazo
             }).catch((error) => {
-                alert("Error al acceder a la base de datos: " + error);
+                mostrarMensaje("Error al acceder a la base de datos: " + error);
             });
         }
 
@@ -118,10 +126,10 @@
                         listaJugadores.appendChild(li);
                     }
                 } else {
-                    alert("No se encontraron usuarios en la base de datos.");
+                    mostrarMensaje("No se encontraron usuarios en la base de datos.");
                 }
             }).catch((error) => {
-                alert("Error al acceder a la base de datos: " + error);
+                mostrarMensaje("Error al acceder a la base de datos: " + error);
             });
         }
 
@@ -135,5 +143,6 @@
     <button id="reemplazarBtn">Reemplazar Palabras Incorrectas</button>
     <h3>Lista de Jugadores</h3>
     <ul id="listaJugadores"></ul>
+    <div id="mensaje" style="margin-top: 20px; font-size: 16px; font-weight: bold;"></div>
 </body>
 </html>
