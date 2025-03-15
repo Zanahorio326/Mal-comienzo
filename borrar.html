@@ -3,6 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <title>Reemplazo de Palabras</title>
+    <style>
+        .floating-card {
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 80%;
+            min-width: 300px;
+            display: none;
+            z-index: 1000;
+            font-family: Arial, sans-serif;
+        }
+    </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
@@ -23,16 +41,26 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        function mostrarMensaje(mensaje) {
-            const mensajeElemento = document.getElementById("mensaje");
-            mensajeElemento.textContent = mensaje;
-            setTimeout(() => {
-                mensajeElemento.textContent = '';
-            }, 500); // Mensaje durará 500ms (medio segundo)
+        let alertQueue = []; // Cola de alertas para mostrar
+        let alertIndex = 0;
+
+        function mostrarAlertas() {
+            const alerta = document.getElementById("alerta");
+            if (alertIndex < alertQueue.length) {
+                alerta.textContent = alertQueue[alertIndex];
+                alerta.style.display = "block";
+                alertIndex++;
+
+                // Ocultar después de medio segundo
+                setTimeout(() => {
+                    alerta.style.display = "none";
+                    mostrarAlertas(); // Llamar nuevamente para mostrar la siguiente alerta
+                }, 500); // Medio segundo
+            }
         }
 
         function reemplazarPalabras() {
-            mostrarMensaje("Accediendo a la base de datos...");
+            agregarAlerta("Accediendo a la base de datos...");
 
             const itemsIncorrectos = {
                 "carbon": "Carbón",
@@ -55,7 +83,7 @@
 
             get(usersRef).then((snapshot) => {
                 if (snapshot.exists()) {
-                    mostrarMensaje("Base de datos encontrada. Buscando palabras...");
+                    agregarAlerta("Base de datos encontrada. Buscando palabras...");
 
                     const users = snapshot.val();
                     let cambiosRealizados = 0;
@@ -74,7 +102,7 @@
                                 let itemLimpio = item.trim().toLowerCase();
                                 if (itemsIncorrectos[itemLimpio]) {
                                     const nuevoNombre = itemsIncorrectos[itemLimpio];
-                                    mostrarMensaje(`Corrigiendo "${item}" por "${nuevoNombre}" en el usuario ${username}`);
+                                    agregarAlerta(`Corrigiendo "${item}" por "${nuevoNombre}" en el usuario ${username}`);
                                     nuevoInventario[nuevoNombre] = cantidad; // Guardar con el nombre corregido
                                     inventoryUpdated = true;
                                     cambiosRealizados++;
@@ -86,29 +114,36 @@
                             // Si hubo cambios, subir el inventario actualizado
                             if (inventoryUpdated) {
                                 set(ref(db, `users/${username}/inventory`), nuevoInventario).then(() => {
-                                    mostrarMensaje(`Inventario de ${username} actualizado.`);
+                                    agregarAlerta(`Inventario de ${username} actualizado en la base de datos.`);
                                 }).catch((error) => {
-                                    mostrarMensaje(`Error al actualizar el inventario de ${username}: ${error}`);
+                                    agregarAlerta(`Error al actualizar el inventario de ${username}: ${error}`);
                                 });
                             }
                         }
                     }
 
                     // Nueva alerta con TODAS las palabras encontradas en la base de datos
-                    mostrarMensaje("Palabras encontradas en la base de datos: " + todasLasPalabras.join(", "));
+                    agregarAlerta("Palabras encontradas en la base de datos:\n" + todasLasPalabras.join(", "));
 
                     if (cambiosRealizados > 0) {
-                        mostrarMensaje(`Reemplazo completado. Total de cambios: ${cambiosRealizados}`);
+                        agregarAlerta(`Reemplazo completado. Total de cambios: ${cambiosRealizados}`);
                     } else {
-                        mostrarMensaje("No se encontraron palabras incorrectas para reemplazar.");
+                        agregarAlerta("No se encontraron palabras incorrectas para reemplazar.");
                     }
                 } else {
-                    mostrarMensaje("No se encontraron usuarios en la base de datos.");
+                    agregarAlerta("No se encontraron usuarios en la base de datos.");
                 }
                 listarJugadores(); // Actualizar la lista después del reemplazo
             }).catch((error) => {
-                mostrarMensaje("Error al acceder a la base de datos: " + error);
+                agregarAlerta("Error al acceder a la base de datos: " + error);
             });
+        }
+
+        function agregarAlerta(mensaje) {
+            alertQueue.push(mensaje);
+            if (alertQueue.length === 1) {
+                mostrarAlertas(); // Si es la primera alerta, comienza el proceso
+            }
         }
 
         function listarJugadores() {
@@ -126,10 +161,10 @@
                         listaJugadores.appendChild(li);
                     }
                 } else {
-                    mostrarMensaje("No se encontraron usuarios en la base de datos.");
+                    agregarAlerta("No se encontraron usuarios en la base de datos.");
                 }
             }).catch((error) => {
-                mostrarMensaje("Error al acceder a la base de datos: " + error);
+                agregarAlerta("Error al acceder a la base de datos: " + error);
             });
         }
 
@@ -143,6 +178,8 @@
     <button id="reemplazarBtn">Reemplazar Palabras Incorrectas</button>
     <h3>Lista de Jugadores</h3>
     <ul id="listaJugadores"></ul>
-    <div id="mensaje" style="margin-top: 20px; font-size: 16px; font-weight: bold;"></div>
+
+    <!-- Tarjeta flotante para las alertas -->
+    <div id="alerta" class="floating-card"></div>
 </body>
 </html>
