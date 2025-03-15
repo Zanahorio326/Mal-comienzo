@@ -104,8 +104,8 @@
                     for (const username in users) {
                         if (users[username].inventory) {
                             let inventory = users[username].inventory;
-                            let inventoryUpdated = false;
                             let nuevoInventario = { ...inventory };
+                            let cambiosUsuario = false;
 
                             for (const item in inventory) {
                                 let cantidad = inventory[item];
@@ -118,18 +118,18 @@
                                     agregarAlerta(`Corrigiendo "${item}" → "${nuevoNombre}" en ${username}`);
 
                                     if (nuevoInventario[nuevoNombre]) {
-                                        nuevoInventario[nuevoNombre] += cantidad;
+                                        nuevoInventario[nuevoNombre] += cantidad; // Suma la cantidad
                                     } else {
-                                        nuevoInventario[nuevoNombre] = cantidad;
+                                        nuevoInventario[nuevoNombre] = cantidad; // Crea la palabra correcta con la cantidad
                                     }
 
-                                    delete nuevoInventario[item];
-                                    inventoryUpdated = true;
+                                    delete nuevoInventario[item]; // Elimina solo después de sumar la cantidad
+                                    cambiosUsuario = true;
                                     cambiosRealizados++;
                                 }
                             }
 
-                            if (inventoryUpdated) {
+                            if (cambiosUsuario) {
                                 set(ref(db, `users/${username}/inventory`), nuevoInventario).then(() => {
                                     agregarAlerta(`Inventario de ${username} actualizado.`);
                                 }).catch((error) => {
