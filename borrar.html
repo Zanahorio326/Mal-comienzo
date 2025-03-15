@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Actualizar Inventarios</title>
+    <title>Corregir Inventarios</title>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
         // Configuración de Firebase
         const firebaseConfig = {
@@ -24,36 +24,49 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Función para realizar los cambios en el inventario
-        function corregirInventario() {
+        // Función para corregir los inventarios de todos los usuarios
+        function corregirInventarios() {
+            // Referencia a todos los usuarios
             const usersRef = ref(db, 'users/');
             
-            // Obtener todos los usuarios
             get(usersRef).then((snapshot) => {
                 if (snapshot.exists()) {
                     const users = snapshot.val();
-                    const updates = {};
-
+                    
                     // Iterar sobre todos los usuarios
                     for (const username in users) {
-                        const user = users[username];
-                        const inventory = user.inventory || {};
+                        const inventory = users[username].inventory;
 
-                        // Realizar cambios en cada ítem
-                        updates[`users/${username}/inventory/Carbón`] = inventory.Carbón ? inventory.Carbón.replace(/carbon/g, 'Carbón').replace(/CARBON/g, 'Carbón') : undefined;
-                        updates[`users/${username}/inventory/Cobre`] = inventory.Cobre ? inventory.Cobre.replace(/cobre/g, 'Cobre').replace(/COBRE/g, 'Cobre') : undefined;
-                        updates[`users/${username}/inventory/Hierro`] = inventory.Hierro ? inventory.Hierro.replace(/hierro/g, 'Hierro').replace(/HIERRO/g, 'Hierro') : undefined;
-                        updates[`users/${username}/inventory/Plata`] = inventory.Plata ? inventory.Plata.replace(/plata/g, 'Plata').replace(/PLATA/g, 'Plata') : undefined;
-                        updates[`users/${username}/inventory/Oro`] = inventory.Oro ? inventory.Oro.replace(/oro/g, 'Oro').replace(/ORO/g, 'Oro') : undefined;
-                        updates[`users/${username}/inventory/Madera`] = inventory.Madera ? inventory.Madera.replace(/madera/g, 'Madera').replace(/MADERA/g, 'Madera') : undefined;
+                        // Corregir los nombres de los items en el inventario
+                        if (inventory) {
+                            for (const item in inventory) {
+                                let correctedItem = inventory[item];
+
+                                // Corrección de palabras incorrectas
+                                if (correctedItem.toLowerCase() === 'carbon') {
+                                    correctedItem = 'Carbón';
+                                } else if (correctedItem.toLowerCase() === 'cobre') {
+                                    correctedItem = 'Cobre';
+                                } else if (correctedItem.toLowerCase() === 'hierro') {
+                                    correctedItem = 'Hierro';
+                                } else if (correctedItem.toLowerCase() === 'plata') {
+                                    correctedItem = 'Plata';
+                                } else if (correctedItem.toLowerCase() === 'oro') {
+                                    correctedItem = 'Oro';
+                                } else if (correctedItem.toLowerCase() === 'madera') {
+                                    correctedItem = 'Madera';
+                                }
+
+                                // Actualizar el inventario con la corrección
+                                inventory[item] = correctedItem;
+                            }
+
+                            // Actualizar el inventario en Firebase
+                            set(ref(db, 'users/' + username + '/inventory'), inventory);
+                        }
                     }
 
-                    // Actualizar todos los inventarios
-                    update(ref(db), updates).then(() => {
-                        alert("Todos los inventarios han sido actualizados correctamente.");
-                    }).catch((error) => {
-                        console.error("Error al actualizar los inventarios: ", error);
-                    });
+                    alert('Inventarios corregidos exitosamente!');
                 } else {
                     console.log("No se encontraron datos de usuarios.");
                 }
@@ -64,7 +77,7 @@
     </script>
 </head>
 <body>
-    <h1>Actualizar Inventarios de Todos los Usuarios</h1>
-    <button onclick="corregirInventario()">Corregir Inventarios</button>
+    <h1>Corregir Inventarios de Todos los Usuarios</h1>
+    <button onclick="corregirInventarios()">Corregir Inventarios</button>
 </body>
 </html>
