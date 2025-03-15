@@ -20,6 +20,22 @@
             z-index: 1000;
             font-family: Arial, sans-serif;
         }
+
+        /* Estilos para el botón */
+        button {
+            padding: 20px;
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1001; /* Asegurarse que el botón esté encima */
+        }
     </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
@@ -133,7 +149,6 @@
                 } else {
                     agregarAlerta("No se encontraron usuarios en la base de datos.");
                 }
-                listarJugadores(); // Actualizar la lista después del reemplazo
             }).catch((error) => {
                 agregarAlerta("Error al acceder a la base de datos: " + error);
             });
@@ -146,38 +161,13 @@
             }
         }
 
-        function listarJugadores() {
-            const usersRef = ref(db, 'users');
-
-            get(usersRef).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const users = snapshot.val();
-                    const listaJugadores = document.getElementById("listaJugadores");
-                    listaJugadores.innerHTML = ""; // Limpiar lista antes de actualizar
-
-                    for (const username in users) {
-                        const li = document.createElement("li");
-                        li.textContent = `${username} → ${JSON.stringify(users[username].inventory)}`;
-                        listaJugadores.appendChild(li);
-                    }
-                } else {
-                    agregarAlerta("No se encontraron usuarios en la base de datos.");
-                }
-            }).catch((error) => {
-                agregarAlerta("Error al acceder a la base de datos: " + error);
-            });
-        }
-
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("reemplazarBtn").addEventListener("click", reemplazarPalabras);
-            listarJugadores(); // Llamar a la función para listar jugadores al cargar la página
         });
     </script>
 </head>
 <body>
     <button id="reemplazarBtn">Reemplazar Palabras Incorrectas</button>
-    <h3>Lista de Jugadores</h3>
-    <ul id="listaJugadores"></ul>
 
     <!-- Tarjeta flotante para las alertas -->
     <div id="alerta" class="floating-card"></div>
