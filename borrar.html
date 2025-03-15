@@ -47,9 +47,11 @@
 
             get(usersRef).then((snapshot) => {
                 if (snapshot.exists()) {
-                    alert("Base de datos encontrada. Buscando palabras incorrectas...");
+                    alert("Base de datos encontrada. Buscando palabras...");
+
                     const users = snapshot.val();
                     let cambiosRealizados = 0;
+                    let todasLasPalabras = [];
 
                     for (const username in users) {
                         if (users[username].inventory) {
@@ -58,6 +60,7 @@
 
                             for (const item in inventory) {
                                 let valorActual = inventory[item];
+                                todasLasPalabras.push(valorActual); // Agregar todas las palabras encontradas
 
                                 if (typeof valorActual === 'string') {
                                     let valorLimpio = valorActual.trim().toLowerCase(); // Normalizar comparación
@@ -81,6 +84,9 @@
                             }
                         }
                     }
+
+                    // Nueva alerta con TODAS las palabras encontradas en la base de datos
+                    alert("Palabras encontradas en la base de datos:\n" + todasLasPalabras.join(", "));
 
                     if (cambiosRealizados > 0) {
                         alert(`Reemplazo completado. Total de cambios: ${cambiosRealizados}`);
