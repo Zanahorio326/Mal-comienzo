@@ -54,22 +54,30 @@
                     for (const username in users) {
                         if (users[username].inventory) {
                             let inventoryUpdated = false;
+                            let inventory = users[username].inventory;
 
-                            for (const item in users[username].inventory) {
-                                const valorActual = users[username].inventory[item];
+                            for (const item in inventory) {
+                                let valorActual = inventory[item];
 
-                                if (typeof valorActual === 'string' && itemsIncorrectos[valorActual]) {
-                                    const nuevoValor = itemsIncorrectos[valorActual];
-                                    alert(`Reemplazando "${valorActual}" por "${nuevoValor}" en el usuario ${username}`);
-                                    users[username].inventory[item] = nuevoValor;
-                                    inventoryUpdated = true;
-                                    cambiosRealizados++;
+                                if (typeof valorActual === 'string') {
+                                    let valorLimpio = valorActual.trim().toLowerCase(); // Normalizar comparación
+                                    if (itemsIncorrectos[valorLimpio]) {
+                                        const nuevoValor = itemsIncorrectos[valorLimpio];
+                                        alert(`Corrigiendo "${valorActual}" por "${nuevoValor}" en el usuario ${username}`);
+                                        inventory[item] = nuevoValor;
+                                        inventoryUpdated = true;
+                                        cambiosRealizados++;
+                                    }
                                 }
                             }
 
                             // Si hubo cambios, subir el inventario actualizado
                             if (inventoryUpdated) {
-                                set(ref(db, `users/${username}/inventory`), users[username].inventory);
+                                set(ref(db, `users/${username}/inventory`), inventory).then(() => {
+                                    alert(`Inventario de ${username} actualizado en la base de datos.`);
+                                }).catch((error) => {
+                                    alert(`Error al actualizar el inventario de ${username}: ${error}`);
+                                });
                             }
                         }
                     }
