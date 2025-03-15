@@ -4,6 +4,19 @@
     <meta charset="UTF-8">      
     <meta name="viewport" content="width=device-width, initial-scale=1.0">      
     <title>Botón Minar</title>      
+    <style>      
+        .info-box {      
+            border: 2px solid #007bff;      
+            padding: 15px;      
+            margin-bottom: 20px;      
+            background-color: #f0f8ff;      
+            color: #0056b3;      
+            font-size: 16px;      
+            font-family: Arial, sans-serif;      
+            border-radius: 8px;      
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);      
+        }      
+    </style>      
     <script type="module">      
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";      
         import { getDatabase, ref, push, get, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";      
@@ -114,7 +127,7 @@
                     let mensaje = "";      
       
                     if (resultado === "Nada") {      
-                        mensaje = "No podré llevar este tronco... ¡Pesa mucho!.";      
+                        mensaje = "Parece que no tuve suerte hoy.";      
                     } else if (resultado === "Tropezón") {      
                         // Enviar siempre el mismo mensaje, independientemente de si pierde algo o no
                         mensaje = "Me tropecé con una rama... Espero no haber dejado caer nada de la mochila";      
@@ -151,9 +164,12 @@
     </script>      
 </head>      
 <body>      
+    <div class="info-box">      
+        <p>Para interactuar con tus herramientas debes tener esta mano en uso, si quitas la mano se cancelará la "acción".</p>      
+    </div>      
     <button id="btnMinar">⛏️ Minar</button>      
     <br><br>      
-    <button id="btnTalar">🪓 Talar</button>      
+    <button id="btnTalar">🪓 Talando</button>      
     <br><br>      
     <button id="btnPoder">🏆 Poder</button>      
 </body>      
