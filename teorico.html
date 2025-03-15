@@ -105,7 +105,7 @@
       
                 push(ref(db, 'chat'), {      
                     usuario: username,      
-                    texto: "Talando...",      
+                    texto: "Talando...", // Mensaje al comenzar a talar
                     timestamp: Date.now()      
                 });      
       
@@ -114,24 +114,11 @@
                     let mensaje = "";      
       
                     if (resultado === "Nada") {      
-                        mensaje = "Parece que no tuve suerte hoy.";      
+                        mensaje = "No puedo llevarme este tronco, ¡pesa demaciado!."; // Mensaje cuando no obtiene nada      
                     } else if (resultado === "Tropezón") {      
-                        get(userRef).then((snapshot) => {      
-                            if (snapshot.exists()) {      
-                                const inventory = snapshot.val().inventory || {};      
-                                const items = Object.keys(inventory);      
-                                if (items.length > 0) {      
-                                    const itemPerdido = items[Math.floor(Math.random() * items.length)];      
-                                    inventory[itemPerdido] -= 1;      
-                                    mensaje = `¡Oh, me tropecé y he perdido ${itemPerdido}!`;      
-                                    update(userRef, { inventory });      
-                                } else {      
-                                    mensaje = "Me caí, pero al menos no perdí nada.";      
-                                }      
-                            }      
-                        });      
+                        mensaje = "Demonios, caí al tropezar con una raíz, espero no haber perdido nada de la mochila"; // Mensaje cuando tropieza      
                     } else if (resultado === "Madera") {      
-                        mensaje = "Logré conseguir un tronco.";      
+                        mensaje = "Con este tronco podré hacer Madera."; // Mensaje cuando obtiene madera      
                         actualizarInventario("Madera");      
                     }      
       
@@ -150,7 +137,7 @@
             function obtenerMadera() {      
                 const probabilidad = Math.random() * 100;      
                 if (probabilidad < 60) return "Nada";      
-                if (probabilidad < 90) return "Tropezón";      
+                if (probabilidad < 80) return "Tropezón";      
                 return "Madera";      
             }      
 
