@@ -2,54 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reemplazar Palabras</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(to bottom right, #28a745, #f39c12);
-            color: #333;
-        }
-
-        h1 {
-            text-align: center;
-            color: #fff;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-    </style>
-</head>
-<body>
-    <h1>Reemplazar Palabras en Inventarios</h1>
-    <div class="container">
-        <button id="reemplazarBtn">Reemplazar Palabras Incorrectas</button>
-    </div>
-
+    <title>Reemplazo de Palabras</title>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
@@ -70,8 +23,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Función para reemplazar palabras incorrectas por las correctas en todos los usuarios
         function reemplazarPalabras() {
+            alert("Accediendo a la base de datos...");
+
             const itemsIncorrectos = {
                 "carbon": "Carbón",
                 "cobre": "Cobre",
@@ -81,42 +35,50 @@
                 "madera": "Madera"
             };
 
-            // Obtener todos los usuarios
             const usersRef = ref(db, 'users');
 
             get(usersRef).then((snapshot) => {
                 if (snapshot.exists()) {
+                    alert("Base de datos encontrada. Buscando palabras incorrectas...");
                     const users = snapshot.val();
+                    let cambiosRealizados = 0;
+
                     for (const username in users) {
                         const userInventory = users[username].inventory;
 
-                        // Reemplazar las palabras incorrectas en el inventario del usuario
-                        for (const item in userInventory) {
-                            const itemValue = userInventory[item];
-                            if (itemValue && typeof itemValue === 'string') {
-                                for (const incorrecta in itemsIncorrectos) {
-                                    if (itemValue.toLowerCase() === incorrecta) {
-                                        // Reemplazar la palabra incorrecta por la correcta
-                                        userInventory[item] = itemsIncorrectos[incorrecta];
-                                    }
+                        if (userInventory) {
+                            for (const item in userInventory) {
+                                const itemValue = userInventory[item];
+                                if (typeof itemValue === 'string' && itemsIncorrectos[itemValue.toLowerCase()]) {
+                                    alert(`Reemplazando "${itemValue}" por "${itemsIncorrectos[itemValue.toLowerCase()]}" en el usuario ${username}`);
+                                    userInventory[item] = itemsIncorrectos[itemValue.toLowerCase()];
+                                    cambiosRealizados++;
                                 }
                             }
                         }
 
-                        // Actualizar el inventario con las palabras corregidas
                         set(ref(db, 'users/' + username + '/inventory'), userInventory);
                     }
-                    alert("Las palabras incorrectas han sido reemplazadas en todos los inventarios.");
+
+                    if (cambiosRealizados > 0) {
+                        alert(`Reemplazo completado. Total de cambios: ${cambiosRealizados}`);
+                    } else {
+                        alert("No se encontraron palabras incorrectas para reemplazar.");
+                    }
                 } else {
-                    console.log("No se encontraron usuarios.");
+                    alert("No se encontraron usuarios en la base de datos.");
                 }
             }).catch((error) => {
-                console.error("Error al obtener los usuarios: ", error);
+                alert("Error al acceder a la base de datos: " + error);
             });
         }
 
-        // Agregar el evento al botón
-        document.getElementById("reemplazarBtn").addEventListener("click", reemplazarPalabras);
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("reemplazarBtn").addEventListener("click", reemplazarPalabras);
+        });
     </script>
+</head>
+<body>
+    <button id="reemplazarBtn">Reemplazar Palabras Incorrectas</button>
 </body>
 </html>
