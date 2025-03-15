@@ -68,22 +68,22 @@
             function obtenerMineral() {      
                 const probabilidad = Math.random() * 100;      
                 if (probabilidad < 40) return "Nada";      
-                if (probabilidad < 65) return "Carbón";      
-                if (probabilidad < 83) return "Cobre";      
-                if (probabilidad < 93) return "Hierro";      
-                if (probabilidad < 98) return "Plata";      
-                return "Oro";      
+                if (probabilidad < 65) return "carbón";      
+                if (probabilidad < 83) return "cobre";      
+                if (probabilidad < 93) return "hierro";      
+                if (probabilidad < 98) return "plata";      
+                return "oro";      
             }      
       
             function actualizarInventario(mineral) {      
                 get(userRef).then((snapshot) => {      
                     if (snapshot.exists()) {      
                         const inventory = snapshot.val().inventory || {      
-                            Carbón: 0,      
-                            Cobre: 0,      
-                            Hierro: 0,      
-                            Plata: 0,      
-                            Oro: 0      
+                            carbón: 0,      
+                            cobre: 0,      
+                            hierro: 0,      
+                            plata: 0,      
+                            oro: 0      
                         };      
       
                         inventory[mineral] = (inventory[mineral] || 0) + 1;      
@@ -110,16 +110,16 @@
                 });      
       
                 setTimeout(function() {      
-                    const resultado = obtenerMadera();      
+                    const resultado = obtenermadera();      
                     let mensaje = "";      
       
                     if (resultado === "Nada") {      
                         mensaje = "No puedo llevarme este tronco, ¡pesa demaciado!."; // Mensaje cuando no obtiene nada      
                     } else if (resultado === "Tropezón") {      
                         mensaje = "Demonios, caí al tropezar con una raíz, espero no haber perdido nada de la mochila"; // Mensaje cuando tropieza      
-                    } else if (resultado === "Madera") {      
-                        mensaje = "Con este tronco podré hacer Madera."; // Mensaje cuando obtiene madera      
-                        actualizarInventario("Madera");      
+                    } else if (resultado === "madera") {      
+                        mensaje = "Con este tronco podré hacer madera."; // Mensaje cuando obtiene madera      
+                        actualizarInventario("madera");      
                     }      
       
                     push(ref(db, 'chat'), {      
@@ -134,11 +134,11 @@
                 }, 15000);      
             });      
       
-            function obtenerMadera() {      
+            function obtenermadera() {      
                 const probabilidad = Math.random() * 100;      
                 if (probabilidad < 60) return "Nada";      
                 if (probabilidad < 80) return "Tropezón";      
-                return "Madera";      
+                return "madera";      
             }      
 
             // Redirección del botón "Poder" para abrir en ventana completa  
