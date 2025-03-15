@@ -50,7 +50,7 @@
                         mensaje = "No encontré nada...";      
                     } else {      
                         mensaje = `Encontré ${resultado}`;      
-                        actualizarInventario(resultado);      
+                        actualizarInventario(resultado.toLowerCase());      
                     }      
       
                     push(ref(db, 'chat'), {      
@@ -123,16 +123,20 @@
                                 if (items.length > 0) {      
                                     const itemPerdido = items[Math.floor(Math.random() * items.length)];      
                                     inventory[itemPerdido] -= 1;      
-                                    mensaje = `¡Oh, me tropecé y he perdido ${itemPerdido}!`;      
+                                    mensaje = `Demonios, me tropecé y creo que perdí algo de mi inventario`;      
                                     update(userRef, { inventory });      
                                 } else {      
-                                    mensaje = "Me caí, pero al menos no perdí nada.";      
+                                    mensaje = "Ho, rayos, me tropecé con una rama";      
                                 }      
+                            } else {      
+                                mensaje = "Ho, rayos, me tropecé con una rama";      
                             }      
+                        }).catch(() => {      
+                            mensaje = "Ho, rayos, me tropecé con una rama";      
                         });      
                     } else if (resultado === "Madera") {      
                         mensaje = "Logré conseguir un tronco.";      
-                        actualizarInventario("Madera");      
+                        actualizarInventario("madera");      
                     }      
       
                     push(ref(db, 'chat'), {      
