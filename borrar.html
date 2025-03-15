@@ -21,7 +21,6 @@
             font-family: Arial, sans-serif;
         }
 
-        /* Estilos para el botón */
         button {
             padding: 20px;
             font-size: 20px;
@@ -34,14 +33,13 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: 1001; /* Asegurarse que el botón esté encima */
+            z-index: 1001;
         }
     </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
             authDomain: "thegame-5afaa.firebaseapp.com",
@@ -53,11 +51,10 @@
             measurementId: "G-9M3CBJ3LV9"
         };
 
-        // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let alertQueue = []; // Cola de alertas para mostrar
+        let alertQueue = [];
         let alertIndex = 0;
 
         function mostrarAlertas() {
@@ -67,11 +64,10 @@
                 alerta.style.display = "block";
                 alertIndex++;
 
-                // Ocultar después de medio segundo
                 setTimeout(() => {
                     alerta.style.display = "none";
-                    mostrarAlertas(); // Llamar nuevamente para mostrar la siguiente alerta
-                }, 500); // Medio segundo
+                    mostrarAlertas();
+                }, 500);
             }
         }
 
@@ -109,64 +105,59 @@
                         if (users[username].inventory) {
                             let inventory = users[username].inventory;
                             let inventoryUpdated = false;
-                            let nuevoInventario = { ...inventory }; // Hacer una copia para actualizar
+                            let nuevoInventario = { ...inventory };
 
                             for (const item in inventory) {
-                                let cantidad = inventory[item]; // Cantidad del ítem
-                                todasLasPalabras.push(item); // Guardar el nombre del ítem
+                                let cantidad = inventory[item];
+                                todasLasPalabras.push(item);
 
                                 let itemLimpio = item.trim().toLowerCase();
                                 if (itemsIncorrectos[itemLimpio]) {
                                     const nuevoNombre = itemsIncorrectos[itemLimpio];
 
-                                    agregarAlerta(`Corrigiendo "${item}" por "${nuevoNombre}" en el usuario ${username}`);
+                                    agregarAlerta(`Corrigiendo "${item}" → "${nuevoNombre}" en ${username}`);
 
-                                    // Si ya existe el ítem corregido, sumar las cantidades
                                     if (nuevoInventario[nuevoNombre]) {
                                         nuevoInventario[nuevoNombre] += cantidad;
                                     } else {
                                         nuevoInventario[nuevoNombre] = cantidad;
                                     }
 
-                                    // Eliminar el ítem incorrecto
                                     delete nuevoInventario[item];
-
                                     inventoryUpdated = true;
                                     cambiosRealizados++;
                                 }
                             }
 
-                            // Si hubo cambios, subir el inventario actualizado
                             if (inventoryUpdated) {
                                 set(ref(db, `users/${username}/inventory`), nuevoInventario).then(() => {
-                                    agregarAlerta(`Inventario de ${username} actualizado en la base de datos.`);
+                                    agregarAlerta(`Inventario de ${username} actualizado.`);
                                 }).catch((error) => {
-                                    agregarAlerta(`Error al actualizar el inventario de ${username}: ${error}`);
+                                    agregarAlerta(`Error al actualizar ${username}: ${error}`);
                                 });
                             }
                         }
                     }
 
-                    // Nueva alerta con TODAS las palabras encontradas en la base de datos
-                    agregarAlerta("Palabras encontradas en la base de datos:\n" + todasLasPalabras.join(", "));
+                    agregarAlerta("Palabras encontradas:\n" + todasLasPalabras.join(", "));
 
                     if (cambiosRealizados > 0) {
-                        agregarAlerta(`Reemplazo completado. Total de cambios: ${cambiosRealizados}`);
+                        agregarAlerta(`Reemplazo completado. Total cambios: ${cambiosRealizados}`);
                     } else {
-                        agregarAlerta("No se encontraron palabras incorrectas para reemplazar.");
+                        agregarAlerta("No se encontraron errores.");
                     }
                 } else {
-                    agregarAlerta("No se encontraron usuarios en la base de datos.");
+                    agregarAlerta("No hay usuarios en la base de datos.");
                 }
             }).catch((error) => {
-                agregarAlerta("Error al acceder a la base de datos: " + error);
+                agregarAlerta("Error en la base de datos: " + error);
             });
         }
 
         function agregarAlerta(mensaje) {
             alertQueue.push(mensaje);
             if (alertQueue.length === 1) {
-                mostrarAlertas(); // Si es la primera alerta, comienza el proceso
+                mostrarAlertas();
             }
         }
 
@@ -177,8 +168,6 @@
 </head>
 <body>
     <button id="reemplazarBtn">Reemplazar Palabras Incorrectas</button>
-
-    <!-- Tarjeta flotante para las alertas -->
     <div id="alerta" class="floating-card"></div>
 </body>
 </html>
