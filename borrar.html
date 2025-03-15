@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mochila</title>
     <style>
+        /* Estilos generales */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(to bottom right, #28a745, #f39c12);
+            background: linear-gradient(to bottom right, #28a745, #f39c12); /* Degradado verde a naranja */
             color: #333;
         }
 
@@ -18,6 +19,7 @@
             color: #fff;
         }
 
+        /* Estilos para el contenedor principal de la mochila */
         #mochila {
             max-width: 600px;
             margin: 20px auto;
@@ -27,6 +29,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
+        /* Estilos para los elementos del inventario */
         p {
             font-size: 1.2em;
             margin: 10px 0;
@@ -39,53 +42,30 @@
             background-color: #e7e7e7;
         }
 
+        /* Estilos para el título principal */
         h1 {
             font-size: 2em;
             color: #2c3e50;
             margin-top: 20px;
         }
 
+        /* Estilos para el título de la mochila */
         h3 {
             font-size: 1.5em;
             color: #2980b9;
         }
 
-        .button {
-            background-color: #2980b9;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.2em;
-            display: block;
-            margin: 20px auto;
-        }
-
-        .button:hover {
-            background-color: #3498db;
+        /* Estilo para el icono de candado */
+        .candado {
+            font-size: 1.5em;
+            color: #f39c12;
         }
     </style>
-</head>
-<body>
-    <h1>Mochila</h1>
-    <div id="mochila">
-        <h3>Inventario</h3>
-        <p id="Carbón">Carbón: 🔒</p>
-        <p id="Cobre">Cobre: 🔒</p>
-        <p id="Hierro">Hierro: 🔒</p>
-        <p id="Plata">Plata: 🔒</p>
-        <p id="Oro">Oro: 🔒</p>
-        <p id="Madera">Madera: 🔒</p>
-
-        <!-- Botón para cambiar el texto -->
-        <button class="button" onclick="cambiarInventario()">Actualizar Inventario</button>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
+        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
             authDomain: "thegame-5afaa.firebaseapp.com",
@@ -97,38 +77,72 @@
             measurementId: "G-9M3CBJ3LV9"
         };
 
+        // Inicialización de Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        // Obtener el nombre de usuario
         const username = localStorage.getItem("username") || "Desconocido";
         const userRef = ref(db, 'users/' + username);
 
-        function cambiarInventario() {
+        // Objeto para manejar los reemplazos de los ítems
+        const cambios = {
+            "carbon": "Carbón",
+            "carbón": "Carbón",
+            "CARBÓN": "Carbón",
+            "cArbOn": "Carbón",
+            "cARBÓN": "Carbón",
+            "cArBoN": "Carbón",
+            "cobres": "Cobre",
+            "cobre": "Cobre",
+            "COBRE": "Cobre",
+            "coBrE": "Cobre",
+            "coBrEs": "Cobre",
+            "hierro": "Hierro",
+            "HIERRO": "Hierro",
+            "hiErRo": "Hierro",
+            "MADERA": "Madera",
+            "madera": "Madera",
+            "MAdera": "Madera",
+            "Oro": "Oro",
+            "ORO": "Oro",
+            "Plata": "Plata",
+            "PLATA": "Plata"
+        };
+
+        // Función para corregir los ítems del inventario
+        function corregirTexto(inventory) {
+            for (let key in inventory) {
+                if (cambios[inventory[key]]) {
+                    inventory[key] = cambios[inventory[key]];
+                }
+            }
+            return inventory;
+        }
+
+        // Función para mostrar el inventario del jugador
+        function mostrarInventario() {
             get(userRef).then((snapshot) => {
                 if (snapshot.exists()) {
-                    const inventory = snapshot.val().inventory || {};
-
-                    // Función para estandarizar las palabras
-                    const corregirPalabras = (texto) => {
-                        const mapaCorrecciones = {
-                            "carbon": "Carbón",
-                            "cobre": "Cobre",
-                            "hierro": "Hierro",
-                            "plata": "Plata",
-                            "oro": "Oro",
-                            "madera": "Madera"
-                        };
-
-                        return mapaCorrecciones[texto.toLowerCase()] || texto;
+                    const inventory = snapshot.val().inventory || {
+                        Carbón: undefined,
+                        Cobre: undefined,
+                        Hierro: undefined,
+                        Plata: undefined,
+                        Oro: undefined,
+                        Madera: undefined // Se añade Madera al inventario
                     };
 
-                    // Reemplazar los valores en el inventario
-                    document.getElementById("Carbón").textContent = inventory.Carbón ? `Carbón: ${corregirPalabras(inventory.Carbón)}` : "Carbón: 🔒";
-                    document.getElementById("Cobre").textContent = inventory.Cobre ? `Cobre: ${corregirPalabras(inventory.Cobre)}` : "Cobre: 🔒";
-                    document.getElementById("Hierro").textContent = inventory.Hierro ? `Hierro: ${corregirPalabras(inventory.Hierro)}` : "Hierro: 🔒";
-                    document.getElementById("Plata").textContent = inventory.Plata ? `Plata: ${corregirPalabras(inventory.Plata)}` : "Plata: 🔒";
-                    document.getElementById("Oro").textContent = inventory.Oro ? `Oro: ${corregirPalabras(inventory.Oro)}` : "Oro: 🔒";
-                    document.getElementById("Madera").textContent = inventory.Madera ? `Madera: ${corregirPalabras(inventory.Madera)}` : "Madera: 🔒";
+                    // Corregir los ítems antes de mostrar
+                    const inventarioCorregido = corregirTexto(inventory);
+
+                    // Mostrar el inventario corregido
+                    document.getElementById("Carbón").textContent = inventarioCorregido.Carbón !== undefined ? "Carbón: " + inventarioCorregido.Carbón : "Carbón: 🔒";
+                    document.getElementById("Cobre").textContent = inventarioCorregido.Cobre !== undefined ? "Cobre: " + inventarioCorregido.Cobre : "Cobre: 🔒";
+                    document.getElementById("Hierro").textContent = inventarioCorregido.Hierro !== undefined ? "Hierro: " + inventarioCorregido.Hierro : "Hierro: 🔒";
+                    document.getElementById("Plata").textContent = inventarioCorregido.Plata !== undefined ? "Plata: " + inventarioCorregido.Plata : "Plata: 🔒";
+                    document.getElementById("Oro").textContent = inventarioCorregido.Oro !== undefined ? "Oro: " + inventarioCorregido.Oro : "Oro: 🔒";
+                    document.getElementById("Madera").textContent = inventarioCorregido.Madera !== undefined ? "Madera: " + inventarioCorregido.Madera : "Madera: 🔒"; // Se muestra la Madera
                 } else {
                     console.log("No se encontraron datos para el usuario.");
                 }
@@ -139,8 +153,21 @@
 
         // Llamar a la función de mostrar inventario al cargar la página
         document.addEventListener("DOMContentLoaded", function() {
-            cambiarInventario(); // Opcional, para que se actualice al inicio
+            mostrarInventario();
         });
     </script>
+</head>
+<body>
+    <h1>Mochila</h1>
+    <div id="mochila">
+        <h3>Inventario</h3>
+        <p id="Carbón">Carbón: 🔒</p>
+        <p id="Cobre">Cobre: 🔒</p>
+        <p id="Hierro">Hierro: 🔒</p>
+        <p id="Plata">Plata: 🔒</p>
+        <p id="Oro">Oro: 🔒</p>
+        <p id="Madera">Madera: 🔒</p> <!-- Se añade la Madera en el HTML -->
+        <button onclick="mostrarInventario()">Actualizar Inventario</button>
+    </div>
 </body>
 </html>
