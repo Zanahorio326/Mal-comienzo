@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combate de Boxeo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: black;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #welcomeMessage {
+            font-size: 28px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="welcomeMessage">Bienvenido, <span id="userName">Cargando...</span></div>
+
+    <script>
+        // Lee el nombre del jugador desde Firebase
+        const userNameElement = document.getElementById('userName');
+
+        // Obtener el nombre del jugador desde Firebase (reemplazar 'jugadorId' por el id correcto del jugador)
+        const userRef = database.ref('usuarios/jugadorId'); // Cambiar 'jugadorId' al ID correcto
+        userRef.once('value', (snapshot) => {
+            const userData = snapshot.val();
+            if (userData && userData.nombre) {
+                userNameElement.textContent = userData.nombre;
+            } else {
+                userNameElement.textContent = "Jugador no encontrado";
+            }
+        });
+    </script>
+
+</body>
+</html>
