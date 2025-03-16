@@ -43,7 +43,7 @@ if (urlParams.has('prestigio')) {
         
                 push(ref(db, 'chat'), {        
                     usuario: username,        
-                    texto: "Minando...",        
+                    texto: "*(Minando... 🪨💥⛏️)🏔️🏔️🏔️⛰️🏔️⛰️🏔️⛰️⛰️⛰️⛰️⛰️🌾🪨🌾🪨🌾🌾🌾🌲🌾🌲🌾🌳🌲🌳🌲🌳🌲",        
                     timestamp: Date.now()        
                 });        
         
@@ -52,9 +52,9 @@ if (urlParams.has('prestigio')) {
                     let mensaje = "";        
         
                     if (resultado === "Nada") {        
-                        mensaje = "No encontré nada...";        
+                        mensaje = "-_- No encontré nada...";        
                     } else {        
-                        mensaje = `Encontré ${resultado}`;        
+                        mensaje = `:D Encontré ${resultado}`;        
                         actualizarInventario(resultado.toLowerCase());        
                     }        
         
@@ -110,7 +110,7 @@ if (urlParams.has('prestigio')) {
         
                 push(ref(db, 'chat'), {        
                     usuario: username,        
-                    texto: "Talando...", // Mensaje al comenzar a talar  
+                    texto: "*(Talando... 🌳💥🪓)🌳🌲🌳🌲🌳🌲🌳🌲🌳🌲🌳🌲🌳🌲🌳", // Mensaje al comenzar a talar  
                     timestamp: Date.now()        
                 });        
         
@@ -119,11 +119,11 @@ if (urlParams.has('prestigio')) {
                     let mensaje = "";        
         
                     if (resultado === "Nada") {        
-                        mensaje = "No puedo llevarme este tronco, ¡pesa demasiado!."; // Mensaje cuando no obtiene nada        
+                        mensaje = "No puedo llevarme este tronco 🪵 ¡pesa demasiado! >:/"; // Mensaje cuando no obtiene nada        
                     } else if (resultado === "Tropezón") {        
-                        mensaje = "Demonios, caí al tropezar con una raíz, espero no haber perdido nada de la mochila"; // Mensaje cuando tropieza        
+                        mensaje = "Demonios, caí al tropezar con una raíz =_= espero no haber perdido nada de la mochila 🎒"; // Mensaje cuando tropieza        
                     } else if (resultado === "madera") {        
-                        mensaje = "Con este tronco podré hacer madera."; // Mensaje cuando obtiene madera        
+                        mensaje = "Este tronco 🪵 me servirá bastante :)"; // Mensaje cuando obtiene madera        
                         actualizarInventario("madera");        
                     }        
         
@@ -162,7 +162,7 @@ document.getElementById("btnPoder").addEventListener("click", function() {
                 // Enviar mensaje 1
                 push(ref(db, 'chat'), {
                     usuario: username,
-                    texto: "Para hacer un cuchillo 🔪 nesecito 3 de carbón 🪨 para fundir el metal 2 de hierro ⚙️ para la hoja y 1 de madera 🪵 para tallar el mango", // Mensaje 1
+                    texto: "Para hacer un cuchillo 🔪 nesecito 3 de carbón 🪨 para fundir el metal 2 de hierro ⚙️ para la hoja y 1 de madera 🪵 para tallar el mango ó_ò", // Mensaje 1
                     timestamp: Date.now()
                 });
 
@@ -182,7 +182,7 @@ document.getElementById("btnPoder").addEventListener("click", function() {
                                 // Si tiene los recursos
                                 push(ref(db, 'chat'), {
                                     usuario: username,
-                                    texto: "Tengo esos materiales, encendere la forja...", // Mensaje 2
+                                    texto: "^_^ Tengo esos materiales, encendere la forja... 🔥", // Mensaje 2
                                     timestamp: Date.now()
                                 },);
 
@@ -190,7 +190,7 @@ document.getElementById("btnPoder").addEventListener("click", function() {
                                     // Confirmación de crafteo (Momento 3)
                                     push(ref(db, 'chat'), {
                                         usuario: username,
-                                        texto: "Usaré el carbón para derretir el metal...", // Mensaje 4
+                                        texto: " `~` 🪨 Usaré el carbón para derretir el metal...", // Mensaje 4
                                         timestamp: Date.now()
                                     });
 
@@ -207,7 +207,7 @@ document.getElementById("btnPoder").addEventListener("click", function() {
                                         // Descuento de materiales (Momento 4)
                                         push(ref(db, 'chat'), {
                                             usuario: username,
-                                            texto: "Aré el mango con la madera...", // Mensaje 5
+                                            texto: "(/◕ヮ◕)/ 🪵 Aré el mango con la madera...", // Mensaje 5
                                             timestamp: Date.now()
                                         });
 
@@ -217,7 +217,7 @@ document.getElementById("btnPoder").addEventListener("click", function() {
                                                 // Crafteo finalizado (Momento 6)
                                                 push(ref(db, 'chat'), {
                                                     usuario: username,
-                                                    texto: "¡Listo! 🔪", // Mensaje 6
+                                                    texto: "¡Listo! 🔪ヽ(^o^)丿", // Mensaje 6
                                                     timestamp: Date.now()
                                                 });
 
