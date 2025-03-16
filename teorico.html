@@ -39,7 +39,7 @@ if (urlParams.has('prestigio')) {
                 isMining = true;        
                 const btn = this;        
                 btn.disabled = true;        
-                btn.textContent = "Picando... ⛏️";        
+                btn.textContent = "Picando... 💥⛏️";        
         
                 push(ref(db, 'chat'), {        
                     usuario: username,        
@@ -65,7 +65,7 @@ if (urlParams.has('prestigio')) {
                     });        
         
                     btn.disabled = false;        
-                    btn.textContent = "⛏️ Minando...";        
+                    btn.textContent = "⛏️ Minar";        
                     isMining = false;        
                 }, 15000);        
             });        
@@ -106,7 +106,7 @@ if (urlParams.has('prestigio')) {
                 isMining = true;        
                 const btn = this;        
                 btn.disabled = true;        
-                btn.textContent = "Talando... 🪓";        
+                btn.textContent = "Talando... 🌳🪓";        
         
                 push(ref(db, 'chat'), {        
                     usuario: username,        
@@ -134,7 +134,7 @@ if (urlParams.has('prestigio')) {
                     });        
         
                     btn.disabled = false;        
-                    btn.textContent = "🪓 Talando";        
+                    btn.textContent = "🪓 Talar";        
                     isMining = false;        
                 }, 15000);        
             });        
