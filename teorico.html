@@ -1,181 +1,283 @@
-<!DOCTYPE html>      
-<html lang="es">      
-<head>      
-    <meta charset="UTF-8">      
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">      
-    <title>Botón Minar</title>      
-    <script type="module">      
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";      
-        import { getDatabase, ref, push, get, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";      
-      
-        const firebaseConfig = {      
-            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",      
-            authDomain: "thegame-5afaa.firebaseapp.com",      
-            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",      
-            projectId: "thegame-5afaa",      
-            storageBucket: "thegame-5afaa.firebasestorage.app",      
-            messagingSenderId: "588556182984",      
-            appId: "1:588556182984:web:a0557067d35c18e3944cfd",      
-            measurementId: "G-9M3CBJ3LV9"      
-        };      
-      
-        const app = initializeApp(firebaseConfig);      
-        const db = getDatabase(app);      
-      
-        const username = localStorage.getItem("username") || "Desconocido";      
-        const userRef = ref(db, 'users/' + username);      
-      
-        let isMining = false; // Variable para evitar realizar dos acciones a la vez (minar y talar)    
+<!DOCTYPE html>        
+<html lang="es">        
+<head>        
+    <meta charset="UTF-8">        
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">        
+    <title>Botón Minar</title>        
+    <script type="module">        
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";        
+        import { getDatabase, ref, push, get, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";        
+        
+        const firebaseConfig = {        
+            apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",        
+            authDomain: "thegame-5afaa.firebaseapp.com",        
+            databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",        
+            projectId: "thegame-5afaa",        
+            storageBucket: "thegame-5afaa.firebasestorage.app",        
+            messagingSenderId: "588556182984",        
+            appId: "1:588556182984:web:a0557067d35c18e3944cfd",        
+            measurementId: "G-9M3CBJ3LV9"        
+        };        
+        
+        const app = initializeApp(firebaseConfig);        
+        const db = getDatabase(app);        
+        
+        const username = localStorage.getItem("username") || "Desconocido";        
+        const userRef = ref(db, 'users/' + username);        
+        
+        let isMining = false; // Variable para evitar realizar dos acciones a la vez (minar y talar)      
+    
+        document.addEventListener("DOMContentLoaded", function() {        
+            document.getElementById("btnMinar").addEventListener("click", function() {        
+                if (isMining) return;        
+                    
+                isMining = true;        
+                const btn = this;        
+                btn.disabled = true;        
+                btn.textContent = "Picando... ⛏️";        
+        
+                push(ref(db, 'chat'), {        
+                    usuario: username,        
+                    texto: "Minando...",        
+                    timestamp: Date.now()        
+                });        
+        
+                setTimeout(function() {        
+                    const resultado = obtenerMineral();        
+                    let mensaje = "";        
+        
+                    if (resultado === "Nada") {        
+                        mensaje = "No encontré nada...";        
+                    } else {        
+                        mensaje = `Encontré ${resultado}`;        
+                        actualizarInventario(resultado.toLowerCase());        
+                    }        
+        
+                    push(ref(db, 'chat'), {        
+                        usuario: username,        
+                        texto: mensaje,        
+                        timestamp: Date.now()        
+                    });        
+        
+                    btn.disabled = false;        
+                    btn.textContent = "⛏️ Minando...";        
+                    isMining = false;        
+                }, 15000);        
+            });        
+        
+            function obtenerMineral() {        
+                const probabilidad = Math.random() * 100;        
+                if (probabilidad < 40) return "Nada";        
+                if (probabilidad < 65) return "carbón";        
+                if (probabilidad < 83) return "cobre";        
+                if (probabilidad < 93) return "hierro";        
+                if (probabilidad < 98) return "plata";        
+                return "oro";        
+            }        
+        
+            function actualizarInventario(mineral) {        
+                get(userRef).then((snapshot) => {        
+                    if (snapshot.exists()) {        
+                        const inventory = snapshot.val().inventory || {        
+                            carbón: 0,        
+                            cobre: 0,        
+                            hierro: 0,        
+                            plata: 0,        
+                            oro: 0        
+                        };        
+        
+                        inventory[mineral] = (inventory[mineral] || 0) + 1;        
+        
+                        update(userRef, { inventory })        
+                        .then(() => console.log(`Inventario actualizado con ${mineral}`))        
+                        .catch((error) => console.error("Error al actualizar el inventario: ", error));        
+                    }        
+                }).catch((error) => console.error("Error al obtener el inventario: ", error));        
+            }    
+    
+            document.getElementById("btnTalar").addEventListener("click", function() {        
+                if (isMining) return;        
+        
+                isMining = true;        
+                const btn = this;        
+                btn.disabled = true;        
+                btn.textContent = "Talando... 🪓";        
+        
+                push(ref(db, 'chat'), {        
+                    usuario: username,        
+                    texto: "Talando...", // Mensaje al comenzar a talar  
+                    timestamp: Date.now()        
+                });        
+        
+                setTimeout(function() {        
+                    const resultado = obtenermadera();        
+                    let mensaje = "";        
+        
+                    if (resultado === "Nada") {        
+                        mensaje = "No puedo llevarme este tronco, ¡pesa demasiado!."; // Mensaje cuando no obtiene nada        
+                    } else if (resultado === "Tropezón") {        
+                        mensaje = "Demonios, caí al tropezar con una raíz, espero no haber perdido nada de la mochila"; // Mensaje cuando tropieza        
+                    } else if (resultado === "madera") {        
+                        mensaje = "Con este tronco podré hacer madera."; // Mensaje cuando obtiene madera        
+                        actualizarInventario("madera");        
+                    }        
+        
+                    push(ref(db, 'chat'), {        
+                        usuario: username,        
+                        texto: mensaje,        
+                        timestamp: Date.now()        
+                    });        
+        
+                    btn.disabled = false;        
+                    btn.textContent = "🪓 Talando";        
+                    isMining = false;        
+                }, 15000);        
+            });        
+        
+            function obtenermadera() {        
+                const probabilidad = Math.random() * 100;        
+                if (probabilidad < 60) return "Nada";        
+                if (probabilidad < 80) return "Tropezón";        
+                return "madera";        
+            }        
+
+            // Agregamos la cadena de eventos al botón 1 (Próximamente 1)
+            document.getElementById("btn1").addEventListener("click", function() {
+                // Deshabilitar todos los botones
+                document.getElementById("btn1").disabled = true;
+                document.getElementById("btn2").disabled = true;
+                document.getElementById("btnMinar").disabled = true;
+                document.getElementById("btnTalar").disabled = true;
+                document.getElementById("btnPoder").disabled = true;
+
+                // Enviar mensaje 1
+                push(ref(db, 'chat'), {
+                    usuario: username,
+                    texto: "Para hacer un cuchillo 🔪 nesecito 3 de carbón 🪨 para fundir el metal 2 de hierro ⚙️ para la hoja y 1 de madera 🪵 para tallar el mango", // Mensaje 1
+                    timestamp: Date.now()
+                });
+
+                setTimeout(function() {
+                    // Verificación de recursos (Momento 2)
+                    get(userRef).then((snapshot) => {
+                        if (snapshot.exists()) {
+                            const inventory = snapshot.val().inventory || {
+                                carbón: 0,
+                                cobre: 0,
+                                hierro: 0,
+                                plata: 0,
+                                oro: 0
+                            };
+
+                            if (inventory.carbón >= 3 && inventory.hierro >= 2 && inventory.madera >= 1) {
+                                // Si tiene los recursos
+                                push(ref(db, 'chat'), {
+                                    usuario: username,
+                                    texto: "Tengo esos materiales, encendere la forja...", // Mensaje 2
+                                    timestamp: Date.now()
+                                },);
+
+                                setTimeout(function() {
+                                    // Confirmación de crafteo (Momento 3)
+                                    push(ref(db, 'chat'), {
+                                        usuario: username,
+                                        texto: "Usaré el carbón para derretir el metal...", // Mensaje 4
+                                        timestamp: Date.now()
+                                    });
+
+                                    // Restar 3 de carbón
+                                    inventory.carbón -= 3;
+                                    // Restar 2 de hierro
+                                    inventory.hierro -= 2;
+                                    // Restar 1 de madera
+                                    inventory.madera -= 1;
+
+                                    update(userRef, { inventory });
+
+                                    setTimeout(function() {
+                                        // Descuento de materiales (Momento 4)
+                                        push(ref(db, 'chat'), {
+                                            usuario: username,
+                                            texto: "Aré el mango con la madera...", // Mensaje 5
+                                            timestamp: Date.now()
+                                        });
+
+                                        setTimeout(function() {
+                                            // Proceso de crafteo (Momento 5)
+                                            setTimeout(function() {
+                                                // Crafteo finalizado (Momento 6)
+                                                push(ref(db, 'chat'), {
+                                                    usuario: username,
+                                                    texto: "¡Listo! 🔪", // Mensaje 6
+                                                    timestamp: Date.now()
+                                                });
+
+                                                // Añadir cuchillo al inventario
+                                                inventory.cuchillo = (inventory.cuchillo || 0) + 1;
+                                                update(userRef, { inventory });
+
+                                                // Habilitar todos los botones nuevamente
+                                                document.getElementById("btn1").disabled = false;
+                                                document.getElementById("btn2").disabled = false;
+                                                document.getElementById("btnMinar").disabled = false;
+                                                document.getElementById("btnTalar").disabled = false;
+                                                document.getElementById("btnPoder").disabled = false;
+                                            }, 10000);
+                                        }, 10000);
+                                    }, 10000);
+                                }, 10000);
+                            } else {
+                                // Si no tiene los recursos
+                                push(ref(db, 'chat'), {
+                                    usuario: username,
+                                    texto: "mensaje 3", // Mensaje 3
+                                    timestamp: Date.now()
+                                });
+
+                                setTimeout(function() {
+                                    // Habilitar todos los botones nuevamente
+                                    document.getElementById("btn1").disabled = false;
+                                    document.getElementById("btn2").disabled = false;
+                                    document.getElementById("btnMinar").disabled = false;
+                                    document.getElementById("btnTalar").disabled = false;
+                                    document.getElementById("btnPoder").disabled = false;
+                                }, 1000);
+                            }
+                        }
+                    }).catch((error) => console.error("Error al obtener los recursos: ", error));
+                }, 1000);
+            });
+
+        });        
+    </script>        
+</head>        
+<body>  
+    <div style="border: 1px solid; padding: 5px; width: 70px; text-align: center; color: white; background-color: gray; font-size: 12px;">  
+        Acción  
+    </div>  
+    <br>  
+    <button id="btnMinar">⛏️ Minar</button>        
+    <br><br>        
+    <button id="btnTalar">🪓 Talar</button>        
+    <br><br>        
+    <button id="btnPoder">🏆 Poder</button>
   
-        document.addEventListener("DOMContentLoaded", function() {      
-            document.getElementById("btnMinar").addEventListener("click", function() {      
-                if (isMining) return;      
-                  
-                isMining = true;      
-                const btn = this;      
-                btn.disabled = true;      
-                btn.textContent = "⛏️ Picando...";      
-      
-                push(ref(db, 'chat'), {      
-                    usuario: username,      
-                    texto: "Minando...",      
-                    timestamp: Date.now()      
-                });      
-      
-                setTimeout(function() {      
-                    const resultado = obtenerMineral();      
-                    let mensaje = "";      
-      
-                    if (resultado === "Nada") {      
-                        mensaje = "No encontré nada...";      
-                    } else {      
-                        mensaje = `Encontré ${resultado}`;      
-                        actualizarInventario(resultado.toLowerCase());      
-                    }      
-      
-                    push(ref(db, 'chat'), {      
-                        usuario: username,      
-                        texto: mensaje,      
-                        timestamp: Date.now()      
-                    });      
-      
-                    btn.disabled = false;      
-                    btn.textContent = "⛏️ Minar";      
-                    isMining = false;      
-                }, 15000);      
-            });      
-      
-            function obtenerMineral() {      
-                const probabilidad = Math.random() * 100;      
-                if (probabilidad < 40) return "Nada";      
-                if (probabilidad < 65) return "carbón";      
-                if (probabilidad < 83) return "cobre";      
-                if (probabilidad < 93) return "hierro";      
-                if (probabilidad < 98) return "plata";      
-                return "oro";      
-            }      
-      
-            function actualizarInventario(mineral) {      
-                get(userRef).then((snapshot) => {      
-                    if (snapshot.exists()) {      
-                        const inventory = snapshot.val().inventory || {      
-                            carbón: 0,      
-                            cobre: 0,      
-                            hierro: 0,      
-                            plata: 0,      
-                            oro: 0      
-                        };      
-      
-                        inventory[mineral] = (inventory[mineral] || 0) + 1;      
-      
-                        update(userRef, { inventory })      
-                        .then(() => console.log(`Inventario actualizado con ${mineral}`))      
-                        .catch((error) => console.error("Error al actualizar el inventario: ", error));      
-                    }      
-                }).catch((error) => console.error("Error al obtener el inventario: ", error));      
-            }  
+    <hr> <!-- Línea separadora -->  
   
-            document.getElementById("btnTalar").addEventListener("click", function() {      
-                if (isMining) return;      
-      
-                isMining = true;      
-                const btn = this;      
-                btn.disabled = true;      
-                btn.textContent = "🪓 Talando...";      
-      
-                push(ref(db, 'chat'), {      
-                    usuario: username,      
-                    texto: "Talando...", // Mensaje al comenzar a talar
-                    timestamp: Date.now()      
-                });      
-      
-                setTimeout(function() {      
-                    const resultado = obtenermadera();      
-                    let mensaje = "";      
-      
-                    if (resultado === "Nada") {      
-                        mensaje = "No puedo llevarme este tronco, ¡pesa demasiado!."; // Mensaje cuando no obtiene nada      
-                    } else if (resultado === "Tropezón") {      
-                        mensaje = "Demonios, caí al tropezar con una raíz, espero no haber perdido nada de la mochila"; // Mensaje cuando tropieza      
-                    } else if (resultado === "madera") {      
-                        mensaje = "Con este tronco podré hacer madera."; // Mensaje cuando obtiene madera      
-                        actualizarInventario("madera");      
-                    }      
-      
-                    push(ref(db, 'chat'), {      
-                        usuario: username,      
-                        texto: mensaje,      
-                        timestamp: Date.now()      
-                    });      
-      
-                    btn.disabled = false;      
-                    btn.textContent = "🪓 Talando";      
-                    isMining = false;      
-                }, 15000);      
-            });      
-      
-            function obtenermadera() {      
-                const probabilidad = Math.random() * 100;      
-                if (probabilidad < 60) return "Nada";      
-                if (probabilidad < 80) return "Tropezón";      
-                return "madera";      
-            }      
-
-            // Redirección del botón "Poder" para abrir en ventana completa  
-            document.getElementById("btnPoder").addEventListener("click", function() {      
-                window.top.location.href = "https://zanahorio326.github.io/Mal-comienzo/prestigio.html";      
-            });      
-
-        });      
-    </script>      
-</head>      
-<body>
-    <div style="border: 1px solid; padding: 5px; width: 70px; text-align: center; color: white; background-color: gray; font-size: 12px;">
-        Acción
-    </div>
-    <br>
-    <button id="btnMinar">⛏️ Minar</button>      
-    <br><br>      
-    <button id="btnTalar">🪓 Talar</button>      
-    <br><br>      
-    <button id="btnPoder">🏆 Poder</button>      
-
-    <hr> <!-- Línea separadora -->
-
-    <!-- Cuadro de texto "Crafteos" debajo de la línea -->
-    <div style="border: 1px solid; padding: 5px; width: 70px; text-align: center; color: white; background-color: gray; font-size: 12px;">
-        Crafteos
-    </div>
-
-    <br>      
-    <button id="btn1">Próximamente 1</button>      
-    <br><br>      
-    <button id="btn2">Próximamente 2</button>      
-
-    <hr> <!-- Línea separadora -->
- 
-    <div style="border: 1px solid; padding: 15px 10px; width: 90px; height: 100px; text-align: center; color: white; background-color: gray; font-size: 12px; word-wrap: break-word;">
-        Para usar tus herramientas debes usar esta mano. Si quitas la mano, se cancelará la acción
-    </div>      
-</body>      
+    <!-- Cuadro de texto "Crafteos" debajo de la línea -->  
+    <div style="border: 1px solid; padding: 5px; width: 70px; text-align: center; color: white; background-color: gray; font-size: 12px;">  
+        Crafteos  
+    </div>  
+  
+    <br>        
+    <button id="btn1">🔪 cuchillo</button>        
+    <br><br>        
+    <button id="btn2">🔒</button>        
+  
+    <hr> <!-- Línea separadora -->  
+   
+    <div style="border: 1px solid; padding: 15px 10px; width: 90px; height: 100px; text-align: center; color: white; background-color: gray; font-size: 12px; word-wrap: break-word;">  
+        Para usar tus herramientas debes usar esta mano. Si quitas la mano, se cancelará la acción  
+    </div>        
+</body>        
 </html>
