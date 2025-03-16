@@ -27,7 +27,12 @@
         
         let isMining = false; // Variable para evitar realizar dos acciones a la vez (minar y talar)      
     
-        document.addEventListener("DOMContentLoaded", function() {        
+        document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('prestigio')) {
+    window.location.href = "https://zanahorio326.github.io/Mal-comienzo/prestigio.html";
+    return;
+}     
             document.getElementById("btnMinar").addEventListener("click", function() {        
                 if (isMining) return;        
                     
@@ -140,6 +145,10 @@
                 if (probabilidad < 80) return "Tropezón";        
                 return "madera";        
             }        
+
+document.getElementById("btnPoder").addEventListener("click", function() {
+                window.top.location.href = "https://zanahorio326.github.io/Mal-comienzo/prestigio.html";
+            });
 
             // Agregamos la cadena de eventos al botón 1 (Próximamente 1)
             document.getElementById("btn1").addEventListener("click", function() {
