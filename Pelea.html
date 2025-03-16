@@ -3,34 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat</title>
+    <title>Combate Medieval</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Garamond', serif;
             text-align: center;
-            background-color: black;
-            color: white;
+            background-color: #2e2e2e;
+            color: #f8f8f8;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: space-between;
             height: 100vh;
+            overflow: hidden;
+            background-image: url('https://www.w3schools.com/w3images/medieval_texture.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        #welcomeMessage {
+            font-size: 26px;
+            margin-top: 20px;
+            font-family: 'Georgia', serif;
+            font-weight: bold;
+            color: #f4c542;
+        }
+
+        #counter {
+            font-size: 28px;
+            margin-top: 20px;
+            font-family: 'Garamond', serif;
+            color: #f4c542;
+            display: none; /* Inicialmente oculto */
+        }
+
+        #timer {
+            font-size: 24px;
+            margin-top: 10px;
+            font-family: 'Garamond', serif;
+            color: #f4c542;
+        }
+
+        .button-container {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+        }
+
+        .btn {
+            font-size: 24px;
+            flex: 1;
+            border: 2px solid #d1a239;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #fff;
+            transition: 0.3s;
+            height: 100px;
+            margin: 0 5px;
+            font-family: 'Georgia', serif;
+            background-color: #5b3a29;
+            box-shadow: 0px 0px 15px #d1a239;
+        }
+
+        #leftHook {
+            background-color: #2e6b8a;
+        }
+
+        #leftHook:active {
+            background-color: #3e8d9f;
+        }
+
+        #rightHook {
+            background-color: #7a5e32;
+        }
+
+        #rightHook:active {
+            background-color: #9a7e53;
+        }
+
+        #uppercut {
+            background-color: #373a40;
+            font-weight: bold;
+            flex: 1.2;
+        }
+
+        #uppercut.ready {
+            background-color: #8b0000;
+            box-shadow: 0px 0px 15px #e73f33;
+        }
+
+        #uppercut:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn:disabled {
+            background-color: #555 !important;
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            color: #f4c542;
+            font-size: 30px;
+            font-weight: bold;
+            text-align: center;
+            font-family: 'Georgia', serif;
         }
     </style>
 </head>
 <body>
 
-    <div id="welcomeMessage">Bienvenido, <span id="userName">Cargando...</span></div>
+    <div id="welcomeMessage">¡Bienvenido, noble luchador <span id="userName">Cargando...</span>! Prepara tu espada y escudo para un combate épico.</div>
+
+    <div id="counter">Golpes de <span id="userNameCounter">Cargando...</span>: <span id="count">0</span></div>
+    <div id="timer">Tiempo restante: <span id="timeLeft">10</span>s</div>
+
+    <div class="button-container">
+        <button id="leftHook" class="btn">Gancho Izq.</button>
+        <button id="uppercut" class="btn" disabled>Uppercut</button>
+        <button id="rightHook" class="btn">Gancho Der.</button>
+    </div>
+
+    <div id="overlay">¡Combate terminado!<br>Total de golpes: <span id="finalCount"></span></div>
 
     <script>
         // Obtener el nombre del jugador desde localStorage
         const userNameElement = document.getElementById('userName');
+        const userNameCounter = document.getElementById('userNameCounter');
         const username = localStorage.getItem('username');
         
         if (username) {
-            userNameElement.textContent = username;  // Mostrar el nombre de usuario
+            userNameElement.textContent = username;  // Mostrar el nombre de usuario en el mensaje de bienvenida
+            userNameCounter.textContent = username;  // Mostrar el nombre de usuario en la sección de golpes
         } else {
             userNameElement.textContent = "Jugador no encontrado";
+            userNameCounter.textContent = "Jugador no encontrado";
         }
+
+        let count = 0;
+        let timeLeft = 10;
+        let timerStarted = false;
+        let countdownInterval = null;
+        let gameEnded = false;
+
+        const countDisplay = document.getElementById("count");
+        const timeDisplay = document.getElementById("timeLeft");
+        const leftHook = document.getElementById("leftHook");
+        const rightHook = document.getElementById("rightHook");
+        const uppercut = document.getElementById("uppercut");
+        const overlay = document.getElementById("overlay");
+        const finalCountDisplay = document.getElementById("finalCount");
+        const welcomeMessage = document.getElementById("welcomeMessage");
+        const counterSection = document.getElementById("counter");
+
+        function updateUppercut() {
+            // El uppercut se habilita cuando el contador llega a un múltiplo de 50
+            if (count % 50 === 0 && count > 0) {
+                uppercut.textContent = "¡Uppercut!";
+                uppercut.classList.add("ready");
+                uppercut.disabled = false;
+            } else {
+                uppercut.textContent = `Uppercut (${50 - (count % 50)})`;
+                uppercut.classList.remove("ready");
+                uppercut.disabled = true;
+            }
+        }
+
+        function startTimer() {
+            if (!timerStarted) {
+                timerStarted = true;
+                countdownInterval = setInterval(() => {
+                    timeLeft--;
+                    timeDisplay.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(countdownInterval);
+                        endFight();
+                    }
+                }, 1000);
+            }
+        }
+
+        function increaseCounter() {
+            if (!timerStarted) startTimer(); 
+            if (gameEnded) return; // Evita sumar más golpes tras el final
+
+            count++;
+            countDisplay.textContent = count;
+            updateUppercut();
+        }
+
+        function endFight() {
+            gameEnded = true; // Marca el juego como terminado
+            leftHook.disabled = true;
+            rightHook.disabled = true;
+            uppercut.disabled = true;
+            finalCountDisplay.textContent = count;
+            overlay.style.display = "flex"; // Muestra el mensaje de finalización
+        }
+
+        // Acción para el uppercut
+        uppercut.addEventListener("click", () => {
+            if (count % 50 === 0) {
+                count += 20;  // Añade 20 golpes al realizar el uppercut
+                countDisplay.textContent = count;
+                updateUppercut(); // Actualiza la visualización del botón Uppercut
+            }
+        });
+
+        leftHook.addEventListener("click", () => {
+            increaseCounter();
+            welcomeMessage.style.display = "none";  // Oculta el mensaje de bienvenida
+            counterSection.style.display = "block"; // Muestra la sección de golpes
+        });
+
+        rightHook.addEventListener("click", increaseCounter);
+
+        updateUppercut();
     </script>
 
 </body>
