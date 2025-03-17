@@ -63,7 +63,7 @@ document.getElementById("btnEspada").addEventListener("click", function() {
                                 setTimeout(function() {
                                     push(ref(db, 'chat'), {
                                         usuario: username,
-                                        texto: "¡Listo! ⚔️ヽ(^o^)丿", // Mensaje 5
+                                        texto: "¡Listo! 🗡️ヽ(^o^)丿", // Mensaje 5
                                         timestamp: Date.now()
                                     });
 
@@ -79,7 +79,7 @@ document.getElementById("btnEspada").addEventListener("click", function() {
                                     document.getElementById("btnEspada").disabled = false;
                                 }, 10000);
                             }, 10000);
-                        }, 10000);
+                        }, 6000);
                     }, 10000);
                 } else {
                     // Si no hay suficientes materiales
