@@ -101,6 +101,8 @@
     </script>
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Uncial+Antiqua&display=swap');
+
         body {
             font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #ff7e00, #3ba54a);
@@ -110,6 +112,15 @@
             align-items: center;
             flex-direction: column;
             color: white;
+        }
+
+        .title {
+            font-family: 'Uncial Antiqua', cursive;
+            font-size: 36px;
+            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+            border-bottom: 3px solid gold;
+            padding-bottom: 10px;
         }
 
         .container {
@@ -183,15 +194,17 @@
 </head>
 <body>
 
+    <div class="title">Bienvenido a Codderland</div>
+
     <div class="container">
         <button id="btnRegistro">Crear</button>
         <button id="btnLogin">Ir a mi cuerpo</button>
         <br>
         <input type="text" id="username" placeholder="Nombre del cuerpo">
         <br>
-        <input type="password" id="password" placeholder="Contraseña">
+        <input type="password" id="password" placeholder="Sello">
         <br>
-        <button id="btnChat">Chat</button>
+        <button id="btnChat">Info</button>
     </div>
 
     <!-- Cuadro de texto informativo -->
@@ -204,6 +217,5 @@
             Al oprimir "Chat", accederás al mundo con el personaje que creaste o con el cuerpo que seleccionaste.
         </p>
     </div>
-
 </body>
 </html>
