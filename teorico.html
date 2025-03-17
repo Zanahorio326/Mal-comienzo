@@ -149,8 +149,6 @@ if (urlParams.has('prestigio')) {
 document.getElementById("btnPoder").addEventListener("click", function() {
                 window.top.location.href = "https://zanahorio326.github.io/Mal-comienzo/prestigio.html";
             });
-
-            // Agregamos la cadena de eventos al botón 1 (Próximamente 1)
             document.getElementById("btn1").addEventListener("click", function() {
                 // Deshabilitar todos los botones
                 document.getElementById("btn1").disabled = true;
@@ -159,7 +157,6 @@ document.getElementById("btnPoder").addEventListener("click", function() {
                 document.getElementById("btnTalar").disabled = true;
                 document.getElementById("btnPoder").disabled = true;
 
-                // Enviar mensaje 1
                 push(ref(db, 'chat'), {
                     usuario: username,
                     texto: "Para hacer un cuchillo 🔪 nesecito 3 de carbón 🪨 para fundir el metal 2 de hierro ⚙️ para la hoja y 1 de madera 🪵 para tallar el mango ó_ò", // Mensaje 1
@@ -281,10 +278,16 @@ document.getElementById("btnPoder").addEventListener("click", function() {
     <br>        
     <button id="btn1">🔪 cuchillo</button>        
     <br><br>        
-    <button id="btn2">🔒</button>        
-  
+    <button id="btn2">🔒</button>           
+    
     <hr> <!-- Línea separadora -->  
-   
+    
+    <div style="border: 1px solid; padding: 5px; width: 70px; text-align: center; color: white; background-color: gray; font-size: 12px;">  
+        Caza 
+    </div>
+    <br>
+    <button id="btn3">Cruzada</button>
+    <br><br>
     <div style="border: 1px solid; padding: 15px 10px; width: 90px; height: 100px; text-align: center; color: white; background-color: gray; font-size: 12px; word-wrap: break-word;">  
         Si sueltas la herramienta que estás usando, se cancelará la acción  
     </div>        
