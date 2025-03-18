@@ -41,34 +41,16 @@
         window.top.location.href = "https://zanahorio326.github.io/Mal-comienzo/prestigio.html";
       });
 
-      // Botón "Misión 👑" muestra el recuadro de confirmación
+      // Botón "Misión 👑" muestra la confirmación
       document.getElementById("btnMision").addEventListener("click", function() {
-        // Forzar que el modal se muestre en la pantalla principal (fuera del iframe)
-        const modalOverlay = document.createElement("div");
-        modalOverlay.id = "modalOverlay";
-        modalOverlay.innerHTML = `
-          <div id="modalBox">
-            <h2>⚔️ Misión Real 👑</h2>
-            <p>📜 El rey solicita tu ayuda para proteger el pueblo de Codderland 🏰</p>
-            <p>Aún no tienes experiencia en combate como para portar tus armas ⚔️ (en caso de que las tengas) y eso hace desconfiar al rey, empieza con misiónes simples ✊ a puño limpio, te enviaremos a eliminar a un par de lobos 🐺 amenazan al ganado.</p>
-            <div id="modalButtons">
-              <button id="btnCancelar">°n° No soy digno</button>
-              <button id="btnAceptar">Yo me encargo (ง'̀-'́)ง</button>
-            </div>
-          </div>
-        `;
-        // Agregar el modal a la pantalla principal
-        document.body.appendChild(modalOverlay);
-
-        // Función de cierre del modal
-        document.getElementById("btnCancelar").addEventListener("click", function() {
-          document.body.removeChild(modalOverlay);
-        });
-
-        // Botón "aceptar" redirige a la página indicada
-        document.getElementById("btnAceptar").addEventListener("click", function() {
-          window.top.location.href = "https://zanahorio326.github.io/Mal-comienzo/Pelea.html";
-        });
+        // Mostrar cuadro de confirmación
+        const userConfirmed = confirm("⚔️ Misión Real 👑\n\n📜 El rey solicita tu ayuda para proteger el pueblo de Codderland 🏰\nAún no tienes experiencia en combate como para portar tus armas ⚔️ (en caso de que las tengas) y eso hace desconfiar al rey, empieza con misiónes simples ✊ a puño limpio, te enviaremos a eliminar a un par de lobos 🐺 amenazan al ganado.");
+        
+        if (userConfirmed) {
+          // Si el usuario acepta, redirigir a la página de misión
+          window.location.href = "https://zanahorio326.github.io/Mal-comienzo/Pelea.html";
+        }
+        // Si el usuario cancela, no hacer nada
       });
     });
   </script>
