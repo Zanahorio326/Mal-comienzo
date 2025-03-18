@@ -8,7 +8,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getDatabase, ref, push, get, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-    // Configuración de Firebase (igual que en el código original)
+    // Configuración de Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
       authDomain: "thegame-5afaa.firebaseapp.com",
@@ -29,14 +29,30 @@
 
     document.addEventListener("DOMContentLoaded", function() {
 
-      // Evento para craftear el cuchillo (botón con id "btn1")
-      document.getElementById("btn1").addEventListener("click", function() {
-        // Deshabilitar todos los botones relacionados
-        document.getElementById("btn1").disabled = true;
-        document.getElementById("btn2").disabled = true;
-        document.getElementById("btnMinar") && (document.getElementById("btnMinar").disabled = true);
-        document.getElementById("btnTalar") && (document.getElementById("btnTalar").disabled = true);
-        document.getElementById("btnPoder") && (document.getElementById("btnPoder").disabled = true);
+      // Variables de botones (verificando existencia)
+      const btnCuchillo = document.getElementById("btn1");
+      const btnespada = document.getElementById("btnespada");
+      const btnMinar = document.getElementById("btnMinar");
+      const btnTalar = document.getElementById("btnTalar");
+      const btnPoder = document.getElementById("btnPoder");
+
+      // Función para reactivar botones
+      function reactivarBotones() {
+        btnCuchillo.disabled = false;
+        if (btnespada) btnespada.disabled = false;
+        if (btnMinar) btnMinar.disabled = false;
+        if (btnTalar) btnTalar.disabled = false;
+        if (btnPoder) btnPoder.disabled = false;
+      }
+
+      // Evento para craftear el cuchillo
+      btnCuchillo.addEventListener("click", function() {
+        // Deshabilitar todos los botones relacionados (si existen)
+        btnCuchillo.disabled = true;
+        if(btnespada) btnespada.disabled = true;
+        if(btnMinar) btnMinar.disabled = true;
+        if(btnTalar) btnTalar.disabled = true;
+        if(btnPoder) btnPoder.disabled = true;
 
         // Mensaje inicial al comenzar el crafteo del cuchillo
         push(ref(db, 'chat'), {
@@ -47,106 +63,218 @@
 
         setTimeout(function() {
           // Verificación de recursos (Momento 2)
-          get(userRef).then((snapshot) => {
-            if (snapshot.exists()) {
-              const inventory = snapshot.val().inventory || {
-                carbón: 0,
-                cobre: 0,
-                hierro: 0,
-                plata: 0,
-                oro: 0,
-                madera: 0
-              };
+          get(userRef)
+            .then((snapshot) => {
+              if (snapshot.exists()) {
+                const inventory = snapshot.val().inventory || {
+                  carbón: 0,
+                  cobre: 0,
+                  hierro: 0,
+                  plata: 0,
+                  oro: 0,
+                  madera: 0
+                };
 
-              if (inventory.carbón >= 3 && inventory.hierro >= 2 && inventory.madera >= 1) {
-                // Si tiene los recursos necesarios
-                push(ref(db, 'chat'), {
-                  usuario: username,
-                  texto: "^_^ Tengo esos materiales, encenderé la forja... 🔥",
-                  timestamp: Date.now()
-                });
-
-                setTimeout(function() {
-                  // Confirmación de crafteo (Momento 3)
+                if (inventory.carbón >= 3 && inventory.hierro >= 2 && inventory.madera >= 1) {
+                  // Si tiene los recursos necesarios
                   push(ref(db, 'chat'), {
                     usuario: username,
-                    texto: " `~` 🪨 Usaré el carbón para derretir el metal...",
+                    texto: "^_^ Tengo esos materiales, encenderé la forja... 🔥",
                     timestamp: Date.now()
                   });
 
-                  // Descontar los materiales necesarios
-                  inventory.carbón -= 3;
-                  inventory.hierro -= 2;
-                  inventory.madera -= 1;
-
-                  update(userRef, { inventory });
-
                   setTimeout(function() {
-                    // Descuento de materiales (Momento 4)
+                    // Confirmación de crafteo (Momento 3)
                     push(ref(db, 'chat'), {
                       usuario: username,
-                      texto: "(/◕ヮ◕)/ 🪵 Aré el mango con la madera...",
+                      texto: " `~` 🪨 Usaré el carbón para derretir el metal...",
                       timestamp: Date.now()
                     });
 
+                    // Descontar los materiales necesarios
+                    inventory.carbón -= 3;
+                    inventory.hierro -= 2;
+                    inventory.madera -= 1;
+
+                    update(userRef, { inventory });
+
                     setTimeout(function() {
-                      // Proceso de crafteo (Momentos 5 y 6)
+                      // Descuento de materiales (Momento 4)
+                      push(ref(db, 'chat'), {
+                        usuario: username,
+                        texto: "(/◕ヮ◕)/ 🪵 Aré el mango con la madera...",
+                        timestamp: Date.now()
+                      });
+
                       setTimeout(function() {
-                        // Crafteo finalizado (Momento 6)
-                        push(ref(db, 'chat'), {
-                          usuario: username,
-                          texto: "¡Listo! 🔪ヽ(^o^)丿",
-                          timestamp: Date.now()
-                        });
+                        // Proceso de crafteo (Momentos 5 y 6)
+                        setTimeout(function() {
+                          // Crafteo finalizado (Momento 6)
+                          push(ref(db, 'chat'), {
+                            usuario: username,
+                            texto: "¡Listo! 🔪ヽ(^o^)丿",
+                            timestamp: Date.now()
+                          });
 
-                        // Añadir cuchillo al inventario
-                        inventory.cuchillo = (inventory.cuchillo || 0) + 1;
-                        update(userRef, { inventory });
+                          // Añadir cuchillo al inventario
+                          inventory.cuchillo = (inventory.cuchillo || 0) + 1;
+                          update(userRef, { inventory });
 
-                        // Habilitar nuevamente todos los botones
-                        document.getElementById("btn1").disabled = false;
-                        document.getElementById("btn2").disabled = false;
-                        document.getElementById("btnMinar") && (document.getElementById("btnMinar").disabled = false);
-                        document.getElementById("btnTalar") && (document.getElementById("btnTalar").disabled = false);
-                        document.getElementById("btnPoder") && (document.getElementById("btnPoder").disabled = false);
+                          // Habilitar nuevamente todos los botones
+                          reactivarBotones();
+                        }, 10000);
                       }, 10000);
                     }, 10000);
                   }, 10000);
-                }, 10000);
+                } else {
+                  // No tiene los recursos necesarios
+                  push(ref(db, 'chat'), {
+                    usuario: username,
+                    texto: "No tienes suficientes materiales para craftear un cuchillo.",
+                    timestamp: Date.now()
+                  });
+                  setTimeout(function() {
+                    reactivarBotones();
+                  }, 1000);
+                }
               } else {
-                // Si no tiene los recursos necesarios
+                // No se encontró inventario
                 push(ref(db, 'chat'), {
                   usuario: username,
-                  texto: "mensaje 3",
+                  texto: "No se encontró inventario para este usuario.",
                   timestamp: Date.now()
                 });
-
                 setTimeout(function() {
-                  // Habilitar nuevamente los botones
-                  document.getElementById("btn1").disabled = false;
-                  document.getElementById("btn2").disabled = false;
-                  document.getElementById("btnMinar") && (document.getElementById("btnMinar").disabled = false);
-                  document.getElementById("btnTalar") && (document.getElementById("btnTalar").disabled = false);
-                  document.getElementById("btnPoder") && (document.getElementById("btnPoder").disabled = false);
+                  reactivarBotones();
                 }, 1000);
               }
-            }
-          }).catch((error) => console.error("Error al obtener los recursos: ", error));
+            })
+            .catch((error) => {
+              console.error("Error al obtener los recursos: ", error);
+              reactivarBotones();
+            });
         }, 1000);
       });
 
-      // Nota: Se incluye la referencia a "btn2" para que la deshabilitación tenga efecto,
-      // aunque en este ejemplo solo se ha implementado el crafteo del cuchillo.
+      // Evento para craftear la espada
+      btnespada.addEventListener("click", function() {
+        // Deshabilitar todos los botones relacionados (si existen)
+        btnespada.disabled = true;
+        if(btnCuchillo) btnCuchillo.disabled = true;
+        if(btnMinar) btnMinar.disabled = true;
+        if(btnTalar) btnTalar.disabled = true;
+        if(btnPoder) btnPoder.disabled = true;
+
+        // Mensaje inicial al comenzar el crafteo de la espada
+        push(ref(db, 'chat'), {
+          usuario: username,
+          texto: "Para hacer una espada 🗡️ necesito 3 de hierro ⚙️, 1 de madera 🪵, y 5 de carbón 🪨.",
+          timestamp: Date.now()
+        });
+
+        setTimeout(function() {
+          // Verificación de recursos (Momento 2)
+          get(userRef)
+            .then((snapshot) => {
+              if (snapshot.exists()) {
+                const inventory = snapshot.val().inventory || {
+                  carbón: 0,
+                  cobre: 0,
+                  hierro: 0,
+                  plata: 0,
+                  oro: 0,
+                  madera: 0
+                };
+
+                if (inventory.carbón >= 5 && inventory.hierro >= 3 && inventory.madera >= 1) {
+                  // Si tiene los recursos necesarios
+                  push(ref(db, 'chat'), {
+                    usuario: username,
+                    texto: "^_^ Tengo esos materiales, encenderé la forja... 🔥",
+                    timestamp: Date.now()
+                  });
+
+                  setTimeout(function() {
+                    // Confirmación de crafteo (Momento 3)
+                    push(ref(db, 'chat'), {
+                      usuario: username,
+                      texto: " `~` 🪨 Usaré el carbón para derretir el metal...",
+                      timestamp: Date.now()
+                    });
+
+                    // Descontar los materiales necesarios
+                    inventory.carbón -= 5;
+                    inventory.hierro -= 3;
+                    inventory.madera -= 1;
+
+                    update(userRef, { inventory });
+
+                    setTimeout(function() {
+                      // Descuento de materiales (Momento 4)
+                      push(ref(db, 'chat'), {
+                        usuario: username,
+                        texto: "(/◕ヮ◕)/ 🪵 Aré el mango con la madera...",
+                        timestamp: Date.now()
+                      });
+
+                      setTimeout(function() {
+                        // Proceso de crafteo (Momentos 5 y 6)
+                        setTimeout(function() {
+                          // Crafteo finalizado (Momento 6)
+                          push(ref(db, 'chat'), {
+                            usuario: username,
+                            texto: "¡Listo! 🗡️ヽ(^o^)丿",
+                            timestamp: Date.now()
+                          });
+
+                          // Añadir espada al inventario
+                          inventory.espada = (inventory.espada || 0) + 1;
+                          update(userRef, { inventory });
+
+                          // Habilitar nuevamente todos los botones
+                          reactivarBotones();
+                        }, 15000); // Tiempo de crafteo de la espada aumentado
+                      }, 10000);
+                    }, 10000);
+                  }, 10000);
+                } else {
+                  // No tiene los recursos necesarios
+                  push(ref(db, 'chat'), {
+                    usuario: username,
+                    texto: "No tienes suficientes materiales para craftear una espada.",
+                    timestamp: Date.now()
+                  });
+                  setTimeout(function() {
+                    reactivarBotones();
+                  }, 1000);
+                }
+              } else {
+                // No se encontró inventario
+                push(ref(db, 'chat'), {
+                  usuario: username,
+                  texto: "No se encontró inventario para este usuario.",
+                  timestamp: Date.now()
+                });
+                setTimeout(function() {
+                  reactivarBotones();
+                }, 1000);
+              }
+            })
+            .catch((error) => {
+              console.error("Error al obtener los recursos: ", error);
+              reactivarBotones();
+            });
+        }, 1000);
+      });
+
     });
   </script>
 </head>
 <body>
-  <!-- Encabezado de la sección de Crafteos -->
-  <br>
   <!-- Botón para craftear cuchillo -->
   <button id="btn1">🔪 cuchillo</button>
   <br><br>
-  <!-- Botón para craftear espada (sin funcionalidad implementada en este ejemplo) -->
-  <button id="btnEspada">🗡️ Espada</button>
+  <!-- Botón para craftear espada -->
+  <button id="btnespada">🗡️ espada</button>
 </body>
 </html>
