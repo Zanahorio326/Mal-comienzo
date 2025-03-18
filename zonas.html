@@ -41,19 +41,50 @@
         window.top.location.href = "https://zanahorio326.github.io/Mal-comienzo/prestigio.html";
       });
 
-      // Botón "Misión 👑" muestra la alerta personalizada
+      // Botón "Misión 👑" muestra la alerta personalizada en la página principal
       document.getElementById("btnMision").addEventListener("click", function() {
-        document.getElementById("customAlert").style.display = "flex";
-      });
+        let topDocument = window.top.document;
 
-      // Botón "Cancelar" cierra la alerta
-      document.getElementById("btnCancelar").addEventListener("click", function() {
-        document.getElementById("customAlert").style.display = "none";
-      });
+        // Si la alerta aún no existe en la página principal, la creamos
+        if (!topDocument.getElementById("customAlert")) {
+          let customAlert = topDocument.createElement("div");
+          customAlert.id = "customAlert";
+          customAlert.innerHTML = `
+            <div id="alertBox">
+              <h2>⚔️ Misión Real 👑</h2>
+              <p>📜 El rey solicita tu ayuda para proteger el pueblo de Codderland 🏰</p>
+              <p>Aún no tienes experiencia en combate como para portar tus armas ⚔️ (en caso de que las tengas) y eso hace desconfiar al rey, empieza con misiones simples ✊ a puño limpio, te enviaremos a eliminar a un par de lobos 🐺 que amenazan al ganado.</p>
+              <div id="alertButtons">
+                <button id="btnCancelar">°n° No soy digno</button>
+                <button id="btnAceptar">Yo me encargo (ง'̀-'́)ง</button>
+              </div>
+            </div>
+          `;
+          customAlert.style.position = "fixed";
+          customAlert.style.top = "0";
+          customAlert.style.left = "0";
+          customAlert.style.width = "100%";
+          customAlert.style.height = "100%";
+          customAlert.style.background = "rgba(0,0,0,0.5)";
+          customAlert.style.display = "flex";
+          customAlert.style.justifyContent = "center";
+          customAlert.style.alignItems = "center";
+          customAlert.style.zIndex = "9999";
+          
+          topDocument.body.appendChild(customAlert);
 
-      // Botón "Aceptar" redirige a la misión en la pantalla principal
-      document.getElementById("btnAceptar").addEventListener("click", function() {
-        window.top.location.href = "https://zanahorio326.github.io/Mal-comienzo/Pelea.html";
+          // Asignar eventos a los botones en la página principal
+          topDocument.getElementById("btnCancelar").addEventListener("click", function() {
+            topDocument.body.removeChild(customAlert);
+          });
+
+          topDocument.getElementById("btnAceptar").addEventListener("click", function() {
+            window.top.location.href = "https://zanahorio326.github.io/Mal-comienzo/Pelea.html";
+          });
+        } else {
+          // Si la alerta ya existe, solo la mostramos
+          topDocument.getElementById("customAlert").style.display = "flex";
+        }
       });
     });
   </script>
@@ -64,18 +95,5 @@
   <br><br>
   <!-- Botón que muestra la alerta personalizada -->
   <button id="btnMision">Misión 👑</button>
-
-  <!-- Alerta personalizada -->
-  <div id="customAlert">
-    <div id="alertBox">
-      <h2>⚔️ Misión Real 👑</h2>
-      <p>📜 El rey solicita tu ayuda para proteger el pueblo de Codderland 🏰</p>
-      <p>Aún no tienes experiencia en combate como para portar tus armas ⚔️ (en caso de que las tengas) y eso hace desconfiar al rey, empieza con misiones simples ✊ a puño limpio, te enviaremos a eliminar a un par de lobos 🐺 que amenazan al ganado.</p>
-      <div id="alertButtons">
-        <button id="btnCancelar">°n° No soy digno</button>
-        <button id="btnAceptar">Yo me encargo (ง'̀-'́)ง</button>
-      </div>
-    </div>
-  </div>
 </body>
 </html>
