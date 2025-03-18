@@ -8,7 +8,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getDatabase, ref, push, get, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-    // Configuración de Firebase (igual que en tu código original)
     const firebaseConfig = {
       apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
       authDomain: "thegame-5afaa.firebaseapp.com",
@@ -23,15 +22,12 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Obtención del nombre de usuario
     const username = localStorage.getItem("username") || "Desconocido";
     const userRef = ref(db, 'users/' + username);
 
-    let isMining = false; // Variable para evitar acciones simultáneas
+    let isMining = false;
 
     document.addEventListener("DOMContentLoaded", function() {
-
-      // Evento para el botón "Minar"
       document.getElementById("btnMinar").addEventListener("click", function() {
         if (isMining) return;
 
@@ -48,14 +44,9 @@
 
         setTimeout(function() {
           const resultado = obtenerMineral();
-          let mensaje = "";
+          let mensaje = resultado === "Nada" ? "-_- No encontré nada..." : `:D Encontré ${resultado}`;
 
-          if (resultado === "Nada") {
-            mensaje = "-_- No encontré nada...";
-          } else {
-            mensaje = `:D Encontré ${resultado}`;
-            actualizarInventario(resultado.toLowerCase());
-          }
+          if (resultado !== "Nada") actualizarInventario(resultado.toLowerCase());
 
           push(ref(db, 'chat'), {
             usuario: username,
@@ -69,30 +60,19 @@
         }, 15000);
       });
 
-      // Función para determinar el mineral encontrado
       function obtenerMineral() {
         const probabilidad = Math.random() * 100;
-        if (probabilidad < 40) return "Nada";
-        if (probabilidad < 65) return "carbón";
-        if (probabilidad < 83) return "cobre";
-        if (probabilidad < 93) return "hierro";
-        if (probabilidad < 98) return "plata";
-        return "oro";
+        return probabilidad < 40 ? "Nada" : 
+               probabilidad < 65 ? "carbón" : 
+               probabilidad < 83 ? "cobre" : 
+               probabilidad < 93 ? "hierro" : 
+               probabilidad < 98 ? "plata" : "oro";
       }
 
-      // Función para actualizar el inventario del usuario
       function actualizarInventario(mineral) {
         get(userRef).then((snapshot) => {
           if (snapshot.exists()) {
-            const inventory = snapshot.val().inventory || {
-              carbón: 0,
-              cobre: 0,
-              hierro: 0,
-              plata: 0,
-              oro: 0,
-              madera: 0
-            };
-
+            const inventory = snapshot.val().inventory || { carbón: 0, cobre: 0, hierro: 0, plata: 0, oro: 0, madera: 0 };
             inventory[mineral] = (inventory[mineral] || 0) + 1;
 
             update(userRef, { inventory })
@@ -102,7 +82,6 @@
         }).catch((error) => console.error("Error al obtener el inventario: ", error));
       }
 
-      // Evento para el botón "Talar"
       document.getElementById("btnTalar").addEventListener("click", function() {
         if (isMining) return;
 
@@ -119,16 +98,11 @@
 
         setTimeout(function() {
           const resultado = obtenerMadera();
-          let mensaje = "";
+          let mensaje = resultado === "Nada" ? "No puedo llevarme este tronco 🪵 ¡pesa demasiado! >:/" : 
+                        resultado === "Tropezón" ? "Demonios, caí al tropezar con una raíz =_= espero no haber perdido nada de la mochila 🎒" : 
+                        "Este tronco 🪵 me servirá bastante :)";
 
-          if (resultado === "Nada") {
-            mensaje = "No puedo llevarme este tronco 🪵 ¡pesa demasiado! >:/";
-          } else if (resultado === "Tropezón") {
-            mensaje = "Demonios, caí al tropezar con una raíz =_= espero no haber perdido nada de la mochila 🎒";
-          } else if (resultado === "madera") {
-            mensaje = "Este tronco 🪵 me servirá bastante :)";
-            actualizarInventario("madera");
-          }
+          if (resultado === "madera") actualizarInventario("madera");
 
           push(ref(db, 'chat'), {
             usuario: username,
@@ -142,39 +116,50 @@
         }, 15000);
       });
 
-      // Función para determinar el resultado al talar
       function obtenerMadera() {
         const probabilidad = Math.random() * 100;
-        if (probabilidad < 60) return "Nada";
-        if (probabilidad < 80) return "Tropezón";
-        return "madera";
+        return probabilidad < 60 ? "Nada" : 
+               probabilidad < 80 ? "Tropezón" : "madera";
       }
 
-      // Evento para mostrar la segunda parte (otro HTML) de forma dinámica
       document.getElementById("mostrarSegunda").addEventListener("click", function(e) {
         e.preventDefault();
-        // Se muestra el iframe que carga "segunda.html"
         document.getElementById("segundaParte").style.display = "block";
       });
     });
   </script>
+  <style>
+    #segundaParte {
+      width: 100%;
+      height: 500px;
+      border: none;
+      display: none;
+      margin: 0;
+      padding: 0;
+    }
+    .enlace-estilo {
+      border: 1px solid;
+      padding: 5px;
+      width: 70px;
+      text-align: center;
+      color: white;
+      background-color: gray;
+      font-size: 12px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <!-- Título de la sección -->
   <div style="border: 1px solid; padding: 5px; width: 70px; text-align: center; color: white; background-color: gray; font-size: 12px;">
     Acción
   </div>
   <br>
-  <!-- Botones de acción -->
   <button id="btnMinar">⛏️ Minar</button>
   <br><br>
   <button id="btnTalar">🪓 Talar</button>
   <br><br>
-  <!-- Línea separadora -->
   <hr>
-  <!-- Enlace para cargar la segunda parte (otro HTML) -->
-  <a href="#" id="mostrarSegunda">Mostrar segunda parte</a>
-  <!-- iframe oculto inicialmente que cargará el otro HTML -->
-  <iframe id="segundaParte" src="segunda.html" style="width:100%; height:500px; border: none; display: none;"></iframe>
+  <div id="mostrarSegunda" class="enlace-estilo">Crafteos</div>
+  <iframe id="segundaParte" src="segunda.html"></iframe>
 </body>
 </html>
