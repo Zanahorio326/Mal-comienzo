@@ -43,7 +43,7 @@
 
       // Botón "Misión 👑" muestra el recuadro de confirmación
       document.getElementById("btnMision").addEventListener("click", function() {
-        // Asegurarse de que el modal aparezca en la pantalla principal
+        // Forzar que el modal se muestre en la pantalla principal (fuera del iframe)
         const modalOverlay = document.createElement("div");
         modalOverlay.id = "modalOverlay";
         modalOverlay.innerHTML = `
@@ -57,6 +57,7 @@
             </div>
           </div>
         `;
+        // Agregar el modal a la pantalla principal
         document.body.appendChild(modalOverlay);
 
         // Función de cierre del modal
