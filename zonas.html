@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Redirecciones</title>
   <style>
-    /* Estilos para el recuadro flotante */
-    #modalOverlay {
+    /* Estilos para la alerta personalizada */
+    #customAlert {
       position: fixed;
       top: 0;
       left: 0;
@@ -18,7 +18,7 @@
       align-items: center;
       z-index: 9999;
     }
-    #modalBox {
+    #alertBox {
       background: #fff;
       padding: 20px;
       border-radius: 5px;
@@ -27,10 +27,10 @@
       width: 90%;
       box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }
-    #modalBox h2 {
+    #alertBox h2 {
       margin-top: 0;
     }
-    #modalButtons button {
+    #alertButtons button {
       margin: 5px;
     }
   </style>
@@ -41,16 +41,19 @@
         window.top.location.href = "https://zanahorio326.github.io/Mal-comienzo/prestigio.html";
       });
 
-      // Botón "Misión 👑" muestra la confirmación
+      // Botón "Misión 👑" muestra la alerta personalizada
       document.getElementById("btnMision").addEventListener("click", function() {
-        // Mostrar cuadro de confirmación
-        const userConfirmed = confirm("⚔️ Misión Real 👑\n\n📜 El rey solicita tu ayuda para proteger el pueblo de Codderland 🏰\nAún no tienes experiencia en combate como para portar tus armas ⚔️ (en caso de que las tengas) y eso hace desconfiar al rey, empieza con misiónes simples ✊ a puño limpio, te enviaremos a eliminar a un par de lobos 🐺 amenazan al ganado.");
-        
-        if (userConfirmed) {
-          // Si el usuario acepta, redirigir a la página de misión en la pantalla principal
-          window.top.location.href = "https://zanahorio326.github.io/Mal-comienzo/Pelea.html";
-        }
-        // Si el usuario cancela, no hacer nada
+        document.getElementById("customAlert").style.display = "flex";
+      });
+
+      // Botón "Cancelar" cierra la alerta
+      document.getElementById("btnCancelar").addEventListener("click", function() {
+        document.getElementById("customAlert").style.display = "none";
+      });
+
+      // Botón "Aceptar" redirige a la misión en la pantalla principal
+      document.getElementById("btnAceptar").addEventListener("click", function() {
+        window.top.location.href = "https://zanahorio326.github.io/Mal-comienzo/Pelea.html";
       });
     });
   </script>
@@ -59,7 +62,20 @@
   <!-- Botón que redirige inmediatamente -->
   <button id="btnPoder">🏆Poder🎖️</button>
   <br><br>
-  <!-- Botón que muestra el recuadro de confirmación -->
+  <!-- Botón que muestra la alerta personalizada -->
   <button id="btnMision">Misión 👑</button>
+
+  <!-- Alerta personalizada -->
+  <div id="customAlert">
+    <div id="alertBox">
+      <h2>⚔️ Misión Real 👑</h2>
+      <p>📜 El rey solicita tu ayuda para proteger el pueblo de Codderland 🏰</p>
+      <p>Aún no tienes experiencia en combate como para portar tus armas ⚔️ (en caso de que las tengas) y eso hace desconfiar al rey, empieza con misiones simples ✊ a puño limpio, te enviaremos a eliminar a un par de lobos 🐺 que amenazan al ganado.</p>
+      <div id="alertButtons">
+        <button id="btnCancelar">°n° No soy digno</button>
+        <button id="btnAceptar">Yo me encargo (ง'̀-'́)ง</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
