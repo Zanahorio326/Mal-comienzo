@@ -124,7 +124,8 @@
 
       document.getElementById("mostrarSegunda").addEventListener("click", function(e) {
         e.preventDefault();
-        document.getElementById("segundaParte").style.display = "block";
+        const iframe = document.getElementById("segundaParte");
+        iframe.style.display = (iframe.style.display === "block") ? "none" : "block";
       });
     });
   </script>
