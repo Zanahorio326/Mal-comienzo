@@ -137,7 +137,7 @@
         const app = initializeApp(firebaseConfig);  
         const db = getDatabase(app);  
         function calcularPrestigio(inventory) {  
-            const puntosPorMineral = { "carbón": 1, "cobre": 2, "hierro": 5, "plata": 10, "oro": 20, "madera": 15 };  
+            const puntosPorMineral = { "carbón": 1, "cobre": 2, "hierro": 5, "plata": 10, "oro": 20, "madera": 15, "cuchillo": 5, "espada": 10 };  
             return Object.entries(inventory).reduce((acc, [mineral, cantidad]) => acc + (cantidad * (puntosPorMineral[mineral] || 0)), 0);  
         }  
         function mostrarInventario(event) {  
