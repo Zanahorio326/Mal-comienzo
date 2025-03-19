@@ -127,12 +127,60 @@
         const iframe = document.getElementById("segundaParte1");  
         iframe.style.display = (iframe.style.display === "block") ? "none" : "block";  
       });  
-
+  
       document.getElementById("mostrarTercera").addEventListener("click", function(e) {  
         e.preventDefault();  
         const iframe = document.getElementById("segundaParte2");  
         iframe.style.display = (iframe.style.display === "block") ? "none" : "block";  
       });  
+  
+      // --- Nueva herramienta: Pala (Excavar) ---  
+      document.getElementById("btnExcavar").addEventListener("click", function() {  
+        if (isMining) return;  
+  
+        isMining = true;  
+        const btn = this;  
+        btn.disabled = true;  
+        btn.textContent = "Excavando... ⏳";  
+  
+        // Desactivar otros botones  
+        document.getElementById("btnMinar").disabled = true;  
+        document.getElementById("btnTalar").disabled = true;  
+  
+        push(ref(db, 'chat'), {  
+          usuario: username,  
+          texto: "*(Excavando... 🕳️)🏞️🪣🌱🌿🌱🌿🌱🌿🌾🌿🌾🌿🌾🌿🌿🌿🌿🌿🌿🌿🌿",  
+          timestamp: Date.now()  
+        });  
+  
+        setTimeout(function() {  
+          const probabilidad = Math.random() * 100;  
+          let mensaje = "";  
+          if (probabilidad < 80) {  
+            mensaje = "Aquí sólo encontré tierra (ーー;)";  
+          } else if (probabilidad < 95) {  
+            mensaje = "Esta arena será muy útil en el futuro (^_^.)";  
+            actualizarInventario("arena");  
+          } else {  
+            mensaje = "¡Parece que encontré algunas raíces! (/◕ヮ◕)/🫚";  
+            actualizarInventario("raíces");  
+          }  
+  
+          push(ref(db, 'chat'), {  
+            usuario: username,  
+            texto: mensaje,  
+            timestamp: Date.now()  
+          });  
+  
+          // Reactivar botones  
+          btn.disabled = false;  
+          btn.textContent = "Excavar";  
+          document.getElementById("btnMinar").disabled = false;  
+          document.getElementById("btnTalar").disabled = false;  
+          isMining = false;  
+        }, 10000);  
+      });  
+      // --- Fin de la nueva herramienta ---  
     });  
   </script>  
   <style>  
@@ -164,6 +212,8 @@
   <button id="btnMinar">⛏️ Minar</button>  
   <br><br>  
   <button id="btnTalar">🪓 Talar</button>  
+  <br><br>  
+  <button id="btnExcavar">𝆺𝅥 Excavar</button>  
   <br><br>  
   <hr>  
   <div id="mostrarSegunda" class="enlace-estilo">Crafteos 🔨</div>  
