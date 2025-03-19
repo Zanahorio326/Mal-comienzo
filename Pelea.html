@@ -1,125 +1,103 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Combate Medieval</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Garamond', serif; text-align: center; background-color: #2e2e2e; color: #f8f8f8; display: flex; flex-direction: column; justify-content: space-between; height: 100vh; overflow: hidden; background-image: url('https://www.w3schools.com/w3images/medieval_texture.jpg'); background-size: cover; background-position: center; }
-        #welcomeMessage { font-size: 26px; margin-top: 20px; font-family: 'Georgia', serif; font-weight: bold; color: #f4c542; }
-        #counter { font-size: 28px; font-family: 'Garamond', serif; color: #f4c542; display: none; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.7); padding: 20px; border-radius: 10px; }
-        #timer { font-size: 24px; margin-top: 10px; font-family: 'Garamond', serif; color: #f4c542; }
-        .button-container { position: fixed; bottom: 20px; width: 100%; display: flex; justify-content: space-around; padding: 10px; }
-        .btn { font-size: 24px; flex: 1; border: 2px solid #d1a239; border-radius: 10px; cursor: pointer; color: #fff; transition: 0.3s; height: 100px; margin: 0 5px; font-family: 'Georgia', serif; background-color: #5b3a29; box-shadow: 0px 0px 15px #d1a239; }
-        #leftHook { background-color: #2e6b8a; }
-        #leftHook:active { background-color: #3e8d9f; }
-        #rightHook { background-color: #7a5e32; }
-        #rightHook:active { background-color: #9a7e53; }
-        #uppercut { background-color: #373a40; font-weight: bold; flex: 1.2; }
-        #uppercut.ready { background-color: #8b0000; box-shadow: 0px 0px 15px #e73f33; }
-        #uppercut:disabled { cursor: not-allowed; opacity: 0.6; }
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); display: none; justify-content: center; align-items: center; color: #f4c542; font-size: 30px; font-weight: bold; text-align: center; font-family: 'Georgia', serif; }
-        #enemyImage { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 300px; max-height: 300px; opacity: 1; transition: opacity 0.5s ease-out; }
-        #lifeBar { width: 100%; background-color: #555; height: 20px; border-radius: 10px; overflow: hidden; margin-top: 10px; position: absolute; top: 10%; left: 50%; transform: translateX(-50%); display: none; }
-        #lifeFill { background-color: #e73f33; height: 100%; width: 100%; transition: width 0.5s ease; }
-        .message-container { display: none; text-align: center; margin-top: 20px; }
-        .message-btn { margin-top: 10px; font-size: 24px; padding: 10px 20px; border: none; background-color: #6b4226; color: white; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; }
-        .message-btn:hover { background-color: #8b5e3c; }
-    </style>
-</head>
-<body>
-    <div id="welcomeMessage">¡Noble luchador <span id="userName">Cargando...</span>! Prepara tu espada para un combate épico.</div>
-    <div id="timer">Tiempo restante: <span id="timeLeft">10</span>s</div>
-    <img id="enemyImage" src="https://zanahorio326.github.io/Mal-comienzo/lobo.jpg" alt="Enemigo">
-    <div id="counter">Golpes de <span id="userNameCounter">Cargando...</span>: <span id="count">0</span></div>
-    <div class="button-container">
-        <button id="leftHook" class="btn">Gancho Izq.</button>
-        <button id="uppercut" class="btn" disabled>Uppercut</button>
-        <button id="rightHook" class="btn">Gancho Der.</button>
-    </div>
-    <div id="overlay">
-        <div class="message-container" id="messageOverlay">
-            <div id="finalMessage">¡Combate terminado!</div>
-            <button class="message-btn" id="newGameBtn">Nuevo Juego</button>
-        </div>
-        <div class="message-container" id="winMessage">
-            <div id="winText">¡Ganaste con <span id="score"></span> golpes!</div>
-            <button class="message-btn" id="continueBtn">Continuar</button>
-        </div>
-        <div class="message-container" id="loseMessage">
-            <div id="loseText">Perdiste. El lobo te derrotó con <span id="scoreLose"></span> golpes.</div>
-            <button class="message-btn" id="retryBtn">Reintentar</button>
-        </div>
-    </div>
-    <div id="lifeBar"><div id="lifeFill"></div></div>
-    <script>
-        const userNameElement = document.getElementById('userName');
-        const userNameCounter = document.getElementById('userNameCounter');
-        const username = localStorage.getItem('username');
-        if (username) { userNameElement.textContent = username; userNameCounter.textContent = username; } else { userNameElement.textContent = "Jugador no encontrado"; userNameCounter.textContent = "Jugador no encontrado"; }
-        let count = 0, timeLeft = 10, timerStarted = false, countdownInterval = null, gameEnded = false;
-        const countDisplay = document.getElementById("count"), timeDisplay = document.getElementById("timeLeft"), leftHook = document.getElementById("leftHook"), rightHook = document.getElementById("rightHook"), uppercut = document.getElementById("uppercut"), overlay = document.getElementById("overlay"), finalMessage = document.getElementById("finalMessage"), welcomeMessage = document.getElementById("welcomeMessage"), counterSection = document.getElementById("counter"), enemyImage = document.getElementById("enemyImage"), lifeFill = document.getElementById("lifeFill"), lifeBar = document.getElementById("lifeBar");
-        const winMessage = document.getElementById('winMessage'), loseMessage = document.getElementById('loseMessage'), messageOverlay = document.getElementById('messageOverlay');
-        const scoreText = document.getElementById('score'), scoreLose = document.getElementById('scoreLose');
-        const newGameBtn = document.getElementById('newGameBtn'), continueBtn = document.getElementById('continueBtn'), retryBtn = document.getElementById('retryBtn');
-        let life = Math.floor(Math.random() * 51) + 50;
-        lifeFill.style.width = (life / 100) * 100 + '%';
-        function updateUppercut() {
-            if (count % 50 === 0 && count > 0) { uppercut.textContent = "¡Uppercut!"; uppercut.classList.add("ready"); uppercut.disabled = false; } else { uppercut.textContent = `Uppercut (${50 - (count % 50)})`; uppercut.classList.remove("ready"); uppercut.disabled = true; }
-        }
-        function startTimer() {
-            if (!timerStarted) {
-                timerStarted = true;
-                countdownInterval = setInterval(() => { timeLeft--; timeDisplay.textContent = timeLeft; if (timeLeft <= 0) { clearInterval(countdownInterval); endFight(); } }, 1000);
-            }
-        }
-        function increaseCounter() {
-            if (!timerStarted) startTimer(); 
-            if (gameEnded) return;
-            count++; countDisplay.textContent = count;
-            life -= 1; lifeFill.style.width = (life / 100) * 100 + '%';
-            updateUppercut();
-        }
-        function useUppercut() {
-            if (count >= 50) {
-                life -= 20;
-                lifeFill.style.width = (life / 100) * 100 + '%';
-                count -= 50;
-                countDisplay.textContent = count;
-                updateUppercut();
-            }
-        }
-        function endFight() {
-            gameEnded = true;
-            leftHook.disabled = true; rightHook.disabled = true; uppercut.disabled = true;
-            enemyImage.style.opacity = 0;
-            if (life <= 0) {
-                scoreText.textContent = count;
-                winMessage.style.display = 'block';
-                messageOverlay.style.display = 'none';
-            } else {
-                scoreLose.textContent = count;
-                loseMessage.style.display = 'block';
-                messageOverlay.style.display = 'none';
-            }
-            overlay.style.display = "flex";
-        }
-        leftHook.addEventListener("click", () => { 
-            increaseCounter(); 
-            welcomeMessage.style.display = "none"; 
-            counterSection.style.display = "block"; 
-            lifeBar.style.display = "block"; 
-        });
-        rightHook.addEventListener("click", () => { 
-            increaseCounter(); 
-            welcomeMessage.style.display = "none"; 
-            counterSection.style.display = "block"; 
-            lifeBar.style.display = "block"; 
-        });
-        uppercut.addEventListener("click", () => {
-            useUppercut();
-        });
-    </script>
-</body>
+<!DOCTYPE html>  
+<html lang="es">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Combate Medieval</title>  
+    <link rel="stylesheet" href="https://zanahorio326.github.io/Mal-comienzo/chat.css">
+</head>  
+<body>  
+    <div id="welcomeMessage">¡Noble luchador <span id="userName">Cargando...</span>! Prepara tu espada para un combate épico.</div>  
+    <div id="timer">Tiempo restante: <span id="timeLeft">10</span>s</div>  
+    <img id="enemyImage" src="https://zanahorio326.github.io/Mal-comienzo/lobo.jpg" alt="Enemigo">  
+    <div id="counter">Golpes de <span id="userNameCounter">Cargando...</span>: <span id="count">0</span></div>  
+    <div class="button-container">  
+        <button id="leftHook" class="btn">Gancho Izq.</button>  
+        <button id="uppercut" class="btn" disabled>Uppercut</button>  
+        <button id="rightHook" class="btn">Gancho Der.</button>  
+    </div>  
+    <div id="overlay">  
+        <div class="message-container" id="messageOverlay">  
+            <div id="finalMessage">¡Combate terminado!</div>  
+            <button class="message-btn" id="newGameBtn">Nuevo Juego</button>  
+        </div>  
+        <div class="message-container" id="winMessage">  
+            <div id="winText">¡Ganaste con <span id="score"></span> golpes!</div>  
+            <button class="message-btn" id="continueBtn">Continuar</button>  
+        </div>  
+        <div class="message-container" id="loseMessage">  
+            <div id="loseText">Perdiste. El lobo te derrotó con <span id="scoreLose"></span> golpes.</div>  
+            <button class="message-btn" id="retryBtn">Reintentar</button>  
+        </div>  
+    </div>  
+    <div id="lifeBar"><div id="lifeFill"></div></div>  
+    <script>  
+        const userNameElement = document.getElementById('userName');  
+        const userNameCounter = document.getElementById('userNameCounter');  
+        const username = localStorage.getItem('username');  
+        if (username) { userNameElement.textContent = username; userNameCounter.textContent = username; } else { userNameElement.textContent = "Jugador no encontrado"; userNameCounter.textContent = "Jugador no encontrado"; }  
+        let count = 0, timeLeft = 10, timerStarted = false, countdownInterval = null, gameEnded = false;  
+        const countDisplay = document.getElementById("count"), timeDisplay = document.getElementById("timeLeft"), leftHook = document.getElementById("leftHook"), rightHook = document.getElementById("rightHook"), uppercut = document.getElementById("uppercut"), overlay = document.getElementById("overlay"), finalMessage = document.getElementById("finalMessage"), welcomeMessage = document.getElementById("welcomeMessage"), counterSection = document.getElementById("counter"), enemyImage = document.getElementById("enemyImage"), lifeFill = document.getElementById("lifeFill"), lifeBar = document.getElementById("lifeBar");  
+        const winMessage = document.getElementById('winMessage'), loseMessage = document.getElementById('loseMessage'), messageOverlay = document.getElementById('messageOverlay');  
+        const scoreText = document.getElementById('score'), scoreLose = document.getElementById('scoreLose');  
+        const newGameBtn = document.getElementById('newGameBtn'), continueBtn = document.getElementById('continueBtn'), retryBtn = document.getElementById('retryBtn');  
+        let life = Math.floor(Math.random() * 51) + 50;  
+        lifeFill.style.width = (life / 100) * 100 + '%';  
+        function updateUppercut() {  
+            if (count % 50 === 0 && count > 0) { uppercut.textContent = "¡Uppercut!"; uppercut.classList.add("ready"); uppercut.disabled = false; } else { uppercut.textContent = `Uppercut (${50 - (count % 50)})`; uppercut.classList.remove("ready"); uppercut.disabled = true; }  
+        }  
+        function startTimer() {  
+            if (!timerStarted) {  
+                timerStarted = true;  
+                countdownInterval = setInterval(() => { timeLeft--; timeDisplay.textContent = timeLeft; if (timeLeft <= 0) { clearInterval(countdownInterval); endFight(); } }, 1000);  
+            }  
+        }  
+        function increaseCounter() {  
+            if (!timerStarted) startTimer();   
+            if (gameEnded) return;  
+            count++; countDisplay.textContent = count;  
+            life -= 1; lifeFill.style.width = (life / 100) * 100 + '%';  
+            updateUppercut();  
+        }  
+        function useUppercut() {  
+            if (count >= 50) {  
+                life -= 20;  
+                lifeFill.style.width = (life / 100) * 100 + '%';  
+                count -= 50;  
+                countDisplay.textContent = count;  
+                updateUppercut();  
+            }  
+        }  
+        function endFight() {  
+            gameEnded = true;  
+            leftHook.disabled = true; rightHook.disabled = true; uppercut.disabled = true;  
+            enemyImage.style.opacity = 0;  
+            if (life <= 0) {  
+                scoreText.textContent = count;  
+                winMessage.style.display = 'block';  
+                messageOverlay.style.display = 'none';  
+            } else {  
+                scoreLose.textContent = count;  
+                loseMessage.style.display = 'block';  
+                messageOverlay.style.display = 'none';  
+            }  
+            overlay.style.display = "flex";  
+        }  
+        leftHook.addEventListener("click", () => {   
+            increaseCounter();   
+            welcomeMessage.style.display = "none";   
+            counterSection.style.display = "block";   
+            lifeBar.style.display = "block";   
+        });  
+        rightHook.addEventListener("click", () => {   
+            increaseCounter();   
+            welcomeMessage.style.display = "none";   
+            counterSection.style.display = "block";   
+            lifeBar.style.display = "block";   
+        });  
+        uppercut.addEventListener("click", () => {  
+            useUppercut();  
+        });  
+    </script>  
+</body>  
 </html>
