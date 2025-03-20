@@ -113,7 +113,8 @@
           document.getElementById("madera").textContent = inventory.madera !== undefined ? "madera: " + inventory.madera : "madera: 🔒";
            document.getElementById("arena").textContent = inventory.arena !== undefined ? "arena: " + inventory.arena : "arena: 🔒";
            document.getElementById("raíces").textContent = inventory.raíces !== undefined ? "raíces: " + inventory.raíces : "raíces: 🔒";
-          document.getElementById("cuchillo").textContent = inventory.cuchillo !== undefined ? "cuchillo: " + porcentajeCuchillo + "%" : "cuchillo: 🔒";
+          document.getElementById("cuchillo").textContent = inventory.cuchillo !== undefined ? "cuchillo: " + porcentajeCuchillo + "%" : "cuchillo: 🔒";        
+          document.getElementById("moneda").textContent = inventory.moneda !== undefined ? "moneda: " + inventory.moneda : "moneda: 🔒";
           document.getElementById("espada").textContent = inventory.espada !== undefined ? "espada: " + porcentajeEspada + "%" : "espada: 🔒";
         } else {
           console.log("No se encontraron datos para el usuario.");
@@ -146,6 +147,10 @@
     <h3 id="herramientas-title">Herramientas</h3>
     <p id="cuchillo">cuchillo: 🔒</p>
     <p id="espada">espada: 🔒</p>
+  </div>
+  <div id="herramientas" style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-top: 20px;">
+    <h3 id="herramientas-title">Dinero 💰</h3>
+    <p id="moneda">🪙: 🔒</p>
   </div>
 </body>
 </html>
