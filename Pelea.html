@@ -27,6 +27,8 @@
 
         document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("continueBtn").addEventListener("click", function () {
+                // Deshabilitar el botón para evitar múltiples recompensas
+                this.disabled = true;
                 push(chatRef, {
                     usuario: "Rey Codder 👑",
                     texto: "Gracias por proteger al pueblo de Codderland 🛖🏰🛖, serás recompensado con cobre por tu azaña",
@@ -45,7 +47,7 @@
                             .catch((error) => console.error("Error al actualizar el inventario: ", error));
                     }
                 }).catch((error) => console.error("Error al obtener el inventario: ", error));
-                // Redireccionar a la URL especificada con un retraso de 1 segundo
+                // Redireccionar a la URL especificada con un retraso de 5 segundos
                 setTimeout(() => {
                     window.location.href = "https://zanahorio326.github.io/Mal-comienzo/codderland.html";
                 }, 5000);
