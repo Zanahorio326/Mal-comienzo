@@ -29,6 +29,10 @@
     }
     #alertBox h2 {
       margin-top: 0;
+      color: white; /* Cambio de color a blanco */
+    }
+    #alertBox p {
+      color: white; /* Cambio de color a blanco */
     }
     #alertButtons button {
       margin: 5px;
@@ -50,10 +54,10 @@
           let customAlert = topDocument.createElement("div");
           customAlert.id = "customAlert";
           customAlert.innerHTML = `
-            <div id="alertBox">
-              <h2>⚔️ Misión Real 👑</h2>
-              <p>📜 El rey solicita tu ayuda para proteger el pueblo de Codderland 🏰</p><br>
-              <p>Aún no tienes experiencia en combate como para portar tus armas ⚔️ (en caso de que las tengas) y eso hace desconfiar al rey, empieza con misiones simples ✊ a puño limpio, te enviaremos a eliminar a un par de lobos 🐺 que amenazan al ganado.</p>
+            <div id="alertBox" style="background: #222; padding: 20px; border-radius: 5px; text-align: center; max-width: 300px; width: 90%; box-shadow: 0 0 10px rgba(0,0,0,0.5);">
+              <h2 style="color: white;">⚔️ Misión Real 👑</h2>
+              <p style="color: white;">📜 El rey solicita tu ayuda para proteger el pueblo de Codderland 🏰</p><br>
+              <p style="color: white;">Aún no tienes experiencia en combate como para portar tus armas ⚔️ (en caso de que las tengas) y eso hace desconfiar al rey, empieza con misiones simples ✊ a puño limpio, te enviaremos a eliminar a un par de lobos 🐺 que amenazan al ganado.</p>
               <div id="alertButtons">
                 <button id="btnCancelar">°n° No soy digno</button>
                 <button id="btnAceptar">Yo me encargo (ง'̀-'́)ง</button>
