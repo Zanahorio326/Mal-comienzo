@@ -94,6 +94,8 @@
             plata: undefined,
             oro: undefined,
             madera: undefined,
+            arena: undefined,
+            raíces: undefined,
             cuchillo: undefined,
             espada: undefined
           };
@@ -109,6 +111,8 @@
           document.getElementById("plata").textContent = inventory.plata !== undefined ? "plata: " + inventory.plata : "plata: 🔒";
           document.getElementById("oro").textContent = inventory.oro !== undefined ? "oro: " + inventory.oro : "oro: 🔒";
           document.getElementById("madera").textContent = inventory.madera !== undefined ? "madera: " + inventory.madera : "madera: 🔒";
+           document.getElementById("arena").textContent = inventory.madera !== undefined ? "arena: " + inventory.madera : "arena: 🔒";
+           document.getElementById("raíces").textContent = inventory.madera !== undefined ? "raíces: " + inventory.madera : "raíces: 🔒";
           document.getElementById("cuchillo").textContent = inventory.cuchillo !== undefined ? "cuchillo: " + porcentajeCuchillo + "%" : "cuchillo: 🔒";
           document.getElementById("espada").textContent = inventory.espada !== undefined ? "espada: " + porcentajeEspada + "%" : "espada: 🔒";
         } else {
@@ -135,6 +139,8 @@
     <p id="plata">plata: 🔒</p>
     <p id="oro">oro: 🔒</p>
     <p id="madera">madera: 🔒</p>
+    <p id="arena">arena: 🔒</p>
+    <p id="raíces">raíces: 🔒</p>
   </div>
   <div id="herramientas" style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-top: 20px;">
     <h3 id="herramientas-title">Herramientas</h3>
