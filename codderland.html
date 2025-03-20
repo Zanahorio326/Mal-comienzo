@@ -129,6 +129,11 @@
     }
 
     function ejecutar() {
+        // Reproducir audio de fondo
+        const audio = new Audio("https://zanahorio326.github.io/Mal-comienzo/fondo.mp3");
+        audio.loop = true;
+        audio.play();
+
         const fondoNegro = document.getElementById('fondoNegro');
         const frame = document.getElementById('frame');
         const contenedorPrincipal = document.getElementById('contenedorPrincipal');
