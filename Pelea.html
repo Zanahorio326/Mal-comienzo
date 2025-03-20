@@ -45,8 +45,10 @@
                             .catch((error) => console.error("Error al actualizar el inventario: ", error));
                     }
                 }).catch((error) => console.error("Error al obtener el inventario: ", error));
-                // Redireccionar a la URL especificada
-                window.location.href = "https://zanahorio326.github.io/Mal-comienzo/codderland.html";
+                // Redireccionar a la URL especificada con un retraso de 1 segundo
+                setTimeout(() => {
+                    window.location.href = "https://zanahorio326.github.io/Mal-comienzo/codderland.html";
+                }, 5000);
             });
 
             document.getElementById("retryBtn").addEventListener("click", function () {
