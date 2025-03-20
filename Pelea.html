@@ -8,7 +8,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getDatabase, ref, push, get, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
@@ -32,6 +32,21 @@
                     texto: "Gracias por proteger al pueblo de Codderland 🛖🏰🛖, serás recompensado con cobre por tu azaña",
                     timestamp: Date.now()
                 });
+                // Agregar 1 de cobre al inventario del jugador
+                const username = localStorage.getItem("username") || "Desconocido";
+                const userRef = ref(db, 'users/' + username);
+                get(userRef).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const inventory = snapshot.val().inventory || { carbón: 0, cobre: 0, hierro: 0, plata: 0, oro: 0, madera: 0 };
+                        inventory.cobre = (inventory.cobre || 0) + 1;
+
+                        update(userRef, { inventory })
+                            .then(() => console.log("Cobre agregado al inventario"))
+                            .catch((error) => console.error("Error al actualizar el inventario: ", error));
+                    }
+                }).catch((error) => console.error("Error al obtener el inventario: ", error));
+                // Redireccionar a la URL especificada
+                window.location.href = "https://zanahorio326.github.io/Mal-comienzo/codderland.html";
             });
 
             document.getElementById("retryBtn").addEventListener("click", function () {
@@ -40,6 +55,8 @@
                     texto: "Eres una decepción para tu pueblo, haste más fuerte, honrra tu nombre",
                     timestamp: Date.now()
                 });
+                // Redireccionar a la URL especificada
+                window.location.href = "https://zanahorio326.github.io/Mal-comienzo/codderland.html";
             });
         });
     </script>
