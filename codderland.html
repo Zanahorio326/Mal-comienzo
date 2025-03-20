@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejecutar Página</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Contenedor principal con la imagen de fondo */
+        #contenedorPrincipal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://zanahorio326.github.io/Mal-comienzo/trader.jpg') no-repeat center center fixed;
+            background-size: cover;
+            transition: opacity 2s ease-in-out;
+        }
+
+        /* Contenedor del título */
+        #contenedorTitulo {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        /* Estilo del título */
+        #titulo {
+            font-size: calc(6vw + 10px);
+            max-width: 90vw;
+            color: orange;
+            font-family: 'Georgia', serif;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
+
+        /* Estilo del botón */
+        #botonEjecutar {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        #botonEjecutar:hover {
+            background-color: #45a049;
+        }
+
+        /* Fondo negro para la transición */
+        #fondoNegro {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            opacity: 0;
+            display: none;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        /* Iframe oculto inicialmente */
+        #frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            display: none;
+            transition: opacity 2s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Contenedor con imagen de fondo -->
+<div id="contenedorPrincipal">
+    <!-- Contenedor con fondo negro translúcido -->
+    <div id="contenedorTitulo">
+        <h1 id="titulo">🪓 🏰 𝐂𝐨𝐝𝐝𝐞𝐫𝐥𝐚𝐧𝐝 ⚔ 🛡</h1>
+    </div>
+
+    <!-- Botón con versión -->
+    <button id="botonEjecutar" onclick="ejecutar()">Versión A.0.1</button>
+</div>
+
+<!-- Fondo negro para fundido -->
+<div id="fondoNegro"></div>
+
+<!-- Iframe para cargar la página después de ejecutar -->
+<iframe id="frame" src="https://zanahorio326.github.io/Mal-comienzo/login_register.html" onload="aparecerIframe()"></iframe>
+
+<script>
+    function ajustarTitulo() {
+        const titulo = document.getElementById("titulo");
+        let fontSize = 6;
+        titulo.style.fontSize = `${fontSize}vw`;
+
+        while (titulo.scrollWidth > window.innerWidth * 0.9 && fontSize > 2) {
+            fontSize -= 0.5;
+            titulo.style.fontSize = `${fontSize}vw`;
+        }
+    }
+
+    function ejecutar() {
+        const fondoNegro = document.getElementById('fondoNegro');
+        const frame = document.getElementById('frame');
+        const contenedorPrincipal = document.getElementById('contenedorPrincipal');
+
+        // Mostrar fondo negro y desvanecer el contenido principal
+        fondoNegro.style.display = 'block';
+        setTimeout(() => {
+            fondoNegro.style.opacity = 1;
+            contenedorPrincipal.style.opacity = 0;
+        }, 100);
+
+        // Esconder contenedor y mostrar el iframe
+        setTimeout(() => {
+            contenedorPrincipal.style.display = 'none';
+            fondoNegro.style.opacity = 0;
+            frame.style.display = 'block';
+        }, 2000);
+    }
+
+    function aparecerIframe() {
+        const frame = document.getElementById('frame');
+
+        // Aparece el iframe suavemente después de la carga
+        setTimeout(() => {
+            frame.style.opacity = 1;
+        }, 500);
+    }
+
+    window.onload = ajustarTitulo;
+    window.onresize = ajustarTitulo;
+</script>
+
+</body>
+</html>
