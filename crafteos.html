@@ -284,7 +284,7 @@
         // Mensaje inicial al comenzar el crafteo de la moneda
         push(ref(db, 'chat'), {
           usuario: username,
-          texto: "mensaje 1",
+          texto: "Pronto podré portar mis armas 🗡️ y construirán una tienda 🏚️, necesitaría dinero. Creo que puedo hacer un par de monedas 🪙 con 2 de cobre 🟫, 1 de oro 🟨, uno 1 de ⬜ y 4 de carbón 🪨 para fundir el metal",
           timestamp: Date.now()
         });
 
@@ -306,7 +306,7 @@
                   // Tiene los recursos necesarios
                   push(ref(db, 'chat'), {
                     usuario: username,
-                    texto: "mensaje 3",
+                    texto: "Tengo esos materiales!, encenderé la forja... 🔥",
                     timestamp: Date.now()
                   });
 
@@ -321,7 +321,7 @@
                     // Crafteo finalizado
                     push(ref(db, 'chat'), {
                       usuario: username,
-                      texto: "mensaje 4",
+                      texto: "Lo logré 🪙ヽ(^o^)丿",
                       timestamp: Date.now()
                     });
 
@@ -336,7 +336,7 @@
                   // No tiene los recursos necesarios
                   push(ref(db, 'chat'), {
                     usuario: username,
-                    texto: "mensaje 2",
+                    texto: "Pero soy POBRE! :/",
                     timestamp: Date.now()
                   });
                   setTimeout(function() {
