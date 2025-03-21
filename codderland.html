@@ -129,10 +129,19 @@
     }
 
     function ejecutar() {
-        // Reproducir audio de fondo
-        const audio = new Audio("https://zanahorio326.github.io/Mal-comienzo/fondo.mp3");
-        audio.loop = true;
+        // Reproducir lista de reproducción de audios
+        const tracks = [
+            "https://zanahorio326.github.io/Mal-comienzo/fondo.mp3",
+            "https://zanahorio326.github.io/Mal-comienzo/fondo2.mp3"
+        ];
+        let currentTrack = 0;
+        const audio = new Audio(tracks[currentTrack]);
         audio.play();
+        audio.addEventListener('ended', function() {
+            currentTrack = (currentTrack + 1) % tracks.length;
+            audio.src = tracks[currentTrack];
+            audio.play();
+        });
 
         const fondoNegro = document.getElementById('fondoNegro');
         const frame = document.getElementById('frame');
