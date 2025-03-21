@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mundo con Pinos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+</head>
+<body>
+    <script>
+        let user;
+        let speed = 3;
+        let moving = false;
+
+        let joystickCenter, joystickPos;
+        let joystickRadius = 40;
+        let dragging = false;
+        let joystickActive = false;
+
+        let worldSize;
+        let camX, camY;
+        let trees = [];
+
+        function setup() {
+            createCanvas(windowWidth, windowHeight);
+            worldSize = createVector(width * 3, height * 3); // Mundo 3 veces más grande
+
+            user = createVector(worldSize.x / 2, worldSize.y / 2);
+            camX = user.x - width / 2;
+            camY = user.y - height / 2;
+
+            // Generar árboles en posiciones aleatorias
+            for (let i = 0; i < 20; i++) {
+                let treeX = random(50, worldSize.x - 50);
+                let treeY = random(50, worldSize.y - 50);
+                trees.push(createVector(treeX, treeY));
+            }
+        }
+
+        function draw() {
+            background("#a8df65"); // Fondo verde
+
+            // Mover la "cámara"
+            camX = constrain(user.x - width / 2, 0, worldSize.x - width);
+            camY = constrain(user.y - height / 2, 0, worldSize.y - height);
+
+            push();
+            translate(-camX, -camY);
+
+            // Dibujar troncos (para colisión)
+            for (let tree of trees) {
+                drawTreeTrunk(tree.x, tree.y);
+            }
+
+            // Dibujar personaje
+            drawHuman(user.x, user.y);
+
+            // Dibujar hojas de árboles (siempre sobre el personaje)
+            for (let tree of trees) {
+                drawTreeLeaves(tree.x, tree.y);
+            }
+
+            pop();
+
+            // Dibujar joystick si está activo
+            if (joystickActive) {
+                fill(150);
+                ellipse(joystickCenter.x, joystickCenter.y, joystickRadius * 2);
+                fill(50);
+                ellipse(joystickPos.x, joystickPos.y, joystickRadius);
+            }
+
+            // Movimiento
+            if (dragging) {
+                let moveDir = p5.Vector.sub(joystickPos, joystickCenter);
+                if (moveDir.mag() > 10) {
+                    moveDir.setMag(speed);
+
+                    // Posición tentativa
+                    let newPos = p5.Vector.add(user, moveDir);
+
+                    // Verificar colisión con troncos
+                    let canMove = true;
+                    for (let tree of trees) {
+                        if (collidesWithTree(newPos, tree)) {
+                            canMove = false;
+                            break;
+                        }
+                    }
+
+                    // Solo mover si no hay colisión
+                    if (canMove) {
+                        user.add(moveDir);
+                    }
+
+                    moving = true;
+                } else {
+                    moving = false;
+                }
+            } else {
+                moving = false;
+            }
+
+            // Evitar que el personaje salga del mundo
+            user.x = constrain(user.x, 25, worldSize.x - 25);
+            user.y = constrain(user.y, 25, worldSize.y - 25);
+        }
+
+        function drawHuman(x, y) {
+            push();
+            translate(x, y);
+            fill(0, 0, 255);
+
+            // Cabeza
+            ellipse(0, -20, 30, 30);
+
+            // Cuerpo
+            rect(-10, 0, 20, 30);
+
+            let angle = moving ? sin(frameCount * 0.2) * 10 : 0;
+
+            // Brazos
+            line(-10, 5, -20, 15 + angle);
+            line(10, 5, 20, 15 - angle);
+
+            // Piernas
+            line(-5, 30, -5, 50 + angle);
+            line(5, 30, 5, 50 - angle);
+
+            pop();
+        }
+
+        function drawTreeTrunk(x, y) {
+            push();
+            translate(x, y);
+            
+            // Tronco sólido
+            fill(139, 69, 19);
+            rect(-10, 10, 20, 40);
+
+            pop();
+        }
+
+        function drawTreeLeaves(x, y) {
+            push();
+            translate(x, y);
+            fill(34, 139, 34);
+
+            // Dibujar hojas en forma de pino (tres triángulos apilados)
+            triangle(-25, 10, 0, -40, 25, 10);
+            triangle(-20, -5, 0, -55, 20, -5);
+            triangle(-15, -20, 0, -70, 15, -20);
+
+            pop();
+        }
+
+        function collidesWithTree(pos, tree) {
+            let trunkLeft = tree.x - 10;
+            let trunkRight = tree.x + 10;
+            let trunkTop = tree.y + 10;
+            let trunkBottom = tree.y + 50;
+
+            return pos.x > trunkLeft && pos.x < trunkRight && pos.y > trunkTop && pos.y < trunkBottom;
+        }
+
+        function touchStarted() {
+            joystickCenter = createVector(touches[0].x, touches[0].y);
+            joystickPos = joystickCenter.copy();
+            joystickActive = true;
+            dragging = true;
+        }
+
+        function touchMoved() {
+            if (dragging) {
+                let moveVec = createVector(touches[0].x, touches[0].y);
+                let dir = p5.Vector.sub(moveVec, joystickCenter);
+                if (dir.mag() > joystickRadius) {
+                    dir.setMag(joystickRadius);
+                }
+                joystickPos = p5.Vector.add(joystickCenter, dir);
+            }
+            return false;
+        }
+
+        function touchEnded() {
+            dragging = false;
+            joystickActive = false;
+        }
+    </script>
+</body>
+</html>
