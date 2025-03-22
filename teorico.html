@@ -182,6 +182,25 @@
       });  
       // --- Fin de la nueva herramienta ---  
     });  
+  
+    // Listener para recibir el mensaje del mundo y actualizar los botones según corresponda  
+    window.addEventListener("message", function(event) {  
+      if (event.data.activeTool) {  
+        const tool = event.data.activeTool;  
+        // Desactivar todos los botones primero  
+        document.getElementById("btnMinar").disabled = true;  
+        document.getElementById("btnTalar").disabled = true;  
+        document.getElementById("btnExcavar").disabled = true;  
+        // Activar el botón correspondiente  
+        if (tool === "minar") {  
+          document.getElementById("btnMinar").disabled = false;  
+        } else if (tool === "talar") {  
+          document.getElementById("btnTalar").disabled = false;  
+        } else if (tool === "pala") {  
+          document.getElementById("btnExcavar").disabled = false;  
+        }  
+      }  
+    });  
   </script>  
   <style>  
     #segundaParte1, #segundaParte2 {  
