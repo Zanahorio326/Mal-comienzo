@@ -1,1 +1,82 @@
-estilo mundo 
+/* Código de Botones Independientes */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: none; /* Sin fondo degradado */
+  color: white;
+  text-align: center;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#btnMochila, #btnHerramientas {
+  position: fixed;
+  top: 10px;
+  background: #ffcc00;
+  color: white;
+  padding: 10px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+#btnMochila {
+  right: 10px;
+  background: #008f39;
+}
+
+#btnHerramientas {
+  left: 10px;
+}
+
+/* Botón Chat en la parte inferior derecha */
+#btnChat {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background: #ffcc00;
+  color: white;
+  padding: 10px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+#inventario, #herramientas {
+  position: fixed;
+  top: 50px;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  border-radius: 10px;
+  max-height: 50vh;
+  overflow-y: auto;
+  display: none;
+  width: 200px;
+}
+
+#chat {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  border-radius: 10px;
+  display: none;
+  width: 95%;
+  height: 95%;
+  z-index: 9999;
+}
+
+#inventario.mostrar, #herramientas.mostrar, #chat.mostrar {
+  display: block;
+}
