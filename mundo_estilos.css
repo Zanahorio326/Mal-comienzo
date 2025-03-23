@@ -17,9 +17,8 @@ body {
   justify-content: center;
 }
 
-#btnMochila, #btnHerramientas {
+#btnMochila, #btnHerramientas, #btnChat {
   position: fixed;
-  top: 10px;
   background: #ffcc00;
   color: white;
   padding: 10px;
@@ -27,29 +26,24 @@ body {
   border: none;
   cursor: pointer;
   font-size: 16px;
+  z-index: 10000; /* Asegura que los botones estén por encima del canvas */
 }
 
 #btnMochila {
+  top: 10px;
   right: 10px;
   background: #008f39;
 }
 
 #btnHerramientas {
+  top: 10px;
   left: 10px;
 }
 
 /* Botón Chat en la parte inferior derecha */
 #btnChat {
-  position: fixed;
   bottom: 10px;
   right: 10px;
-  background: #ffcc00;
-  color: white;
-  padding: 10px;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
 }
 
 #inventario, #herramientas {
