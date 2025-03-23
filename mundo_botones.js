@@ -14,5 +14,5 @@ document.getElementById("btnChat").addEventListener("click", function() {
   const chat = document.getElementById("chat");
   chat.classList.toggle("mostrar");
   // El iframe ahora tiene un alto reducido para no tocar los botones superior e inferior.
-  chat.innerHTML = `<iframe src="https://zanahorio326.github.io/Mal-comienzo/chat.html" width="100%" height="100%" frameborder="0"></iframe>`;
+  chat.innerHTML = `<iframe src="https://zanahorio326.github.io/Mal-comienzo/chat.html" width="100%" height="90%" frameborder="0"></iframe>`;
 });
