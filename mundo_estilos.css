@@ -1,8 +1,8 @@
 /* Código de Botones Independientes */
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+  margin: -10;
+  padding: -10;
 }
 
 body {
@@ -21,7 +21,7 @@ body {
   position: fixed;
   background: #ffcc00;
   color: white;
-  padding: 0px;
+  padding: 10px;
   border-radius: 50%;
   border: none;
   cursor: pointer;
