@@ -13,7 +13,7 @@
       authDomain: "thegame-5afaa.firebaseapp.com",
       databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
       projectId: "thegame-5afaa",
-      storageBucket: "thegame-5afaa.firebasestorage.app",
+      storageBucket: "thegame-5afaa.appspot.com",
       messagingSenderId: "588556182984",
       appId: "1:588556182984:web:a0557067d35c18e3944cfd",
       measurementId: "G-9M3CBJ3LV9"
@@ -26,7 +26,6 @@
     const username = localStorage.getItem("username") || "Desconocido";
 
     document.addEventListener("DOMContentLoaded", function() {
-      // Enviar mensaje
       document.getElementById("btnEnviar").addEventListener("click", function() {
         const mensaje = document.getElementById("inputMensaje").value.trim();
         if (mensaje !== "") {
@@ -40,19 +39,23 @@
       });
     });
 
-    // Mostrar mensajes en tiempo real
+    function formatearMensaje(texto) {
+      return texto
+        .replace(/\*\*\*(.*?)\*\*\*/g, '<b><i>$1</i></b>') // ***negrita y cursiva***
+        .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')           // **negrita**
+        .replace(/\*(.*?)\*/g, '<i>$1</i>');              // *cursiva*
+    }
+
     onChildAdded(chatRef, (snapshot) => {
       const data = snapshot.val();
       const mensajeElemento = document.createElement("div");
-      mensajeElemento.textContent = `${data.usuario}: ${data.texto}`;
+      mensajeElemento.innerHTML = `<b>${data.usuario}:</b> ${formatearMensaje(data.texto)}`;
       mensajeElemento.classList.add("mensaje");
       document.getElementById("mensajes").appendChild(mensajeElemento);
 
-      // Desplazar hacia el último mensaje
       const mensajes = document.getElementById("mensajes");
       mensajes.scrollTop = mensajes.scrollHeight;
 
-      // Limitar la cantidad de mensajes visibles (opcional)
       const mensajeLimite = 8;
       const mensajesHijos = mensajes.children;
       if (mensajesHijos.length > mensajeLimite) {
