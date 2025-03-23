@@ -15,7 +15,8 @@
   
   <div id="inventario"></div>
   <div id="herramientas"></div>
-  <div id="chat"></div>
+  <!-- Se ha modificado este contenedor para que el iframe de chat no toque los botones superiores ni el inferior -->
+  <div id="chat" style="top: 60px; bottom: 60px; left: 0; right: 0; width: 100%;"></div>
   
   <!-- Código de Mundo con Bosque y Piedras con Degradé (p5.js) -->
   <script>
@@ -317,6 +318,6 @@
   </script>
   
   <!-- Código de Botones Independientes extraído en archivo externo -->
-  <script src="https://zanahorio326.github.io/Mal-comienzo/mundo_botones.js"></script>
+  <script src="https://zanahorio326.github.io/Mal-comienzo/mundo_botones.js"> </script>
 </body>
 </html>
