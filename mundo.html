@@ -1,191 +1,322 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mundo con Pinos</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mundo con Bosque y Botones Independientes</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+  <link rel="stylesheet" href="https://zanahorio326.github.io/Mal-comienzo/mundo_estilos.css">
 </head>
 <body>
-    <script>
-        let user;
-        let speed = 3;
-        let moving = false;
-
-        let joystickCenter, joystickPos;
-        let joystickRadius = 40;
-        let dragging = false;
-        let joystickActive = false;
-
-        let worldSize;
-        let camX, camY;
-        let trees = [];
-
-        function setup() {
-            createCanvas(windowWidth, windowHeight);
-            worldSize = createVector(width * 3, height * 3); // Mundo 3 veces más grande
-
-            user = createVector(worldSize.x / 2, worldSize.y / 2);
-            camX = user.x - width / 2;
-            camY = user.y - height / 2;
-
-            // Generar árboles en posiciones aleatorias
-            for (let i = 0; i < 20; i++) {
-                let treeX = random(50, worldSize.x - 50);
-                let treeY = random(50, worldSize.y - 50);
-                trees.push(createVector(treeX, treeY));
-            }
-        }
-
-        function draw() {
-            background("#a8df65"); // Fondo verde
-
-            // Mover la "cámara"
-            camX = constrain(user.x - width / 2, 0, worldSize.x - width);
-            camY = constrain(user.y - height / 2, 0, worldSize.y - height);
-
-            push();
-            translate(-camX, -camY);
-
-            // Dibujar troncos (para colisión)
-            for (let tree of trees) {
-                drawTreeTrunk(tree.x, tree.y);
-            }
-
-            // Dibujar personaje
-            drawHuman(user.x, user.y);
-
-            // Dibujar hojas de árboles (siempre sobre el personaje)
-            for (let tree of trees) {
-                drawTreeLeaves(tree.x, tree.y);
-            }
-
-            pop();
-
-            // Dibujar joystick si está activo
-            if (joystickActive) {
-                fill(150);
-                ellipse(joystickCenter.x, joystickCenter.y, joystickRadius * 2);
-                fill(50);
-                ellipse(joystickPos.x, joystickPos.y, joystickRadius);
-            }
-
-            // Movimiento
-            if (dragging) {
-                let moveDir = p5.Vector.sub(joystickPos, joystickCenter);
-                if (moveDir.mag() > 10) {
-                    moveDir.setMag(speed);
-
-                    // Posición tentativa
-                    let newPos = p5.Vector.add(user, moveDir);
-
-                    // Verificar colisión con troncos
-                    let canMove = true;
-                    for (let tree of trees) {
-                        if (collidesWithTree(newPos, tree)) {
-                            canMove = false;
-                            break;
-                        }
-                    }
-
-                    // Solo mover si no hay colisión
-                    if (canMove) {
-                        user.add(moveDir);
-                    }
-
-                    moving = true;
-                } else {
-                    moving = false;
-                }
-            } else {
-                moving = false;
-            }
-
-            // Evitar que el personaje salga del mundo
-            user.x = constrain(user.x, 25, worldSize.x - 25);
-            user.y = constrain(user.y, 25, worldSize.y - 25);
-        }
-
-        function drawHuman(x, y) {
-            push();
-            translate(x, y);
-            fill(0, 0, 255);
-
-            // Cabeza
-            ellipse(0, -20, 30, 30);
-
-            // Cuerpo
-            rect(-10, 0, 20, 30);
-
-            let angle = moving ? sin(frameCount * 0.2) * 10 : 0;
-
-            // Brazos
-            line(-10, 5, -20, 15 + angle);
-            line(10, 5, 20, 15 - angle);
-
-            // Piernas
-            line(-5, 30, -5, 50 + angle);
-            line(5, 30, 5, 50 - angle);
-
-            pop();
-        }
-
-        function drawTreeTrunk(x, y) {
-            push();
-            translate(x, y);
+  <!-- Botones e iframes de Botones Independientes -->
+  <button id="btnMochila">🎒</button>
+  <button id="btnHerramientas">⛏️</button>
+  <button id="btnChat">🗣️</button>
+  
+  <div id="inventario"></div>
+  <div id="herramientas"></div>
+  <div id="chat"></div>
+  
+  <!-- Código de Mundo con Bosque y Piedras con Degradé (p5.js) -->
+  <script>
+    let user;
+    let speed = 3;
+    let moving = false;
+    
+    let joystickCenter, joystickPos;
+    let joystickRadius = 40;
+    let dragging = false;
+    let joystickActive = false;
+    
+    let worldSize;
+    let camX, camY;
+    let trees = [];
+    let stones = [];
+    
+    let topColor, bottomColor;
+    
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      worldSize = createVector(width * 3, height * 3); // Mundo 3 veces más grande
+      
+      user = createVector(worldSize.x / 2, worldSize.y / 2);
+      camX = user.x - width / 2;
+      camY = user.y - height / 2;
+          
+      // Definir los colores para el degradé:
+      // En la parte superior (más arriba) verde oscuro y en la parte inferior verde claro.
+      topColor = color("#006400");     // Verde oscuro
+      bottomColor = color("#a8df65");    // Verde claro
+      
+      // Parámetros para la distribución con degradé
+      let minOffset = 10; // margen para no pegarse al borde
+      let delta = 350; // incremento adicional para solapar las áreas
+      // Para ambos, usamos un área extendida de:
+      let areaWidth = worldSize.x / 3 + delta;
+      let areaHeight = worldSize.y / 3 + delta;
             
-            // Tronco sólido
-            fill(139, 69, 19);
-            rect(-10, 10, 20, 40);
-
-            pop();
+      // --- Generación de árboles en la esquina superior izquierda ---
+      let treeCount = 100; // cantidad deseada de árboles
+      let minTreeDistance = 50; // distancia mínima entre árboles
+      let attempts = 0;
+      while (trees.length < treeCount && attempts < 1000) {
+        let candidateX = minOffset + pow(random(), 2) * (areaWidth - minOffset);
+        let candidateY = minOffset + pow(random(), 2) * (areaHeight - minOffset);
+        let candidate = createVector(candidateX, candidateY);
+        let valid = true;
+        for (let t of trees) {
+          if (candidate.dist(t) < minTreeDistance) {
+            valid = false;
+            break;
+          }
         }
-
-        function drawTreeLeaves(x, y) {
-            push();
-            translate(x, y);
-            fill(34, 139, 34);
-
-            // Dibujar hojas en forma de pino (tres triángulos apilados)
-            triangle(-25, 10, 0, -40, 25, 10);
-            triangle(-20, -5, 0, -55, 20, -5);
-            triangle(-15, -20, 0, -70, 15, -20);
-
-            pop();
+        if (valid) {
+          trees.push(candidate);
         }
-
-        function collidesWithTree(pos, tree) {
-            let trunkLeft = tree.x - 10;
-            let trunkRight = tree.x + 10;
-            let trunkTop = tree.y + 10;
-            let trunkBottom = tree.y + 50;
-
-            return pos.x > trunkLeft && pos.x < trunkRight && pos.y > trunkTop && pos.y < trunkBottom;
+        attempts++;
+      }
+            
+      // --- Generación de piedras en la esquina superior derecha ---
+      let stoneCount = 100; // cantidad de piedras
+      let minStoneDistance = 30; // separación mínima entre piedras
+      let minTreeStoneDistance = 50; // separación mínima entre árboles y piedras
+      attempts = 0;
+      while (stones.length < stoneCount && attempts < 1000) {
+        // Para las piedras, la posición X se genera de forma sesgada hacia el extremo derecho.
+        let candidateX = worldSize.x - (minOffset + pow(random(), 2) * (areaWidth - minOffset));
+        let candidateY = minOffset + pow(random(), 2) * (areaHeight - minOffset);
+        let candidate = createVector(candidateX, candidateY);
+        let valid = true;
+        for (let s of stones) {
+          if (candidate.dist(s) < minStoneDistance) {
+            valid = false;
+            break;
+          }
         }
-
-        function touchStarted() {
-            joystickCenter = createVector(touches[0].x, touches[0].y);
-            joystickPos = joystickCenter.copy();
-            joystickActive = true;
-            dragging = true;
-        }
-
-        function touchMoved() {
-            if (dragging) {
-                let moveVec = createVector(touches[0].x, touches[0].y);
-                let dir = p5.Vector.sub(moveVec, joystickCenter);
-                if (dir.mag() > joystickRadius) {
-                    dir.setMag(joystickRadius);
-                }
-                joystickPos = p5.Vector.add(joystickCenter, dir);
+        // Verificar separación mínima entre la piedra candidata y cada árbol
+        if (valid) {
+          for (let t of trees) {
+            if (candidate.dist(t) < minTreeStoneDistance) {
+              valid = false;
+              break;
             }
-            return false;
+          }
         }
-
-        function touchEnded() {
-            dragging = false;
-            joystickActive = false;
+        if (valid) {
+          stones.push(candidate);
         }
-    </script>
+        attempts++;
+      }
+    }
+    
+    function draw() {
+      // Limpiar el canvas con un fondo negro para luego dibujar el degradé en el mundo
+      background(0);
+      
+      // Actualizar la cámara para seguir al personaje sin perderlo de vista
+      camX = constrain(user.x - width / 2, 0, worldSize.x - width);
+      camY = constrain(user.y - height / 2, 0, worldSize.y - height);
+      
+      push();
+      translate(-camX, -camY);
+      
+      // Dibujar el piso con degradé: de verde oscuro en la parte superior a verde claro en la inferior.
+      drawFloorGradient();
+      
+      // Dibujar árboles: primero sus troncos (sólidos, para colisión)
+      for (let tree of trees) {
+        drawTreeTrunk(tree.x, tree.y);
+      }
+            
+      // Dibujar piedras (antes del personaje)
+      for (let stone of stones) {
+        drawStone(stone.x, stone.y);
+      }
+      
+      // Dibujar personaje
+      drawHuman(user.x, user.y);
+      
+      // Dibujar hojas de los árboles (siempre sobre el personaje)
+      for (let tree of trees) {
+        drawTreeLeaves(tree.x, tree.y);
+      }
+      pop();
+      
+      // Dibujar joystick si está activo
+      if (joystickActive) {
+        fill(150);
+        ellipse(joystickCenter.x, joystickCenter.y, joystickRadius * 2);
+        fill(50);
+        ellipse(joystickPos.x, joystickPos.y, joystickRadius);
+      }
+      
+      // Movimiento con joystick
+      if (dragging) {
+        let moveDir = p5.Vector.sub(joystickPos, joystickCenter);
+        if (moveDir.mag() > 10) {
+          moveDir.setMag(speed);
+          // Posición tentativa del usuario
+          let newPos = p5.Vector.add(user, moveDir);
+          let canMove = true;
+          // Verificar colisión con troncos de árboles
+          for (let tree of trees) {
+            if (collidesWithTree(newPos, tree)) {
+              canMove = false;
+              break;
+            }
+          }
+          // Verificar colisión con piedras
+          if (canMove) {
+            for (let stone of stones) {
+              if (collidesWithStone(newPos, stone)) {
+                canMove = false;
+                break;
+              }
+            }
+          }
+          // Solo mover al usuario si no hay colisión
+          if (canMove) {
+            user.add(moveDir);
+          }
+          moving = true;
+        } else {
+          moving = false;
+        }
+      } else {
+        moving = false;
+      }
+      
+      // Evitar que el usuario salga del mundo
+      user.x = constrain(user.x, 25, worldSize.x - 25);
+      user.y = constrain(user.y, 25, worldSize.y - 25);
+      
+      // --- Detección de recurso más cercano (sin mostrar mensaje en pantalla) ---
+      let threshold = 50;
+      let nearestTreeDist = Infinity;
+      let nearestStoneDist = Infinity;
+      
+      for (let tree of trees) {
+        let treeCenter = createVector(tree.x, tree.y + 30);
+        let d = dist(user.x, user.y, treeCenter.x, treeCenter.y);
+        if (d < nearestTreeDist) {
+          nearestTreeDist = d;
+        }
+      }
+      
+      for (let stone of stones) {
+        let d = dist(user.x, user.y, stone.x, stone.y);
+        if (d < nearestStoneDist) {
+          nearestStoneDist = d;
+        }
+      }
+      
+      // Determinar el recurso detectado según las condiciones exclusivas
+      let activeTool = "";
+      if (nearestStoneDist < threshold && (nearestStoneDist < nearestTreeDist || nearestTreeDist >= threshold)) {
+        activeTool = "minar";
+      } else if (nearestTreeDist < threshold) {
+        activeTool = "talar";
+      } else {
+        activeTool = "pala";
+      }
+      
+      // Enviar el mensaje al iframe de herramientas para habilitar el botón correspondiente
+      const herramientasIframe = document.querySelector('#herramientas iframe');
+      if (herramientasIframe) {
+        herramientasIframe.contentWindow.postMessage({ activeTool: activeTool }, "*");
+      }
+    }
+    
+    function drawFloorGradient() {
+      noFill();
+      for (let y = 0; y < worldSize.y; y++) {
+        let inter = y / worldSize.y;
+        let c = lerpColor(topColor, bottomColor, inter);
+        stroke(c);
+        line(0, y, worldSize.x, y);
+      }
+    }
+    
+    function drawHuman(x, y) {
+      push();
+      translate(x, y);
+      fill(0, 0, 255);
+      ellipse(0, -20, 30, 30);
+      rect(-10, 0, 20, 30);
+      let angle = moving ? sin(frameCount * 0.2) * 10 : 0;
+      line(-10, 5, -20, 15 + angle);
+      line(10, 5, 20, 15 - angle);
+      line(-5, 30, -5, 50 + angle);
+      line(5, 30, 5, 50 - angle);
+      pop();
+    }
+    
+    function drawTreeTrunk(x, y) {
+      push();
+      translate(x, y);
+      fill(139, 69, 19);
+      rect(-10, 10, 20, 40);
+      pop();
+    }
+    
+    function drawTreeLeaves(x, y) {
+      push();
+      translate(x, y);
+      fill(34, 139, 34);
+      triangle(-25, 10, 0, -40, 25, 10);
+      triangle(-20, -5, 0, -55, 20, -5);
+      triangle(-15, -20, 0, -70, 15, -20);
+      pop();
+    }
+    
+    function drawStone(x, y) {
+      push();
+      translate(x, y);
+      fill(120);
+      noStroke();
+      ellipse(0, 0, 30, 20);
+      pop();
+    }
+    
+    function collidesWithTree(pos, tree) {
+      let trunkLeft = tree.x - 10;
+      let trunkRight = tree.x + 10;
+      let trunkTop = tree.y + 10;
+      let trunkBottom = tree.y + 50;
+      return pos.x > trunkLeft && pos.x < trunkRight &&
+             pos.y > trunkTop && pos.y < trunkBottom;
+    }
+    
+    function collidesWithStone(pos, stone) {
+      return dist(pos.x, pos.y, stone.x, stone.y) < 20;
+    }
+    
+    function touchStarted() {
+      joystickCenter = createVector(touches[0].x, touches[0].y);
+      joystickPos = joystickCenter.copy();
+      joystickActive = true;
+      dragging = true;
+    }
+    
+    function touchMoved() {
+      if (dragging) {
+        let moveVec = createVector(touches[0].x, touches[0].y);
+        let dir = p5.Vector.sub(moveVec, joystickCenter);
+        if (dir.mag() > joystickRadius) {
+          dir.setMag(joystickRadius);
+        }
+        joystickPos = p5.Vector.add(joystickCenter, dir);
+      }
+      return false;
+    }
+    
+    function touchEnded() {
+      dragging = false;
+      joystickActive = false;
+    }
+  </script>
+  
+  <!-- Código de Botones Independientes extraído en archivo externo -->
+  <script src="https://zanahorio326.github.io/Mal-comienzo/mundo_botones.js"></script>
 </body>
 </html>
