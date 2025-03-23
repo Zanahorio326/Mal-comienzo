@@ -318,5 +318,23 @@
   
   <!-- Código de Botones Independientes extraído en archivo externo -->
   <script src="https://zanahorio326.github.io/Mal-comienzo/mundo_botones.js"></script>
+  
+  <!-- Solicitar pantalla completa en la primera interacción -->
+  <script>
+    function goFullScreen() {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.webkitRequestFullscreen) { /* Safari */
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) { /* IE11 */
+        elem.msRequestFullscreen();
+      }
+      document.removeEventListener('click', goFullScreen);
+      document.removeEventListener('touchstart', goFullScreen);
+    }
+    document.addEventListener('click', goFullScreen);
+    document.addEventListener('touchstart', goFullScreen);
+  </script>
 </body>
 </html>
