@@ -10,7 +10,7 @@ body {
   background: none; /* Sin fondo degradado */
   color: white;
   text-align: center;
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
