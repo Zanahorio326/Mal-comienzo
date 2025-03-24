@@ -185,7 +185,7 @@
         drawStone(stone.x, stone.y);
       }
       
-      // Dibujar personaje
+      // Dibujar personaje propio
       drawHuman(user.x, user.y);
       
       // Dibujar hojas de los árboles (siempre sobre el personaje)
@@ -201,8 +201,21 @@
         for (let p in otherPlayers) {
           if (p !== username) { // No dibujar el jugador propio
             let player = otherPlayers[p];
-            fill(255, 0, 0); // Color rojo para otros jugadores
-            ellipse(player.x, player.y, 30, 30);
+            // Dibujar el avatar completo para otros jugadores (simulando drawHuman pero en color rojo)
+            push();
+            translate(player.x, player.y);
+            // Cabeza
+            fill(255, 0, 0);
+            ellipse(0, -20, 30, 30);
+            // Cuerpo
+            rect(-10, 0, 20, 30);
+            // Brazos
+            line(-10, 5, -20, 15);
+            line(10, 5, 20, 15);
+            // Piernas
+            line(-5, 30, -5, 50);
+            line(5, 30, 5, 50);
+            pop();
           }
         }
         pop();
