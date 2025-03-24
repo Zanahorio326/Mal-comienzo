@@ -1,16 +1,15 @@
 function animateLimbs(isMoving) {
-  // Detectar si el movimiento es mayormente horizontal usando las variables globales del joystick
-  let sideView = false;
-  let dx = 0, dy = 0;
+  // Determinar si el movimiento es mayormente horizontal usando las variables globales del joystick
+  let horizontal = false;
   if (typeof joystickCenter !== 'undefined' && typeof joystickPos !== 'undefined') {
-    dx = joystickPos.x - joystickCenter.x;
-    dy = joystickPos.y - joystickCenter.y;
+    let dx = joystickPos.x - joystickCenter.x;
+    let dy = joystickPos.y - joystickCenter.y;
     if (abs(dx) > abs(dy)) {
-      sideView = true;
+      horizontal = true;
     }
   }
-
-  if (!sideView) {
+  
+  if (!horizontal) {
     // Animación original: brazos y piernas oscilan verticalmente (pendular)
     let angle = isMoving ? sin(frameCount * 0.2) * 10 : 0;
     line(-10, 5, -20, 15 + angle);
@@ -18,21 +17,39 @@ function animateLimbs(isMoving) {
     line(-5, 30, -5, 50 + angle);
     line(5, 30, 5, 50 - angle);
   } else {
-    // Animación en vista de perfil: ambos brazos y piernas en su extensión máxima
-    // oscilan de lado a lado.
-    let armLength = 20;
-    let legLength = 20;
-    // Se usan fases opuestas para cada lado: el brazo izquierdo y la pierna izquierda se mueven en fase
-    // mientras que el derecho se mueve en contrafase.
-    let leftArmOsc = isMoving ? sin(frameCount * 0.2) * 5 : 0;
-    let rightArmOsc = isMoving ? -sin(frameCount * 0.2) * 5 : 0;
-    let leftLegOsc = isMoving ? sin(frameCount * 0.2) * 5 : 0;
-    let rightLegOsc = isMoving ? -sin(frameCount * 0.2) * 5 : 0;
-    // Dibujar brazos: se parte de los hombros (asumidos en (-10,5) para la izquierda y (10,5) para la derecha)
-    line(-10, 5, -10 - armLength + leftArmOsc, 5);
-    line(10, 5, 10 + armLength + rightArmOsc, 5);
-    // Dibujar piernas: se parte de la cadera (asumida en (-5,30) para la izquierda y (5,30) para la derecha)
-    line(-5, 30, -5 - legLength + leftLegOsc, 30);
-    line(5, 30, 5 + legLength + rightLegOsc, 30);
+    // Animación para movimiento horizontal: brazos y piernas "extendidos" y rotados pendularmente
+    // Usamos un ángulo máximo de swing de aproximadamente 20° (0.35 radianes)
+    let maxSwing = 0.35;
+    let swing = isMoving ? sin(frameCount * 0.2) * maxSwing : 0;
+    
+    // Dibujar brazo izquierdo: pivote en (-10,5) y se extiende a la izquierda
+    push();
+    translate(-10, 5);
+    rotate(swing);
+    // Dibujar línea horizontal a la izquierda (longitud fija, p.ej. 10 píxeles)
+    line(0, 0, -10, 0);
+    pop();
+    
+    // Dibujar brazo derecho: pivote en (10,5) y se extiende a la derecha
+    push();
+    translate(10, 5);
+    rotate(-swing);
+    line(0, 0, 10, 0);
+    pop();
+    
+    // Dibujar pierna izquierda: pivote en (-5,30) y se extiende hacia atrás
+    push();
+    translate(-5, 30);
+    rotate(swing);
+    // Longitud fija (20 píxeles) para la pierna
+    line(0, 0, -20, 0);
+    pop();
+    
+    // Dibujar pierna derecha: pivote en (5,30) y se extiende hacia atrás
+    push();
+    translate(5, 30);
+    rotate(-swing);
+    line(0, 0, 20, 0);
+    pop();
   }
 }
