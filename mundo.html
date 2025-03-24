@@ -22,6 +22,9 @@
   <!-- Se ha modificado este contenedor para que el iframe de chat no toque los botones superiores ni el inferior -->
   <div id="chat" style="top: 60px; bottom: 60px; left: 0; right: 0; width: 100%;"></div>
   
+  <!-- Cargar módulo de recursos (animación de brazos y piernas) -->
+  <script src="https://zanahorio326.github.io/Mal-comienzo/mundo_recursos.js"></script>
+  
   <!-- Código de Mundo con Bosque y Piedras con Degradé (p5.js) -->
   <script>
     // --- INTEGRACIÓN DE FIREBASE ---
@@ -325,11 +328,8 @@
       fill(0, 0, 255);
       ellipse(0, -20, 30, 30);
       rect(-10, 0, 20, 30);
-      let angle = moving ? sin(frameCount * 0.2) * 10 : 0;
-      line(-10, 5, -20, 15 + angle);
-      line(10, 5, 20, 15 - angle);
-      line(-5, 30, -5, 50 + angle);
-      line(5, 30, 5, 50 - angle);
+      // Se ha extraído la animación de brazos y piernas
+      animateLimbs(moving);
       pop();
     }
     
