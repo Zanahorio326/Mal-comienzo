@@ -17,39 +17,48 @@ function animateLimbs(isMoving) {
     line(-5, 30, -5, 50 + angle);
     line(5, 30, 5, 50 - angle);
   } else {
-    // Animación para movimiento horizontal: brazos y piernas "extendidos" y rotados pendularmente
-    // Usamos un ángulo máximo de swing de aproximadamente 20° (0.35 radianes)
-    let maxSwing = 0.35;
+    // Animación para movimiento horizontal: 
+    // Las extremidades parten de su posición por defecto:
+    // - Brazo izquierdo: desde (-10,5) con dirección 135° (3*PI/4) [simula (-20,15)]
+    // - Brazo derecho: desde (10,5) con dirección 45° (PI/4) [simula (20,15)]
+    // - Piernas: ambas desde (-5,30) y (5,30) en dirección vertical (90° o PI/2)
+    // Luego se les aplica una rotación pendular para oscilar de adelante hacia atrás.
+    let maxSwing = 0.35; // en radianes (aprox 20°)
     let swing = isMoving ? sin(frameCount * 0.2) * maxSwing : 0;
+    let armLength = 14; // longitud aproximada desde hombro hasta mano
+    let legLength = 20; // longitud aproximada desde cadera hasta pie
     
-    // Dibujar brazo izquierdo: pivote en (-10,5) y se extiende a la izquierda
+    // Brazo izquierdo
     push();
-    translate(-10, 5);
-    rotate(swing);
-    // Dibujar línea horizontal a la izquierda (longitud fija, p.ej. 10 píxeles)
-    line(0, 0, -10, 0);
+      translate(-10, 5);
+      // Ángulo base 3*PI/4 (135°) y se suma swing
+      rotate(3 * PI / 4 + swing);
+      // Dibujar línea de longitud fija
+      line(0, 0, armLength, 0);
     pop();
     
-    // Dibujar brazo derecho: pivote en (10,5) y se extiende a la derecha
+    // Brazo derecho
     push();
-    translate(10, 5);
-    rotate(-swing);
-    line(0, 0, 10, 0);
+      translate(10, 5);
+      // Ángulo base PI/4 (45°) y se resta swing
+      rotate(PI / 4 - swing);
+      line(0, 0, armLength, 0);
     pop();
     
-    // Dibujar pierna izquierda: pivote en (-5,30) y se extiende hacia atrás
+    // Pierna izquierda
     push();
-    translate(-5, 30);
-    rotate(swing);
-    // Longitud fija (20 píxeles) para la pierna
-    line(0, 0, -20, 0);
+      translate(-5, 30);
+      // Ángulo base PI/2 (90°) y se suma swing
+      rotate(PI / 2 + swing);
+      line(0, 0, legLength, 0);
     pop();
     
-    // Dibujar pierna derecha: pivote en (5,30) y se extiende hacia atrás
+    // Pierna derecha
     push();
-    translate(5, 30);
-    rotate(-swing);
-    line(0, 0, 20, 0);
+      translate(5, 30);
+      // Ángulo base PI/2 (90°) y se resta swing
+      rotate(PI / 2 - swing);
+      line(0, 0, legLength, 0);
     pop();
   }
 }
