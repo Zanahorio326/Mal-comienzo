@@ -209,7 +209,7 @@
             translate(player.x, player.y);
             // Cabeza
             fill(255, 0, 0);
-            ellipse(0, -20, 30, 30);
+            ellipse(0, -20 + getHeadBounce(moving), 30, 30);
             // Cuerpo
             rect(-10, 0, 20, 30);
             // Brazos
