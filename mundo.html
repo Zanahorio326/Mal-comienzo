@@ -4,7 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mundo con Bosque y Botones Independientes</title>
+  <!-- p5.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+  <!-- Firebase compat para App y Database -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
   <link rel="stylesheet" href="https://zanahorio326.github.io/Mal-comienzo/mundo_estilos.css">
 </head>
 <body>
@@ -20,6 +24,53 @@
   
   <!-- Código de Mundo con Bosque y Piedras con Degradé (p5.js) -->
   <script>
+    // --- INTEGRACIÓN DE FIREBASE ---
+    // Recuperar el username desde localStorage (o asignar uno por defecto)
+    let username = localStorage.getItem('username');
+    if (!username) { 
+      username = "Guest" + Math.floor(Math.random() * 1000); 
+    }
+    // Configuración de Firebase (sin modificar la información persistente de usuarios)
+    var firebaseConfig = {
+      apiKey: "AIzaSyBRCo_R7EOod4IE67GlSLNrO3WEOOVMLrQ",
+      authDomain: "thegame-5afaa.firebaseapp.com",
+      databaseURL: "https://thegame-5afaa-default-rtdb.firebaseio.com",
+      projectId: "thegame-5afaa",
+      storageBucket: "thegame-5afaa.firebasestorage.app",
+      messagingSenderId: "588556182984",
+      appId: "1:588556182984:web:a0557067d35c18e3944cfd",
+      measurementId: "G-9M3CBJ3LV9"
+    };
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.database();
+    
+    // Función para actualizar la posición y estado del jugador en Firebase (nodo 'players')
+    function updatePlayerState(username, x, y) {
+      db.ref('players/' + username).set({
+        x: x,
+        y: y,
+        lastUpdate: Date.now()
+      });
+    }
+    
+    // Configurar la eliminación del estado del jugador en caso de desconexión
+    db.ref('players/' + username).onDisconnect().remove();
+    
+    // Variable global para almacenar los datos de otros jugadores
+    let otherPlayers = {};
+    // Función para escuchar en tiempo real el nodo 'players'
+    function listenForPlayers() {
+      db.ref('players').on('value', (snapshot) => {
+        otherPlayers = snapshot.val();
+      });
+    }
+    
+    // Llamada a la función para iniciar la escucha de jugadores
+    listenForPlayers();
+    // --- FIN INTEGRACIÓN FIREBASE ---
+    
+    // Variables y configuración original de p5.js
     let user;
     let speed = 3;
     let moving = false;
@@ -143,6 +194,20 @@
       }
       pop();
       
+      // Dibuja a los otros jugadores (estado obtenido de Firebase)
+      if (otherPlayers) {
+        push();
+        translate(-camX, -camY);
+        for (let p in otherPlayers) {
+          if (p !== username) { // No dibujar el jugador propio
+            let player = otherPlayers[p];
+            fill(255, 0, 0); // Color rojo para otros jugadores
+            ellipse(player.x, player.y, 30, 30);
+          }
+        }
+        pop();
+      }
+      
       // Dibujar joystick si está activo
       if (joystickActive) {
         fill(150);
@@ -190,6 +255,9 @@
       // Evitar que el usuario salga del mundo
       user.x = constrain(user.x, 25, worldSize.x - 25);
       user.y = constrain(user.y, 25, worldSize.y - 25);
+      
+      // Actualizar el estado del jugador en Firebase (datos temporales para el mundo compartido)
+      updatePlayerState(username, user.x, user.y);
       
       // --- Detección de recurso más cercano (sin mostrar mensaje en pantalla) ---
       let threshold = 50;
