@@ -99,12 +99,12 @@ function animateLimbs(isMoving) {
           scale(-1, 1);
           textAlign(RIGHT, BOTTOM);
           // Se ajusta el offset a +1 para acercar el mango del acha
-          text("🪓", 2, 2);
+          text("🪓", 1, 1);
         pop();
       } else {
         textAlign(RIGHT, BOTTOM);
         // Offset de +1 para acercar el mango en la mano izquierda
-        text("🪓", axePos.x + 2, axePos.y + 2);
+        text("🪓", axePos.x + 1, axePos.y + 1);
       }
     pop();
   }
