@@ -1,4 +1,5 @@
 function animateLimbs(isMoving) {
+  // Determinar si el movimiento es mayormente horizontal usando las variables globales del joystick
   let horizontal = false;
   if (typeof joystickCenter !== 'undefined' && typeof joystickPos !== 'undefined') {
     let dx = joystickPos.x - joystickCenter.x;
@@ -8,9 +9,11 @@ function animateLimbs(isMoving) {
     }
   }
   
+  // Variables para almacenar las posiciones de las manos (en coordenadas locales, con origen en el usuario)
   let leftHand, rightHand;
   
   if (!horizontal) {
+    // Animación original: brazos y piernas oscilan verticalmente (pendular)
     let angle = isMoving ? sin(frameCount * 0.2) * 10 : 0;
     line(-10, 5, -20, 15 + angle);
     line(10, 5, 20, 15 - angle);
@@ -19,11 +22,14 @@ function animateLimbs(isMoving) {
     leftHand = createVector(-20, 15 + angle);
     rightHand = createVector(20, 15 - angle);
   } else {
-    let maxSwing = 0.35;
+    // Animación para movimiento horizontal: 
+    // Las extremidades parten de su posición por defecto y se les aplica una rotación pendular
+    let maxSwing = 0.35; // ~20° en radianes
     let swing = isMoving ? sin(frameCount * 0.2) * maxSwing : 0;
-    let armLength = 14;
-    let legLength = 20;
+    let armLength = 14; // longitud aproximada desde hombro hasta mano
+    let legLength = 20; // longitud aproximada desde cadera hasta pie
     
+    // Brazo izquierdo: pivote en (-10,5), ángulo base 3*PI/4 (135°) + swing
     push();
       translate(-10, 5);
       rotate(3 * PI / 4 + swing);
@@ -31,6 +37,7 @@ function animateLimbs(isMoving) {
       leftHand = p5.Vector.add(createVector(-10, 5), p5.Vector.fromAngle(3 * PI / 4 + swing).mult(armLength));
     pop();
     
+    // Brazo derecho: pivote en (10,5), ángulo base PI/4 (45°) - swing
     push();
       translate(10, 5);
       rotate(PI / 4 - swing);
@@ -38,6 +45,7 @@ function animateLimbs(isMoving) {
       rightHand = p5.Vector.add(createVector(10, 5), p5.Vector.fromAngle(PI / 4 - swing).mult(armLength));
     pop();
     
+    // Dibujar piernas (se mantiene la animación sin uso para el Acha)
     push();
       translate(-5, 30);
       rotate(PI / 2 + swing);
@@ -51,6 +59,7 @@ function animateLimbs(isMoving) {
     pop();
   }
   
+  // --- Mostrar Acha en la mano más próxima al árbol más cercano cuando se realiza la acción de talar ---
   let threshold = 50;
   let chopping = false;
   let nearestTree = null;
@@ -81,9 +90,10 @@ function animateLimbs(isMoving) {
     let axePos = dLeft < dRight ? leftHand : rightHand;
 
     push();
-      textAlign(CENTER, CENTER);
+      textAlign(RIGHT, BOTTOM);
       textSize(24);
-      text("🪓", axePos.x, axePos.y);
+      // Aplicamos un desplazamiento pequeño: 1 píxel a la izquierda y 1 píxel arriba
+      text("🪓", axePos.x - 1, axePos.y - 1);
     pop();
   }
 }
