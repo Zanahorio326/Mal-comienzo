@@ -39,7 +39,6 @@ function animateLimbs(isMoving) {
       translate(-10, 5);
       rotate(3 * PI / 4 + swing);
       line(0, 0, armLength, 0);
-      // Calcular posición final de la mano en coordenadas locales
       leftHand = p5.Vector.add(createVector(-10, 5), p5.Vector.fromAngle(3 * PI / 4 + swing).mult(armLength));
     pop();
     
@@ -104,10 +103,10 @@ function animateLimbs(isMoving) {
     } else {
       axePos = rightHand;
     }
-    // Dibujar el emoji de Acha sobre la mano seleccionada
+    // Dibujar el emoji de Acha sobre la mano seleccionada, agrandado y usando la esquina inferior derecha como ancla
     push();
-      textAlign(CENTER, CENTER);
-      textSize(16);
+      textAlign(RIGHT, BOTTOM);
+      textSize(20);
       text("🪓", axePos.x, axePos.y);
     pop();
   }
