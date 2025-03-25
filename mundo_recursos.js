@@ -1,6 +1,3 @@
-// Variable global para gestionar el temporizador de la visualización del Acha
-let axeDisplayStart = undefined;
-
 function animateLimbs(isMoving) {
   // Determinar si el movimiento es mayormente horizontal usando las variables globales del joystick
   let horizontal = false;
@@ -27,7 +24,7 @@ function animateLimbs(isMoving) {
     leftHand = createVector(-20, 15 + angle);
     rightHand = createVector(20, 15 - angle);
   } else {
-    // Animación para movimiento horizontal:
+    // Animación para movimiento horizontal: 
     // Las extremidades parten de su posición por defecto y se les aplica una rotación pendular
     let maxSwing = 0.35; // ~20° en radianes
     let swing = isMoving ? sin(frameCount * 0.2) * maxSwing : 0;
@@ -39,6 +36,7 @@ function animateLimbs(isMoving) {
       translate(-10, 5);
       rotate(3 * PI / 4 + swing);
       line(0, 0, armLength, 0);
+      // Calcular posición final de la mano en coordenadas locales
       leftHand = p5.Vector.add(createVector(-10, 5), p5.Vector.fromAngle(3 * PI / 4 + swing).mult(armLength));
     pop();
     
@@ -103,11 +101,13 @@ function animateLimbs(isMoving) {
     } else {
       axePos = rightHand;
     }
-    // Dibujar el emoji de Acha sobre la mano seleccionada, agrandado y con un ligero offset para que no quede justo en la esquina inferior derecha
+    // Dibujar el emoji del Acha:
+    // Se agranda el emoji (textSize 24) y se posiciona de modo que su esquina inferior derecha 
+    // (con un pequeño desplazamiento) sea casi el punto de sostén.
     push();
       textAlign(RIGHT, BOTTOM);
-      textSize(20);
-      // Se desplaza 3 píxeles a la izquierda y 3 píxeles hacia arriba del ancla
+      textSize(24);
+      // Desplazamiento sutil para que el punto de "sostén" esté casi en la esquina inferior derecha
       text("🪓", axePos.x - 3, axePos.y - 3);
     pop();
   }
