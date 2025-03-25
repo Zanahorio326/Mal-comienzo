@@ -103,11 +103,13 @@ function animateLimbs(isMoving) {
     } else {
       axePos = rightHand;
     }
-    // Dibujar el emoji de Acha sobre la mano seleccionada, agrandado y usando la esquina inferior derecha como ancla
+    // Dibujar el emoji de Acha sobre la mano seleccionada,
+    // agrandado y con un leve desplazamiento para no estar justo en la esquina inferior derecha.
     push();
       textAlign(RIGHT, BOTTOM);
       textSize(20);
-      text("🪓", axePos.x, axePos.y);
+      // Se reduce la proximidad a la esquina inferior derecha con un pequeño offset
+      text("🪓", axePos.x - 4, axePos.y - 4);
     pop();
   }
 }
