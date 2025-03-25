@@ -104,7 +104,7 @@ function animateLimbs(isMoving) {
       } else {
         textAlign(RIGHT, BOTTOM);
         // Offset de +1 para acercar el mango en la mano izquierda
-        text("🪓", axePos.x + 1, axePos.y + 1);
+        text("🪓", axePos.x + 2, axePos.y + 2);
       }
     pop();
   }
