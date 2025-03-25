@@ -2,6 +2,7 @@
 let axeDisplayStart = undefined;
 
 function animateLimbs(isMoving) {
+  // Determinar si el movimiento es mayormente horizontal usando las variables globales del joystick
   let horizontal = false;
   if (typeof joystickCenter !== 'undefined' && typeof joystickPos !== 'undefined') {
     let dx = joystickPos.x - joystickCenter.x;
@@ -10,55 +11,66 @@ function animateLimbs(isMoving) {
       horizontal = true;
     }
   }
-
+  
+  // Variables para almacenar las posiciones de las manos (en coordenadas locales, con origen en el usuario)
   let leftHand, rightHand;
-
+  
   if (!horizontal) {
+    // Animación original: brazos y piernas oscilan verticalmente (pendular)
     let angle = isMoving ? sin(frameCount * 0.2) * 10 : 0;
+    // Dibujar brazos y piernas
     line(-10, 5, -20, 15 + angle);
     line(10, 5, 20, 15 - angle);
     line(-5, 30, -5, 50 + angle);
     line(5, 30, 5, 50 - angle);
+    // Calcular puntos finales de las manos
     leftHand = createVector(-20, 15 + angle);
     rightHand = createVector(20, 15 - angle);
   } else {
-    let maxSwing = 0.35;
+    // Animación para movimiento horizontal:
+    // Las extremidades parten de su posición por defecto y se les aplica una rotación pendular
+    let maxSwing = 0.35; // ~20° en radianes
     let swing = isMoving ? sin(frameCount * 0.2) * maxSwing : 0;
-    let armLength = 14;
-    let legLength = 20;
-
+    let armLength = 14; // longitud aproximada desde hombro hasta mano
+    let legLength = 20; // longitud aproximada desde cadera hasta pie
+    
+    // Brazo izquierdo: pivote en (-10,5), ángulo base 3*PI/4 (135°) + swing
     push();
       translate(-10, 5);
       rotate(3 * PI / 4 + swing);
       line(0, 0, armLength, 0);
       leftHand = p5.Vector.add(createVector(-10, 5), p5.Vector.fromAngle(3 * PI / 4 + swing).mult(armLength));
     pop();
-
+    
+    // Brazo derecho: pivote en (10,5), ángulo base PI/4 (45°) - swing
     push();
       translate(10, 5);
       rotate(PI / 4 - swing);
       line(0, 0, armLength, 0);
       rightHand = p5.Vector.add(createVector(10, 5), p5.Vector.fromAngle(PI / 4 - swing).mult(armLength));
     pop();
-
+    
+    // Dibujar piernas (se mantiene la animación sin uso para el Acha)
     push();
       translate(-5, 30);
       rotate(PI / 2 + swing);
       line(0, 0, legLength, 0);
     pop();
-
+    
     push();
       translate(5, 30);
       rotate(PI / 2 - swing);
       line(0, 0, legLength, 0);
     pop();
   }
-
+  
+  // --- Mostrar Acha en la mano más próxima al árbol más cercano cuando se realiza la acción de talar ---
+  // Se usa un umbral similar al usado en el código principal (50)
   let threshold = 50;
   let chopping = false;
   let nearestTree = null;
   let nearestTreeDist = Infinity;
-
+  // Recorrer el arreglo global de árboles; se usa (t.y + 30) como centro, según el código principal
   for (let t of trees) {
     let d = dist(user.x, user.y, t.x, t.y + 30);
     if (d < nearestTreeDist) {
@@ -69,7 +81,8 @@ function animateLimbs(isMoving) {
   if (nearestTree && nearestTreeDist < threshold) {
     chopping = true;
   }
-
+  
+  // Gestionar el temporizador para mostrar el Acha durante 3 segundos
   if (chopping) {
     if (axeDisplayStart === undefined) {
       axeDisplayStart = millis();
@@ -77,9 +90,11 @@ function animateLimbs(isMoving) {
   } else {
     axeDisplayStart = undefined;
   }
-
+  
   if (axeDisplayStart !== undefined && millis() - axeDisplayStart < 3000) {
+    // Calcular la posición del árbol en coordenadas locales (relativa al usuario)
     let treeLocal = createVector(nearestTree.x - user.x, (nearestTree.y + 30) - user.y);
+    // Comparar distancias desde el árbol a cada mano
     let dLeft = p5.Vector.dist(leftHand, treeLocal);
     let dRight = p5.Vector.dist(rightHand, treeLocal);
     let axePos;
@@ -88,11 +103,11 @@ function animateLimbs(isMoving) {
     } else {
       axePos = rightHand;
     }
-
+    // Dibujar el emoji de Acha sobre la mano seleccionada, agrandado y con un ligero offset para que no quede justo en la esquina inferior derecha
     push();
       textAlign(RIGHT, BOTTOM);
       textSize(20);
-      // Ajuste fino: el emoji ahora se dibuja ligeramente más arriba y a la izquierda de la esquina inferior derecha
+      // Se desplaza 3 píxeles a la izquierda y 3 píxeles hacia arriba del ancla
       text("🪓", axePos.x - 3, axePos.y - 3);
     pop();
   }
