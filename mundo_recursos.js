@@ -45,7 +45,7 @@ function animateLimbs(isMoving) {
       rightHand = p5.Vector.add(createVector(10, 5), p5.Vector.fromAngle(PI / 4 - swing).mult(armLength));
     pop();
     
-    // Dibujar piernas (sin usar para el Acha)
+    // Dibujar piernas (sin uso para el Acha)
     push();
       translate(-5, 30);
       rotate(PI / 2 + swing);
@@ -90,17 +90,17 @@ function animateLimbs(isMoving) {
     let handUsed = (dLeft < dRight) ? "left" : "right";
     let axePos = (handUsed === "left") ? leftHand : rightHand;
 
-    // Dibujar el emoji del Acha con efecto espejo para la mano derecha
     push();
       textSize(24);
       if (handUsed === "right") {
-        // Para la mano derecha se aplica efecto espejo:
-        // Se traslada al punto de la mano, se invierte el eje x y se ajusta el alineamiento.
-        translate(axePos.x, axePos.y);
-        scale(-1, 1);
-        textAlign(LEFT, BOTTOM);
-        // Un ligero offset para ajustar el punto de sostén (1 píxel)
-        text("🪓", 1, -1);
+        // Efecto espejo completo en la mano derecha: ancla desde la esquina inferior derecha.
+        push();
+          translate(axePos.x, axePos.y);
+          scale(-1, 1);
+          textAlign(RIGHT, BOTTOM);
+          // Se aplica un offset sutil para ajustar el punto de sostén
+          text("🪓", -1, -1);
+        pop();
       } else {
         textAlign(RIGHT, BOTTOM);
         text("🪓", axePos.x - 1, axePos.y - 1);
