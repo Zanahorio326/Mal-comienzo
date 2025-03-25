@@ -22,7 +22,7 @@ function animateLimbs(isMoving) {
     leftHand = createVector(-20, 15 + angle);
     rightHand = createVector(20, 15 - angle);
   } else {
-    // Animación para movimiento horizontal: 
+    // Animación para movimiento horizontal:
     // Las extremidades parten de su posición por defecto y se les aplica una rotación pendular
     let maxSwing = 0.35; // ~20° en radianes
     let swing = isMoving ? sin(frameCount * 0.2) * maxSwing : 0;
@@ -98,13 +98,13 @@ function animateLimbs(isMoving) {
           translate(axePos.x, axePos.y);
           scale(-1, 1);
           textAlign(RIGHT, BOTTOM);
-          // Ajuste sutil para acercar el mango del acha
-          text("🪓", -0.5, -0.5);
+          // Se ajusta el offset a +1 para acercar el mango del acha
+          text("🪓", 1, 1);
         pop();
       } else {
         textAlign(RIGHT, BOTTOM);
-        // Ajuste sutil para acercar el mango del acha en la mano izquierda
-        text("🪓", axePos.x - 0.5, axePos.y - 0.5);
+        // Offset de +1 para acercar el mango en la mano izquierda
+        text("🪓", axePos.x + 1, axePos.y + 1);
       }
     pop();
   }
