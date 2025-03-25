@@ -98,12 +98,13 @@ function animateLimbs(isMoving) {
           translate(axePos.x, axePos.y);
           scale(-1, 1);
           textAlign(RIGHT, BOTTOM);
-          // Se aplica un offset sutil para ajustar el punto de sostén
-          text("🪓", -1, -1);
+          // Ajuste sutil para acercar el mango del acha
+          text("🪓", -0.5, -0.5);
         pop();
       } else {
         textAlign(RIGHT, BOTTOM);
-        text("🪓", axePos.x - 1, axePos.y - 1);
+        // Ajuste sutil para acercar el mango del acha en la mano izquierda
+        text("🪓", axePos.x - 0.5, axePos.y - 0.5);
       }
     pop();
   }
